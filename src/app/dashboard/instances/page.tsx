@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "IConsole | Instances",
-  description: "Manage your virtual machine instances",
+  description: "Manage and create your virtual machine instances",
 };
 
 export default function InstancesPage() {
@@ -19,7 +19,7 @@ export default function InstancesPage() {
               Instances
             </h1>
             <p className="text-muted-foreground">
-              Manage and monitor your virtual machine instances
+              Manage, create, and monitor your virtual machine instances
             </p>
           </div>
           <Instances />
