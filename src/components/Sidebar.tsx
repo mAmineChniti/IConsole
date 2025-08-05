@@ -38,7 +38,7 @@ const sidebarItems = [
 ];
 
 const collapsibleRoutes: Record<string, string[]> = {
-  compute: ["/dashboard/instances", "/dashboard/vm"],
+  compute: ["/dashboard/instances", "/dashboard/create-instance"],
 };
 
 export function Sidebar() {
@@ -214,13 +214,15 @@ export function Sidebar() {
                     <Button
                       variant="ghost"
                       className={`w-full justify-start h-9 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white
-                        ${pathname === "/dashboard/vm" ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}
+                        ${pathname === "/dashboard/create-instance" ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}
                       onClick={() => {
-                        router.push("/dashboard/vm");
+                        router.push("/dashboard/create-instance");
                       }}
                     >
                       <MonitorStop className="h-4 w-4 mr-3" />
-                      <span className="text-sm font-medium">VM</span>
+                      <span className="text-sm font-medium">
+                        Create Instance
+                      </span>
                     </Button>
                   </li>
                 </ul>
