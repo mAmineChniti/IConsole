@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 
 import { Sidebar } from "@/components/Sidebar";
 import { VM } from "@/components/VM";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
   title: "IConsole | Create Instance",
@@ -10,9 +11,9 @@ export const metadata: Metadata = {
 
 export default function CreateInstancePage() {
   return (
-    <div className="flex min-h-screen">
+    <SidebarProvider>
       <Sidebar />
-      <main className="flex-1 min-h-screen">
+      <SidebarInset>
         <div className="w-full p-4 sm:p-6 space-y-6">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent select-none">
@@ -24,7 +25,7 @@ export default function CreateInstancePage() {
           </div>
           <VM />
         </div>
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
