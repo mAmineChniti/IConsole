@@ -1,7 +1,6 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import pluginQuery from "@tanstack/eslint-plugin-query";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
 import prettierPlugin from "eslint-plugin-prettier";
 import reactPlugin from "eslint-plugin-react";
@@ -28,7 +27,6 @@ export default tseslint.config(
       ...tseslint.configs.stylisticTypeChecked,
     ],
     plugins: {
-      "@typescript-eslint": typescriptEslint,
       react: reactPlugin,
       "react-hooks": reactHooksPlugin,
       "jsx-a11y": jsxA11yPlugin,
