@@ -5,12 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { imageSchema } from "@/types/RequestSchemas";
+import type { ImageFormData } from "@/types/RequestInterfaces";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 import type { useForm } from "react-hook-form";
-import type z from "zod";
-
-type ImageFormData = z.infer<typeof imageSchema>;
 
 export function ImageStep({
   form,

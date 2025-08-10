@@ -16,12 +16,14 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import type { z } from "zod";
 
-import { InfraService } from "@/lib/requests";
-import { cn } from "@/lib/utils";
-import type { VMCreateRequest } from "@/types/ResponseInterfaces";
-
+import { DetailsStep } from "@/components/DetailsStep";
+import { ErrorCard } from "@/components/ErrorCard";
+import { FlavorStep } from "@/components/FlavorStep";
+import { ImageStep } from "@/components/ImageStep";
+import { ImportVMTab } from "@/components/ImportVMTab";
+import { NetworkStep } from "@/components/NetworkStep";
+import { SummaryStep } from "@/components/SummaryStep";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,6 +33,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { InfraService } from "@/lib/requests";
+import { cn } from "@/lib/utils";
+import type {
+  CombinedVMData,
+  FlavorFormData,
+  ImageFormData,
+  ImportVMFormData,
+  NetworkFormData,
+  VMCreateRequest,
+  VMDetailsFormData,
+} from "@/types/RequestInterfaces";
 import {
   flavorSchema,
   imageSchema,
@@ -38,26 +51,6 @@ import {
   networkSchema,
   vmDetailsSchema,
 } from "@/types/RequestSchemas";
-
-import { DetailsStep } from "@/components/DetailsStep";
-import { ErrorCard } from "@/components/ErrorCard";
-import { FlavorStep } from "@/components/FlavorStep";
-import { ImageStep } from "@/components/ImageStep";
-import { ImportVMTab } from "@/components/ImportVMTab";
-import { NetworkStep } from "@/components/NetworkStep";
-import { SummaryStep } from "@/components/SummaryStep";
-
-type FlavorFormData = z.infer<typeof flavorSchema>;
-type ImageFormData = z.infer<typeof imageSchema>;
-type NetworkFormData = z.infer<typeof networkSchema>;
-type VMDetailsFormData = z.infer<typeof vmDetailsSchema>;
-type ImportVMFormData = z.infer<typeof importVMSchema>;
-
-interface CombinedVMData
-  extends FlavorFormData,
-    ImageFormData,
-    NetworkFormData,
-    VMDetailsFormData {}
 
 type WizardStep = "flavor" | "image" | "network" | "details" | "summary";
 
@@ -159,7 +152,18 @@ export function VM() {
 
   const createVMMutation = useMutation({
     mutationFn: async () => {
-      return InfraService.createVM(combinedData as VMCreateRequest);
+      const requestData: VMCreateRequest = {
+        name: vmDetailsForm.getValues("name"),
+        image_id: imageForm.getValues("image_id"),
+        flavor_id: flavorForm.getValues("flavor_id"),
+        network_id: networkForm.getValues("network_id"),
+        key_name: networkForm.getValues("key_name"),
+        security_group: networkForm.getValues("security_group"),
+        admin_username: vmDetailsForm.getValues("admin_username"),
+        admin_password: vmDetailsForm.getValues("admin_password"),
+      };
+
+      return InfraService.createVM(requestData);
     },
     onSuccess: async (response) => {
       toast.success("VM created successfully!", {
@@ -171,7 +175,6 @@ export function VM() {
       imageForm.reset();
       networkForm.reset();
       vmDetailsForm.reset();
-      // Optionally invalidate queries if needed
       await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
     },
     onError: (error) => {
