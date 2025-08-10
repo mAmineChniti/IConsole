@@ -1,18 +1,15 @@
 "use client";
 
-import { Cpu } from "lucide-react";
+import { Cpu, HardDrive, MemoryStick } from "lucide-react";
 import { type useForm } from "react-hook-form";
-import type { z } from "zod";
 
-import { cn } from "@/lib/utils";
-import type { ResourcesResponse } from "@/types/ResponseInterfaces";
-
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
-import { type flavorSchema } from "@/types/RequestSchemas";
-
-type FlavorFormData = z.infer<typeof flavorSchema>;
+import { cn } from "@/lib/utils";
+import type { FlavorFormData } from "@/types/RequestInterfaces";
+import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 
 export function FlavorStep({
   form,
@@ -32,19 +29,26 @@ export function FlavorStep({
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="border-2">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-muted rounded-full">
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                     <Skeleton className="h-5 w-5" />
                   </div>
-                  <Skeleton className="h-5 w-20" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-4 w-4" />
-                    <Skeleton className="h-4 w-24" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-3 w-12" />
                   </div>
+                </div>
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, j) => (
+                    <div key={j} className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                        <Skeleton className="h-4 w-4" />
+                      </div>
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -62,35 +66,116 @@ export function FlavorStep({
           render={({ field }) => (
             <FormItem>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {resources?.flavors.map((flavor) => (
-                  <Card
-                    key={flavor.id}
-                    className={cn(
-                      "cursor-pointer transition-all hover:shadow-md border-2",
-                      field.value === flavor.id
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                        : "border-border hover:border-border/80",
-                    )}
-                    onClick={() => field.onChange(flavor.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full min-w-[40px] flex justify-center">
-                          <Cpu className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <h3 className="font-semibold">{flavor.name}</h3>
-                      </div>
-                      <div className="space-y-2 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <div className="p-0.5 min-w-[40px] flex justify-center">
-                            <Cpu className="h-4 w-4" />
+                {resources?.flavors.length === 0 ? (
+                  <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                    <div className="rounded-full bg-muted/50 p-3 mb-4">
+                      <Cpu className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">
+                      No flavors available
+                    </h3>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      Contact your administrator to create flavors before you
+                      can launch instances.
+                    </p>
+                  </div>
+                ) : (
+                  resources?.flavors.map((flavor) => (
+                    <Card
+                      key={flavor.id}
+                      className={cn(
+                        "relative cursor-pointer transition-all duration-200 hover:shadow-md",
+                        field.value === flavor.id
+                          ? "ring-2 ring-primary ring-offset-2 border-primary/50"
+                          : "border-border hover:border-primary/30",
+                      )}
+                      onClick={() => field.onChange(flavor.id)}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                              <Cpu className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold leading-none">
+                                {flavor.name}
+                              </h3>
+                              {!flavor.is_public && (
+                                <Badge
+                                  variant="secondary"
+                                  className="mt-1 text-xs"
+                                >
+                                  Private
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <span>Flavor: {flavor.name}</span>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                        <div className="space-y-3 text-sm">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                              <Cpu className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1">
+                              <span className="font-medium">
+                                {flavor.vcpus} vCPU
+                                {flavor.vcpus !== 1 ? "s" : ""}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                              <MemoryStick className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1">
+                              <span className="font-medium">
+                                {(flavor.ram / 1024).toFixed(
+                                  flavor.ram >= 1024 ? 1 : 0,
+                                )}{" "}
+                                {flavor.ram >= 1024 ? "GB" : "MB"} RAM
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                              <HardDrive className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1">
+                              <span className="font-medium">
+                                {flavor.disk} GB Storage
+                              </span>
+                            </div>
+                          </div>
+                          {flavor.ephemeral > 0 && (
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                                <HardDrive className="h-4 w-4 text-muted-foreground/60" />
+                              </div>
+                              <div className="flex-1">
+                                <span className="text-muted-foreground">
+                                  {flavor.ephemeral} GB Ephemeral
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {flavor.swap > 0 && (
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                                <MemoryStick className="h-4 w-4 text-muted-foreground/60" />
+                              </div>
+                              <div className="flex-1">
+                                <span className="text-muted-foreground text-xs">
+                                  {flavor.swap} MB Swap
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
               <FormMessage />
             </FormItem>

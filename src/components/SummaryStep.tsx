@@ -2,12 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import type {
-  flavorSchema,
-  imageSchema,
-  networkSchema,
-  vmDetailsSchema,
-} from "@/types/RequestSchemas";
+import type { CombinedVMData } from "@/types/RequestInterfaces";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 import {
   ArrowLeft,
@@ -18,18 +13,6 @@ import {
   Settings,
   Zap,
 } from "lucide-react";
-import type z from "zod";
-
-type FlavorFormData = z.infer<typeof flavorSchema>;
-type ImageFormData = z.infer<typeof imageSchema>;
-type NetworkFormData = z.infer<typeof networkSchema>;
-type VMDetailsFormData = z.infer<typeof vmDetailsSchema>;
-
-interface CombinedVMData
-  extends FlavorFormData,
-    ImageFormData,
-    NetworkFormData,
-    VMDetailsFormData {}
 export function SummaryStep({
   data,
   resources,
@@ -68,6 +51,42 @@ export function SummaryStep({
                 {selectedFlavor?.name ?? "N/A"}
               </span>
             </div>
+            {selectedFlavor && (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">vCPUs:</span>
+                  <span className="font-medium">{selectedFlavor.vcpus}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">RAM:</span>
+                  <span className="font-medium">
+                    {selectedFlavor.ram >= 1024
+                      ? `${(selectedFlavor.ram / 1024).toFixed(1)} GB`
+                      : `${selectedFlavor.ram} MB`}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Storage:</span>
+                  <span className="font-medium">{selectedFlavor.disk} GB</span>
+                </div>
+                {selectedFlavor.ephemeral > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Ephemeral:</span>
+                    <span className="font-medium">
+                      {selectedFlavor.ephemeral} GB
+                    </span>
+                  </div>
+                )}
+                {selectedFlavor.swap > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Swap:</span>
+                    <span className="font-medium">
+                      {selectedFlavor.swap} MB
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Flavor ID:</span>
               <span className="text-xs font-mono">{data.flavor_id}</span>

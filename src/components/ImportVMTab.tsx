@@ -1,6 +1,5 @@
 import { Download, Loader2, Package, Upload } from "lucide-react";
 import { type useForm } from "react-hook-form";
-import type { z } from "zod";
 
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 
@@ -31,10 +30,8 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { type importVMSchema } from "@/types/RequestSchemas";
+import type { ImportVMFormData } from "@/types/RequestInterfaces";
 import { toast } from "sonner";
-
-type ImportVMFormData = z.infer<typeof importVMSchema>;
 
 export function ImportVMTab({
   form,

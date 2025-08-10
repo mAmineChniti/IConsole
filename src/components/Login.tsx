@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import {
   AlertCircle,
   CheckCircle,
@@ -14,13 +15,13 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
+import { toast } from "sonner";
 
 import { setCookie } from "cookies-next";
 
-import { env } from "@/env";
+import { AuthService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
-import { loginSchema } from "@/types/LoginSchema";
+import { LoginRequestSchema } from "@/types/RequestSchemas";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -46,41 +47,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import type { LoginRequest } from "@/types/RequestInterfaces";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
 
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<LoginRequest>({
+    resolver: zodResolver(LoginRequestSchema),
     defaultValues: {
       username: "",
       password: "",
-      region: "RegionOne",
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    try {
-      const envUsername = env.NEXT_PUBLIC_LOGIN_USERNAME;
-      const envPassword = env.NEXT_PUBLIC_LOGIN_PASSWORD;
-
-      if (data.username !== envUsername || data.password !== envPassword) {
-        form.setError("root", {
-          type: "manual",
-          message: "Invalid username or password. Please try again.",
-        });
-        return;
-      }
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginRequest) => AuthService.login(data),
+    onSuccess: async (response) => {
+      await setCookie("token", response.token, {
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
 
       await setCookie(
         "user",
         JSON.stringify({
-          username: data.username,
-          region: data.region,
+          username: response.username,
+          projects: response.projects,
           loginTime: new Date().toISOString(),
         }),
         {
@@ -91,13 +87,21 @@ export default function Login() {
         },
       );
 
-      router.push("/dashboard/overview");
-    } catch {
-      form.setError("root", {
-        type: "manual",
-        message: "An error occurred during login. Please try again.",
+      toast.success("Login successful!", {
+        description: response.message,
       });
-    }
+
+      router.push("/dashboard/overview");
+    },
+    onError: (error: Error) => {
+      toast.error("Login failed", {
+        description: error.message,
+      });
+    },
+  });
+
+  const onSubmit = async (data: LoginRequest) => {
+    loginMutation.mutate(data);
   };
 
   return (
@@ -139,33 +143,14 @@ export default function Login() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-5"
               >
-                <FormField
-                  control={form.control}
-                  name="region"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                        <Shield className="h-4 w-4" />
-                        Region
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="!h-12 w-full rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 cursor-pointer">
-                            <SelectValue placeholder="Select a region" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="RegionOne">RegionOne</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs text-red-500" />
-                    </FormItem>
-                  )}
-                />
-
+                <Select defaultValue="RegionOne">
+                  <SelectTrigger className="!h-12 w-full rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 cursor-pointer">
+                    <SelectValue placeholder="Select a region" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="RegionOne">RegionOne</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormField
                   control={form.control}
                   name="username"
@@ -241,25 +226,30 @@ export default function Login() {
                   )}
                 />
 
-                {form.formState.errors.root && (
+                {loginMutation.error && (
                   <div className="flex items-center gap-3 p-4 text-sm text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl">
                     <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                    {form.formState.errors.root.message}
+                    {loginMutation.error.message ||
+                      "An error occurred during login. Please try again."}
                   </div>
                 )}
 
                 <Button
                   type="submit"
+                  disabled={loginMutation.isPending}
                   className={cn(
                     "w-full h-12 text-sm font-medium transition-all duration-200 rounded-xl cursor-pointer",
                     "bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700",
                     "text-white shadow-lg",
                     "focus:ring-4 focus:ring-blue-500/20 focus:ring-offset-2",
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
                   )}
                 >
                   <div className="flex items-center gap-2">
                     <LogIn className="w-4 h-4" />
-                    Sign in securely
+                    {loginMutation.isPending
+                      ? "Signing in..."
+                      : "Sign in securely"}
                   </div>
                 </Button>
               </form>

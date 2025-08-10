@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InfraService } from "@/lib/requests";
+import { ImageService, InfraService } from "@/lib/requests";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 
 interface ImportImageForm {
@@ -62,11 +62,11 @@ export function Images() {
 
   const importMutation = useMutation({
     mutationFn: async (formData: ImportImageForm) => {
-      return await InfraService.importImageFromUrl(
-        formData.imageUrl,
-        formData.imageName,
-        formData.visibility,
-      );
+      return await ImageService.importFromUrl({
+        image_url: formData.imageUrl,
+        image_name: formData.imageName,
+        visibility: formData.visibility,
+      });
     },
     onSuccess: () => {
       setImportForm({

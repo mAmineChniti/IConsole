@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const user = request.cookies.get("user");
-  const isLoggedIn = !!user;
+  const token = request.cookies.get("token");
+  const isLoggedIn = !!(user && token);
 
   const protectedRoutes = [
     "/dashboard/overview",

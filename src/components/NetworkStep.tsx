@@ -14,12 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { networkSchema } from "@/types/RequestSchemas";
+import type { NetworkFormData } from "@/types/RequestInterfaces";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 import { Network, Shield } from "lucide-react";
 import { type useForm } from "react-hook-form";
-import type z from "zod";
-type NetworkFormData = z.infer<typeof networkSchema>;
 
 export function NetworkStep({
   form,

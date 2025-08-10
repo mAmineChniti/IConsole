@@ -1,6 +1,5 @@
 import { MonitorStop } from "lucide-react";
-import { type useForm } from "react-hook-form";
-import type { z } from "zod";
+import { type UseFormReturn } from "react-hook-form";
 
 import {
   Form,
@@ -12,14 +11,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { type vmDetailsSchema } from "@/types/RequestSchemas";
-
-type VMDetailsFormData = z.infer<typeof vmDetailsSchema>;
+import type { VMDetailsFormData } from "@/types/RequestInterfaces";
 
 export function DetailsStep({
   form,
 }: {
-  form: ReturnType<typeof useForm<VMDetailsFormData>>;
+  form: UseFormReturn<VMDetailsFormData>;
 }) {
   return (
     <Form {...form}>

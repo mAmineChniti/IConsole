@@ -10,8 +10,25 @@ export type ImageStatus = "active" | "queued" | "saving";
 type ServiceStatus = "enabled" | "disabled";
 type ServiceState = "up" | "down";
 
-export interface AuthPingResponse {
-  message: "auth ok";
+export interface LoginResponse {
+  username: string;
+  token: string;
+  projects: ProjectInfo[];
+  message: string;
+}
+
+export interface ProjectInfo {
+  project_id: string;
+  project_name: string;
+  roles: string[];
+}
+
+export interface ProjectsResponse {
+  projects: ProjectInfo[];
+}
+
+export interface LogoutResponse {
+  message: string;
 }
 
 export interface InstanceListItem {
@@ -74,17 +91,6 @@ export interface InstanceDetailsResponse {
   floating_ips: string[];
 }
 
-export interface VMCreateRequest {
-  name: string;
-  image_id: string;
-  flavor_id: string;
-  network_id: string;
-  key_name: string;
-  security_group: string;
-  admin_password: string;
-  admin_username: string;
-}
-
 export interface VMCreateResponse {
   status: "success";
   server: {
@@ -96,20 +102,6 @@ export interface VMCreateResponse {
     ssh_key: string;
     floating_ip: string;
   };
-}
-
-export interface VMwareImportRequest {
-  vm_name: string;
-  description?: string;
-  min_disk?: number;
-  min_ram?: number;
-  is_public?: boolean;
-  flavor_id: string;
-  network_id: string;
-  key_name: string;
-  security_group: string;
-  admin_password?: string;
-  vmdk_file: File;
 }
 
 export interface VMwareImportResponse {
@@ -126,9 +118,33 @@ export interface VMwareImportResponse {
   };
 }
 
+export interface CreateFromDescriptionResponse {
+  status: "success";
+  server_id: string;
+  server_name: string;
+  image_source: string;
+  flavor: string;
+  networks: NetworkReference[];
+  security_groups: string[];
+  admin_username: string;
+  admin_password: string;
+  floating_ip: string;
+}
+
+export interface NetworkReference {
+  uuid: string;
+}
+
 export interface ResourceFlavor {
   id: string;
   name: string;
+  ram: number;
+  vcpus: number;
+  disk: number;
+  ephemeral: number;
+  swap: number;
+  is_public: boolean;
+  extra_specs: Record<string, unknown>;
 }
 
 export interface ResourceImage {
@@ -157,9 +173,104 @@ export interface ResourcesResponse {
   security_groups: ResourceSecurityGroup[];
 }
 
-export interface QemuImgCheckResponse {
-  installed: boolean;
-  version: string;
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  domain_id: string;
+  enabled: boolean;
+  user_count: number;
+}
+
+export type ProjectListResponse = Project[];
+
+export interface ProjectDetailsResponse extends Project {
+  assignments: UserAssignment[];
+}
+
+export interface UserAssignment {
+  user_id: string;
+  user_name: string;
+  roles: UserRole[];
+}
+
+export interface UserRole {
+  role_id: string;
+  role_name: string;
+}
+
+export interface UnassignedUser {
+  user_id: string;
+  user_name: string;
+}
+
+export type UnassignedUsersResponse = UnassignedUser[];
+
+export interface AssignUserResponse {
+  message: string;
+  user_id: string;
+  project_id: string;
+  roles_assigned: string[];
+}
+
+export interface RemoveUserResponse {
+  message: string;
+  user_id: string;
+  project_id: string;
+  roles_removed: string[];
+}
+
+export interface UpdateUserRolesResponse {
+  message: string;
+  user_id: string;
+  project_id: string;
+  roles_assigned: string[];
+}
+
+export interface ProjectDeleteResponse {
+  message: string;
+}
+
+export interface UserCreateResponse {
+  id: string;
+  name: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  project: string;
+  domain: string;
+  email: string;
+  enabled: boolean;
+}
+
+export type UserListResponse = User[];
+
+export interface UserDetailsResponse {
+  id: string;
+  name: string;
+  email: string;
+  enabled: boolean;
+  default_project_id: string;
+  projects: ProjectInfo[];
+}
+
+export interface UserDeleteResponse {
+  message: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+}
+
+export type RolesResponse = Role[];
+
+export interface ImageImportFromUrlResponse {
+  message: string;
+  image_id: string;
+  format: string;
 }
 
 interface Image {
@@ -177,20 +288,6 @@ interface Instance {
 }
 
 export type NovaInstancesResponse = Instance[];
-
-export interface ImageImportFromUrlResponse {
-  message: string;
-  image_id: string;
-  visibility: string;
-}
-
-export interface UserPingResponse {
-  message: "User service OK";
-}
-
-export interface ProjectPingResponse {
-  message: "Project service is working";
-}
 
 interface PlatformInfo {
   nodes: number;
@@ -258,16 +355,30 @@ export interface DashboardOverviewResponse {
   network_services: NetworkService[];
 }
 
-export interface ImageImportFromUrlResponse {
+export interface NetworkListItem {
+  id: string;
+  name: string;
+  status: string;
+  is_external: boolean;
+  shared: boolean;
+  subnets: string[];
+}
+
+export type NetworkListResponse = NetworkListItem[];
+
+export interface NetworkCreateResponse {
   message: string;
-  image_id: string;
-  visibility: string;
 }
 
-export interface UserPingResponse {
-  message: "User service OK";
+export interface RouterCreateResponse {
+  id: string;
+  name: string;
 }
 
-export interface ProjectPingResponse {
-  message: "Project service is working";
+export interface RouterAddInterfaceResponse {
+  message: string;
+}
+
+export interface NetworkDeleteResponse {
+  message: string;
 }
