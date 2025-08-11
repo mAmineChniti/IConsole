@@ -31,6 +31,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -100,66 +105,86 @@ function InstanceActions({
   return (
     <div className="flex justify-center gap-2 pt-4 mt-4 border-t border-border/50">
       {canStart && (
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            startMutation.mutate(instanceId);
-          }}
-          disabled={startMutation.isPending}
-          size="sm"
-          variant="outline"
-          className="cursor-pointer rounded-full group transition-all duration-200"
-        >
-          <Power className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
-          Start
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                startMutation.mutate(instanceId);
+              }}
+              disabled={startMutation.isPending}
+              size="sm"
+              variant="outline"
+              className="cursor-pointer rounded-full group transition-all duration-200"
+            >
+              <Power className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
+              Start
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Start the instance</TooltipContent>
+        </Tooltip>
       )}
 
       {canStop && (
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            stopMutation.mutate(instanceId);
-          }}
-          disabled={stopMutation.isPending}
-          size="sm"
-          variant="outline"
-          className="cursor-pointer rounded-full group transition-all duration-200"
-        >
-          <PowerOff className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
-          Stop
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                stopMutation.mutate(instanceId);
+              }}
+              disabled={stopMutation.isPending}
+              size="sm"
+              variant="outline"
+              className="cursor-pointer rounded-full group transition-all duration-200"
+            >
+              <PowerOff className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
+              Stop
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Stop the instance</TooltipContent>
+        </Tooltip>
       )}
 
       {canReboot && (
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            rebootMutation.mutate(instanceId);
-          }}
-          disabled={rebootMutation.isPending}
-          size="sm"
-          variant="outline"
-          className="cursor-pointer rounded-full group transition-all duration-200"
-        >
-          <RotateCcw className="h-4 w-4 mr-1 group-hover:rotate-180 transition-transform duration-300" />
-          Reboot
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                rebootMutation.mutate(instanceId);
+              }}
+              disabled={rebootMutation.isPending}
+              size="sm"
+              variant="outline"
+              className="cursor-pointer rounded-full group transition-all duration-200"
+            >
+              <RotateCcw className="h-4 w-4 mr-1 group-hover:rotate-180 transition-transform duration-300" />
+              Reboot
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Reboot the instance</TooltipContent>
+        </Tooltip>
       )}
 
-      <Button
-        onClick={(e) => {
-          e.stopPropagation();
-          deleteMutation.mutate(instanceId);
-        }}
-        disabled={deleteMutation.isPending}
-        size="sm"
-        variant="outline"
-        className="cursor-pointer rounded-full group transition-all duration-200"
-      >
-        <Trash2 className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
-        Delete
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteMutation.mutate(instanceId);
+            }}
+            disabled={deleteMutation.isPending}
+            size="sm"
+            variant="outline"
+            className="cursor-pointer rounded-full group transition-all duration-200"
+          >
+            <Trash2 className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
+            Delete
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Delete the instance</TooltipContent>
+      </Tooltip>
     </div>
   );
 }
@@ -181,7 +206,6 @@ export function Instances() {
     queryFn: () => InfraService.listInstances(),
     refetchInterval: 15000,
     staleTime: 10000,
-    gcTime: 5 * 60 * 1000,
   });
 
   const { data: detailedInstances, isLoading: isLoadingDetails } = useQuery({

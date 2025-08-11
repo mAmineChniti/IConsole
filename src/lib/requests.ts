@@ -46,6 +46,7 @@ import type {
   VMwareImportResponse,
 } from "@/types/ResponseInterfaces";
 import { TFetchClient } from "@thatguyjamal/type-fetch";
+import { getCookie } from "cookies-next";
 
 const API_CONFIG = {
   BASE_URL: env.NEXT_PUBLIC_BACKEND ?? "http://127.0.0.1:8000/api/v1",
@@ -74,7 +75,7 @@ const API_CONFIG = {
     UPDATE_USER_ROLES: "/projects/update-user-roles",
   },
   USERS: {
-    BASE: "/users/",
+    BASE: "/users",
     ROLES: "/users/roles",
   },
   IMAGE: {
@@ -90,6 +91,10 @@ const API_CONFIG = {
 } as const;
 
 const client = new TFetchClient();
+const authHeaders = (): Record<string, string> => {
+  const t = getCookie("token") as string;
+  return t ? { Authorization: `Bearer ${t}` } : {};
+};
 
 export const AuthService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
@@ -101,16 +106,22 @@ export const AuthService = {
     return result.data!;
   },
   async switchProject(data: SwitchProjectRequest): Promise<LoginResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<LoginResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.AUTH.SWITCH_PROJECT,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async getProjects(): Promise<ProjectsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<ProjectsResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.AUTH.PROJECTS,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -127,23 +138,45 @@ export const AuthService = {
 
 export const ProjectService = {
   async list(): Promise<ProjectListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<ProjectListResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
+  async listDetails(): Promise<ProjectDetailsResponse[]> {
+    const projects = await this.list();
+    if (projects.length === 0) return [];
+    const settled = await Promise.allSettled(
+      projects.map((p) => this.get(p.id)),
+    );
+    return settled
+      .filter(
+        (r): r is PromiseFulfilledResult<ProjectDetailsResponse> =>
+          r.status === "fulfilled",
+      )
+      .map((r) => r.value);
+  },
   async create(data: ProjectCreateRequest): Promise<ProjectDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<ProjectDetailsResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async get(projectId: string): Promise<ProjectDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<ProjectDetailsResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + projectId,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -151,10 +184,13 @@ export const ProjectService = {
   async getUnassignedUsers(
     projectId: string,
   ): Promise<UnassignedUsersResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<UnassignedUsersResponse>(
       API_CONFIG.BASE_URL +
         API_CONFIG.PROJECTS.BASE +
         `${projectId}/unassigned_users`,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -162,9 +198,12 @@ export const ProjectService = {
   async assignUser(
     data: AssignUserToProjectRequest,
   ): Promise<AssignUserResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<AssignUserResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.ASSIGN_USER,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -172,9 +211,12 @@ export const ProjectService = {
   async removeUser(
     data: RemoveUserFromProjectRequest,
   ): Promise<RemoveUserResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<RemoveUserResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.REMOVE_USER,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -182,9 +224,12 @@ export const ProjectService = {
   async updateUserRoles(
     data: UpdateUserRolesRequest,
   ): Promise<UpdateUserRolesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.put<UpdateUserRolesResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.UPDATE_USER_ROLES,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -193,16 +238,22 @@ export const ProjectService = {
     projectId: string,
     data: ProjectUpdateRequest,
   ): Promise<ProjectDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.put<ProjectDetailsResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + projectId,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async delete(projectId: string): Promise<ProjectDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.delete<ProjectDeleteResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + projectId,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -211,23 +262,33 @@ export const ProjectService = {
 
 export const UserService = {
   async create(data: UserCreateRequest): Promise<UserCreateResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<UserCreateResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.USERS.BASE,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async list(): Promise<UserListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<UserListResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.USERS.BASE,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
+    console.log(result.data);
     return result.data!;
   },
   async get(userId: string): Promise<UserDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<UserDetailsResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.USERS.BASE + userId,
+      API_CONFIG.BASE_URL + `${API_CONFIG.USERS.BASE}/${userId}`,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -236,23 +297,32 @@ export const UserService = {
     userId: string,
     data: UserUpdateRequest,
   ): Promise<UserDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.put<UserDetailsResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.USERS.BASE + userId,
+      API_CONFIG.BASE_URL + `${API_CONFIG.USERS.BASE}/${userId}`,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async delete(userId: string): Promise<UserDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.delete<UserDeleteResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.USERS.BASE + userId,
+      API_CONFIG.BASE_URL + `${API_CONFIG.USERS.BASE}/${userId}`,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async getRoles(): Promise<RolesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<RolesResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.USERS.ROLES,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;

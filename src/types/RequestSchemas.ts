@@ -46,7 +46,7 @@ export const ProjectAssignmentSchema = z.object({
 });
 
 export const ProjectCreateRequestSchema = z.object({
-  name: z.string(),
+  name: z.string().nonempty(),
   description: z.string().optional(),
   domain_id: z.string().optional(),
   enabled: z.boolean(),

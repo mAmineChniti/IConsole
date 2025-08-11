@@ -12,6 +12,7 @@ export function middleware(request: NextRequest) {
     "/dashboard/instances",
     "/dashboard/create-instance",
     "/dashboard/images",
+    "/dashboard/projects",
   ];
 
   if (pathname === "/") {

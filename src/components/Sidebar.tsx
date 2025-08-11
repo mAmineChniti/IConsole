@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import {
   Combobox,
   ComboboxContent,
+  ComboboxEmpty,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
@@ -39,11 +40,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { AuthService } from "@/lib/requests";
+import type { ProjectInfo } from "@/types/ResponseInterfaces";
+import Link from "next/link";
 
 const sidebarItems = [
   {
@@ -56,7 +57,7 @@ const sidebarItems = [
     icon: HardDrive,
     href: "/dashboard/images",
   },
-];
+] as const;
 
 const computeSubItems = [
   {
@@ -69,15 +70,50 @@ const computeSubItems = [
     icon: MonitorStop,
     href: "/dashboard/create-instance",
   },
-];
+] as const;
 
 export function Sidebar() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [computeOpen, setComputeOpen] = useState(false);
+
+  const initialComputeOpen = computeSubItems.some(
+    (item) => pathname === item.href,
+  );
+  const [computeOpen, setComputeOpen] = useState(initialComputeOpen);
+
   const [selectedProject, setSelectedProject] = useState<string>("");
+  const [user, setUser] = useState<
+    | {
+        username: string;
+        projects: ProjectInfo[];
+        loginTime: string;
+      }
+    | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const savedProject = localStorage.getItem("selectedProject");
+    if (savedProject) {
+      setSelectedProject(savedProject);
+    }
+
+    try {
+      const userCookie = getCookie("user");
+      if (userCookie) {
+        const parsedUser = JSON.parse(userCookie as string) as {
+          username: string;
+          projects: ProjectInfo[];
+          loginTime: string;
+        };
+        setUser(parsedUser);
+      }
+    } catch {
+      setUser(undefined);
+    }
+    setMounted(true);
+  }, []);
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
     queryKey: ["projects"],
@@ -88,7 +124,7 @@ export function Sidebar() {
   const switchProjectMutation = useMutation({
     mutationFn: (projectId: string) =>
       AuthService.switchProject({ project_id: projectId }),
-    onSuccess: async (response) => {
+    onSuccess: async (response, projectId) => {
       await setCookie("token", response.token, {
         maxAge: 60 * 60 * 24 * 7,
         httpOnly: false,
@@ -96,76 +132,54 @@ export function Sidebar() {
         sameSite: "lax",
       });
 
-      await setCookie(
-        "user",
-        JSON.stringify({
-          username: response.username,
-          projects: response.projects,
-          loginTime: new Date().toISOString(),
-        }),
-        {
-          maxAge: 60 * 60 * 24 * 7,
-          httpOnly: false,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-        },
-      );
+      const userData = {
+        username: response.username,
+        projects: response.projects,
+        loginTime: new Date().toISOString(),
+      };
 
-      toast.success("Project switched successfully!", {
-        description: response.message,
+      await setCookie("user", JSON.stringify(userData), {
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
       });
+
+      setSelectedProject(projectId);
+      setUser(userData);
+      localStorage.setItem("selectedProject", projectId);
+
+      toast.success("Project switched successfully!");
     },
     onError: (error: Error) => {
       toast.error("Failed to switch project", {
-        description:
-          error.message || "An error occurred while switching projects.",
+        description: error.message,
       });
     },
   });
 
   const handleProjectChange = (projectId: string) => {
     setSelectedProject(projectId);
+    localStorage.setItem("selectedProject", projectId);
     switchProjectMutation.mutate(projectId);
   };
-
-  const isComputeActive = computeSubItems.some(
-    (item) => pathname === item.href,
-  );
-
-  useEffect(() => {
-    if (isComputeActive) {
-      setComputeOpen(true);
-    }
-    setMounted(true);
-  }, [isComputeActive]);
-
-  let user = undefined;
-  if (typeof window !== "undefined") {
-    try {
-      const userCookie = getCookie("user");
-      if (userCookie) {
-        user = JSON.parse(userCookie as string) as {
-          username: string;
-          region: string;
-          loginTime: string;
-        };
-      }
-    } catch {
-      user = undefined;
-    }
-  }
 
   const logoutMutation = useMutation({
     mutationFn: () => AuthService.logout(),
     onSuccess: async () => {
       await deleteCookie("user");
       await deleteCookie("token");
-      toast.success("Logged out successfully");
+      setUser(undefined);
+      setSelectedProject("");
+      localStorage.removeItem("selectedProject");
       router.push("/login");
     },
     onError: async (error: Error) => {
       await deleteCookie("user");
       await deleteCookie("token");
+      setUser(undefined);
+      setSelectedProject("");
+      localStorage.removeItem("selectedProject");
       toast.error("Logout failed", {
         description: error.message,
       });
@@ -202,7 +216,7 @@ export function Sidebar() {
                   })) ?? []
                 }
                 type="project"
-                defaultValue={selectedProject}
+                value={selectedProject}
                 onValueChange={handleProjectChange}
               >
                 <ComboboxTrigger
@@ -227,16 +241,19 @@ export function Sidebar() {
                       <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
                         Loading projects...
                       </div>
-                    ) : (
-                      projects?.projects?.map((project) => (
+                    ) : projects?.projects && projects.projects.length > 0 ? (
+                      projects.projects.map((project) => (
                         <ComboboxItem
                           key={project.project_id}
                           value={project.project_id}
+                          keywords={[project.project_name]}
                           className="px-3 py-2 text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-700 dark:text-slate-300 rounded-sm mx-1 transition-colors"
                         >
                           {project.project_name}
                         </ComboboxItem>
                       ))
+                    ) : (
+                      <ComboboxEmpty />
                     )}
                   </ComboboxList>
                 </ComboboxContent>
@@ -247,23 +264,18 @@ export function Sidebar() {
               const isActive = pathname === item.href;
               return (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
+                  <Link
+                    href={item.href}
                     className={cn(
-                      "w-full justify-start h-10 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
+                      "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
                       isActive
                         ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
                         : "text-slate-700 dark:text-slate-300",
                     )}
                   >
-                    <Button
-                      variant="ghost"
-                      onClick={() => router.push(item.href)}
-                    >
-                      <item.icon className="h-4 w-4 mr-3" />
-                      <span className="text-sm font-medium">{item.title}</span>
-                    </Button>
-                  </SidebarMenuButton>
+                    <item.icon className="h-4 w-4 mr-3" />
+                    <span className="text-sm font-medium">{item.title}</span>
+                  </Link>
                 </SidebarMenuItem>
               );
             })}
@@ -293,31 +305,45 @@ export function Sidebar() {
                   {computeSubItems.map((subItem) => {
                     const isSubActive = pathname === subItem.href;
                     return (
-                      <SidebarMenuSubItem key={subItem.href}>
-                        <SidebarMenuSubButton
-                          asChild
+                      <SidebarMenuItem key={subItem.href}>
+                        <Link
+                          href={subItem.href}
                           className={cn(
-                            "w-full justify-start h-10 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
+                            "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
                             isSubActive
                               ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
                               : "text-slate-700 dark:text-slate-300",
                           )}
                         >
-                          <Button
-                            variant="ghost"
-                            onClick={() => router.push(subItem.href)}
-                          >
-                            <subItem.icon className="h-4 w-4 mr-3" />
-                            <span className="text-sm font-medium">
-                              {subItem.title}
-                            </span>
-                          </Button>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
+                          <subItem.icon className="h-4 w-4 mr-3" />
+                          <span className="text-sm font-medium">
+                            {subItem.title}
+                          </span>
+                        </Link>
+                      </SidebarMenuItem>
                     );
                   })}
                 </SidebarMenuSub>
               )}
+            </SidebarMenuItem>
+            <SidebarMenuItem key="projects">
+              {(() => {
+                const isActive = pathname === "/dashboard/projects";
+                return (
+                  <Link
+                    href="/dashboard/projects"
+                    className={cn(
+                      "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
+                      isActive
+                        ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
+                        : "text-slate-700 dark:text-slate-300",
+                    )}
+                  >
+                    <LayoutGrid className="h-4 w-4 mr-3" />
+                    <span className="text-sm font-medium">Projects</span>
+                  </Link>
+                );
+              })()}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
@@ -335,9 +361,6 @@ export function Sidebar() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                   {user.username}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                  {user.region}
                 </p>
               </div>
             </div>

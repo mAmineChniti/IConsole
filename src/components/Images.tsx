@@ -109,28 +109,33 @@ export function Images() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-4 w-48" />
-          </div>
+          <Skeleton className="h-4 w-32" />
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-full max-w-md" />
           <Skeleton className="h-10 w-32" />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="border-border/50">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Card
+              key={index}
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+            >
               <CardHeader className="pb-3">
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-2/3" />
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <Skeleton className="h-6 w-3/4" />
                 </div>
-              </CardContent>
+                <Skeleton className="h-4 w-1/2 mt-2" />
+              </CardHeader>
             </Card>
           ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Skeleton className="h-10 w-32" />
         </div>
       </div>
     );
