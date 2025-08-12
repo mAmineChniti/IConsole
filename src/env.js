@@ -17,8 +17,6 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_BACKEND: z.url(),
-    NEXT_PUBLIC_LOGIN_USERNAME: z.string().min(1, "Username is required"),
-    NEXT_PUBLIC_LOGIN_PASSWORD: z.string().min(1, "Password is required"),
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
   },
 
@@ -29,8 +27,6 @@ export const env = createEnv({
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_BACKEND: process.env.NEXT_PUBLIC_BACKEND,
-    NEXT_PUBLIC_LOGIN_USERNAME: process.env.NEXT_PUBLIC_LOGIN_USERNAME,
-    NEXT_PUBLIC_LOGIN_PASSWORD: process.env.NEXT_PUBLIC_LOGIN_PASSWORD,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

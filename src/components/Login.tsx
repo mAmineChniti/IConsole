@@ -86,11 +86,6 @@ export default function Login() {
           sameSite: "lax",
         },
       );
-
-      toast.success("Login successful!", {
-        description: response.message,
-      });
-
       router.push("/dashboard/overview");
     },
     onError: (error: Error) => {
