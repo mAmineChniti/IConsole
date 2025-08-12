@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteCookie, getCookie, setCookie } from "cookies-next";
+import { deleteCookie, setCookie } from "cookies-next";
 import {
   ChevronDown,
   HardDrive,
@@ -19,7 +19,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Combobox,
@@ -40,10 +39,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { AuthService } from "@/lib/requests";
-import type { ProjectInfo } from "@/types/ResponseInterfaces";
 import Link from "next/link";
 
 const sidebarItems = [
@@ -84,42 +81,31 @@ export function Sidebar() {
   const [computeOpen, setComputeOpen] = useState(initialComputeOpen);
 
   const [selectedProject, setSelectedProject] = useState<string>("");
-  const [user, setUser] = useState<
-    | {
-        username: string;
-        projects: ProjectInfo[];
-        loginTime: string;
-      }
-    | undefined
-  >(undefined);
 
   useEffect(() => {
     const savedProject = localStorage.getItem("selectedProject");
-    if (savedProject) {
-      setSelectedProject(savedProject);
-    }
-
-    try {
-      const userCookie = getCookie("user");
-      if (userCookie) {
-        const parsedUser = JSON.parse(userCookie as string) as {
-          username: string;
-          projects: ProjectInfo[];
-          loginTime: string;
-        };
-        setUser(parsedUser);
-      }
-    } catch {
-      setUser(undefined);
-    }
+    if (savedProject) setSelectedProject(savedProject);
     setMounted(true);
   }, []);
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: () => AuthService.getProjects(),
-    enabled: mounted,
   });
+
+  useEffect(() => {
+    if (
+      selectedProject === "" &&
+      projects?.projects &&
+      projects.projects.length > 0
+    ) {
+      const first = projects.projects[0]!.project_id;
+      setSelectedProject(first);
+      if (!localStorage.getItem("selectedProject")) {
+        localStorage.setItem("selectedProject", first);
+      }
+    }
+  }, [selectedProject, projects]);
 
   const switchProjectMutation = useMutation({
     mutationFn: (projectId: string) =>
@@ -133,7 +119,6 @@ export function Sidebar() {
       });
 
       const userData = {
-        username: response.username,
         projects: response.projects,
         loginTime: new Date().toISOString(),
       };
@@ -144,9 +129,7 @@ export function Sidebar() {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
       });
-
       setSelectedProject(projectId);
-      setUser(userData);
       localStorage.setItem("selectedProject", projectId);
 
       toast.success("Project switched successfully!");
@@ -169,7 +152,6 @@ export function Sidebar() {
     onSuccess: async () => {
       await deleteCookie("user");
       await deleteCookie("token");
-      setUser(undefined);
       setSelectedProject("");
       localStorage.removeItem("selectedProject");
       router.push("/login");
@@ -177,7 +159,6 @@ export function Sidebar() {
     onError: async (error: Error) => {
       await deleteCookie("user");
       await deleteCookie("token");
-      setUser(undefined);
       setSelectedProject("");
       localStorage.removeItem("selectedProject");
       toast.error("Logout failed", {
@@ -350,24 +331,6 @@ export function Sidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
-        {mounted && user && (
-          <>
-            <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white text-sm font-medium">
-                  {user.username.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                  {user.username}
-                </p>
-              </div>
-            </div>
-            <SidebarSeparator />
-          </>
-        )}
-
         <SidebarMenuButton
           asChild
           className="w-full h-10 justify-start px-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
