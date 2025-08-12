@@ -111,13 +111,13 @@ export function Projects() {
     error,
     refetch,
   } = useQuery<ProjectDetailsResponse[]>({
-    queryKey: ["projects"],
+    queryKey: ["projects", "details"],
     queryFn: () => ProjectService.listDetails(),
     staleTime: 30000,
     refetchInterval: 60000,
   });
 
-  const projectData = projects ?? [];
+  const projectData = Array.isArray(projects) ? projects : [];
   const isLoadingInitial = isLoading;
   const isRefetching = isFetching;
   const isError = !!error;

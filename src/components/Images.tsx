@@ -291,15 +291,15 @@ export function Images() {
               className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
             >
               <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <GetDistroIcon
                     imageName={typeof image.name === "string" ? image.name : ""}
                   />
-                  <CardTitle className="text-lg font-semibold text-foreground truncate">
+                  <CardTitle className="text-lg font-semibold text-foreground whitespace-normal break-words">
                     {image.name}
                   </CardTitle>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono truncate mt-2 bg-muted/20 px-2 py-1 rounded-md">
+                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded-md">
                   ID: {image.id}
                 </p>
               </CardHeader>
