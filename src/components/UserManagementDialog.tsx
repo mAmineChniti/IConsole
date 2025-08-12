@@ -81,8 +81,12 @@ export function UserManagementDialog({
     mutationFn: (data: AssignUserToProjectRequest) =>
       ProjectService.assignUser(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects"] });
-      await queryClient.invalidateQueries({ queryKey: ["project-details"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", "details"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "projects"],
+      });
       await queryClient.invalidateQueries({ queryKey: ["unassigned-users"] });
       toast.success("User assigned successfully");
       setSelectedUser("");
@@ -97,8 +101,12 @@ export function UserManagementDialog({
     mutationFn: (data: RemoveUserFromProjectRequest) =>
       ProjectService.removeUser(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects"] });
-      await queryClient.invalidateQueries({ queryKey: ["project-details"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", "details"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "projects"],
+      });
       await queryClient.invalidateQueries({ queryKey: ["unassigned-users"] });
       toast.success("User removed successfully");
     },
@@ -111,8 +119,12 @@ export function UserManagementDialog({
     mutationFn: (data: UpdateUserRolesRequest) =>
       ProjectService.updateUserRoles(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects"] });
-      await queryClient.invalidateQueries({ queryKey: ["project-details"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", "details"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "projects"],
+      });
       toast.success("User roles updated successfully");
       setEditingUser(undefined);
     },

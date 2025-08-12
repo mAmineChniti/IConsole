@@ -89,7 +89,7 @@ export function Sidebar() {
   }, []);
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
-    queryKey: ["projects"],
+    queryKey: ["auth", "projects"],
     queryFn: () => AuthService.getProjects(),
   });
 
