@@ -11,7 +11,6 @@ type ServiceStatus = "enabled" | "disabled";
 type ServiceState = "up" | "down";
 
 export interface LoginResponse {
-  username: string;
   token: string;
   projects: ProjectInfo[];
   message: string;
