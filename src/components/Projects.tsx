@@ -126,7 +126,12 @@ export function Projects() {
   const deleteMutation = useMutation({
     mutationFn: (projectId: string) => ProjectService.delete(projectId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", "details"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "projects"],
+      });
       toast.success("Project deleted successfully");
       setShowDeleteDialog(false);
       setProjectToDelete(undefined);

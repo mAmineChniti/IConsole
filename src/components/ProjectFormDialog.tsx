@@ -89,7 +89,12 @@ export function ProjectFormDialog({
   const createMutation = useMutation({
     mutationFn: (data: ProjectCreateRequest) => ProjectService.create(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", "details"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "projects"],
+      });
       toast.success("Project created successfully");
       onOpenChange(false);
       form.reset();
@@ -104,7 +109,12 @@ export function ProjectFormDialog({
     mutationFn: ({ id, ...data }: ProjectUpdateRequest & { id: string }) =>
       ProjectService.update(id, data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", "details"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "projects"],
+      });
       toast.success("Project updated successfully");
       onOpenChange(false);
       form.reset();
