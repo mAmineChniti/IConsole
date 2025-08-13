@@ -75,7 +75,7 @@ const API_CONFIG = {
     UPDATE_USER_ROLES: "/projects/update-user-roles",
   },
   USERS: {
-    BASE: "/users",
+    BASE: "/users/users",
     ROLES: "/users/roles",
   },
   IMAGE: {
@@ -138,11 +138,9 @@ export const AuthService = {
 
 export const ProjectService = {
   async list(): Promise<ProjectListResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<ProjectListResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE,
-      { headers: token },
+      { headers: { Accept: "application/json" } },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
