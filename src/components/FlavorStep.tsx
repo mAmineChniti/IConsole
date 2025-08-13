@@ -29,7 +29,10 @@ export function FlavorStep({
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="border-2">
+            <Card
+              key={i}
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+            >
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">

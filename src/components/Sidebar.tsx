@@ -6,14 +6,17 @@ import { deleteCookie, setCookie } from "cookies-next";
 import {
   Boxes,
   ChevronDown,
+  Globe,
   Image as ImageIcon,
   LayoutDashboard,
   LogOut,
   Moon,
+  Plus,
   Server,
-  ServerCog,
   Shield,
   Sun,
+  Users as UsersIcon,
+  Zap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
@@ -51,9 +54,27 @@ const sidebarItems = [
     href: "/dashboard/overview",
   },
   {
+    title: "Projects",
+    icon: Boxes,
+    href: "/dashboard/projects",
+  },
+  {
     title: "Images",
     icon: ImageIcon,
     href: "/dashboard/images",
+  },
+  {
+    title: "Users",
+    icon: UsersIcon,
+    href: "/dashboard/users",
+  },
+] as const;
+
+const networkingItems = [
+  {
+    title: "Networks",
+    icon: Globe,
+    href: "/dashboard/networks",
   },
 ] as const;
 
@@ -65,8 +86,13 @@ const computeSubItems = [
   },
   {
     title: "Create Instance",
-    icon: ServerCog,
+    icon: Plus,
     href: "/dashboard/create-instance",
+  },
+  {
+    title: "Scaling",
+    icon: Zap,
+    href: "/dashboard/scale",
   },
 ] as const;
 
@@ -74,7 +100,6 @@ export function Sidebar() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
 
   const initialComputeOpen = computeSubItems.some(
     (item) => pathname === item.href,
@@ -86,7 +111,6 @@ export function Sidebar() {
   useEffect(() => {
     const savedProject = localStorage.getItem("selectedProject");
     if (savedProject) setSelectedProject(savedProject);
-    setMounted(true);
   }, []);
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
@@ -308,12 +332,13 @@ export function Sidebar() {
                 </SidebarMenuSub>
               )}
             </SidebarMenuItem>
-            <SidebarMenuItem key="projects">
-              {(() => {
-                const isActive = pathname === "/dashboard/projects";
-                return (
+
+            {networkingItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <SidebarMenuItem key={item.href}>
                   <Link
-                    href="/dashboard/projects"
+                    href={item.href}
                     className={cn(
                       "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
                       isActive
@@ -321,12 +346,12 @@ export function Sidebar() {
                         : "text-slate-700 dark:text-slate-300",
                     )}
                   >
-                    <Boxes className="h-4 w-4 mr-3" />
-                    <span className="text-sm font-medium">Projects</span>
+                    <item.icon className="h-4 w-4 mr-3" />
+                    <span className="text-sm font-medium">{item.title}</span>
                   </Link>
-                );
-              })()}
-            </SidebarMenuItem>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
@@ -340,13 +365,13 @@ export function Sidebar() {
             variant="ghost"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            {mounted && theme === "dark" ? (
+            {theme === "dark" ? (
               <Sun className="h-4 w-4 mr-3" />
             ) : (
               <Moon className="h-4 w-4 mr-3" />
             )}
             <span className="text-sm font-medium">
-              {mounted && theme === "dark" ? "Light Mode" : "Dark Mode"}
+              {theme === "dark" ? "Light Mode" : "Dark Mode"}
             </span>
           </Button>
         </SidebarMenuButton>

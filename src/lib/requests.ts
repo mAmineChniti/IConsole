@@ -1,6 +1,8 @@
 import { env } from "@/env";
 import type {
   AssignUserToProjectRequest,
+  CreateFromDescriptionRequest,
+  ImageImportFromNameRequest,
   ImageImportFromUrlRequest,
   LoginRequest,
   NetworkCreateRequest,
@@ -9,6 +11,8 @@ import type {
   RemoveUserFromProjectRequest,
   RouterAddInterfaceRequest,
   RouterCreateRequest,
+  ScaleNodeRequest,
+  SendTestEmailRequest,
   SwitchProjectRequest,
   UpdateUserRolesRequest,
   UserCreateRequest,
@@ -17,7 +21,10 @@ import type {
 } from "@/types/RequestInterfaces";
 import type {
   AssignUserResponse,
+  CreateFromDescriptionResponse,
   DashboardOverviewResponse,
+  DebugRoleAssignmentsResponse,
+  ImageImportFromNameResponse,
   ImageImportFromUrlResponse,
   InstanceDetailsResponse,
   InstanceListResponse,
@@ -31,11 +38,15 @@ import type {
   ProjectDetailsResponse,
   ProjectListResponse,
   ProjectsResponse,
+  QemuImgCheckResponse,
   RemoveUserResponse,
   ResourcesResponse,
   RolesResponse,
   RouterAddInterfaceResponse,
   RouterCreateResponse,
+  ScaleHealthResponse,
+  ScaleNodeResponse,
+  SendTestEmailResponse,
   UnassignedUsersResponse,
   UpdateUserRolesResponse,
   UserCreateResponse,
@@ -60,26 +71,31 @@ const API_CONFIG = {
     INSTANCES: "/nova/instances",
     INSTANCE_DETAILS: "/nova/servers",
     CREATE_VM: "/nova/create-vm",
+    CREATE_FROM_DESCRIPTION: "/nova/create-from-description",
     IMPORT_VMWARE: "/nova/import-vmware-vm",
     START_INSTANCE: "/nova/start",
     STOP_INSTANCE: "/nova/stop",
     REBOOT_INSTANCE: "/nova/reboot",
     DELETE_INSTANCE: "/nova/delete",
     RESOURCES: "/nova/resources",
+    CHECK_QEMU: "/nova/check-qemu-img",
     OVERVIEW: "/dashboard/overview",
   },
   PROJECTS: {
     BASE: "/projects/",
-    ASSIGN_USER: "/projects/assign-user",
-    REMOVE_USER: "/projects/remove-user",
-    UPDATE_USER_ROLES: "/projects/update-user-roles",
+    ASSIGN_USER: "/projects/projects/assign-user",
+    REMOVE_USER: "/projects/projects/remove-user",
+    UPDATE_USER_ROLES: "/projects/projects/update-user-roles",
   },
   USERS: {
     BASE: "/users/users",
     ROLES: "/users/roles",
+    DEBUG_ROLE_ASSIGNMENTS: "/users/debug_role_assignments",
+    PROJECTS: "/users/projects",
   },
   IMAGE: {
     IMPORT_FROM_URL: "/image/images/import-from-url",
+    IMPORT_FROM_NAME: "/image/images/import-from-name",
   },
   NETWORK: {
     LIST: "/network/list",
@@ -87,6 +103,11 @@ const API_CONFIG = {
     ROUTER_CREATE: "/network/router/create",
     ROUTER_ADD_INTERFACE: "/network/router/",
     DELETE: "/network/delete/",
+  },
+  SCALE: {
+    HEALTH: "/scale/",
+    NODE: "/scale/node",
+    SEND_TEST_EMAIL: "/scale/send_test_email",
   },
 } as const;
 
@@ -325,6 +346,30 @@ export const UserService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
+  async debugRoleAssignments(
+    userId: string,
+  ): Promise<DebugRoleAssignmentsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<DebugRoleAssignmentsResponse>(
+      API_CONFIG.BASE_URL +
+        API_CONFIG.USERS.DEBUG_ROLE_ASSIGNMENTS +
+        `/${userId}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async listUserProjects(): Promise<ProjectListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<ProjectListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.USERS.PROJECTS,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
 };
 
 export const ImageService = {
@@ -336,6 +381,20 @@ export const ImageService = {
       API_CONFIG.IMAGE.IMPORT_FROM_URL +
       `?image_url=${encodeURIComponent(params.image_url)}&image_name=${encodeURIComponent(params.image_name)}${params.visibility ? `&visibility=${params.visibility}` : ""}`;
     const result = await client.post<ImageImportFromUrlResponse>(url, {
+      type: "json",
+      data: {},
+    });
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async importFromName(
+    params: ImageImportFromNameRequest,
+  ): Promise<ImageImportFromNameResponse> {
+    const url =
+      API_CONFIG.BASE_URL +
+      API_CONFIG.IMAGE.IMPORT_FROM_NAME +
+      `?description=${encodeURIComponent(params.description)}${params.visibility ? `&visibility=${params.visibility}` : ""}`;
+    const result = await client.post<ImageImportFromNameResponse>(url, {
       type: "json",
       data: {},
     });
@@ -436,6 +495,35 @@ export const InfraService = {
     }
     return result.data;
   },
+  async createFromDescription(
+    data: CreateFromDescriptionRequest,
+  ): Promise<CreateFromDescriptionResponse> {
+    const result = await client.post<CreateFromDescriptionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.CREATE_FROM_DESCRIPTION,
+      { type: "json", data },
+    );
+    if (result.error) {
+      throw new Error(
+        `Error creating from description: ${result.error.message}`,
+      );
+    }
+    if (!result.data) {
+      throw new Error("No data received from create-from-description endpoint");
+    }
+    return result.data;
+  },
+  async checkQemuImg(): Promise<QemuImgCheckResponse> {
+    const result = await client.get<QemuImgCheckResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.CHECK_QEMU,
+    );
+    if (result.error) {
+      throw new Error(`Error checking qemu-img: ${result.error.message}`);
+    }
+    if (!result.data) {
+      throw new Error("No data received from qemu check endpoint");
+    }
+    return result.data;
+  },
 
   async importVMwareVM(formData: FormData): Promise<VMwareImportResponse> {
     const result = await client.post<VMwareImportResponse>(
@@ -530,5 +618,33 @@ export const InfraService = {
       throw new Error("No data received from overview endpoint");
     }
     return result.data;
+  },
+};
+
+export const ScaleService = {
+  async health(): Promise<ScaleHealthResponse> {
+    const result = await client.get<ScaleHealthResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.SCALE.HEALTH,
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async addNode(data: ScaleNodeRequest): Promise<ScaleNodeResponse> {
+    const result = await client.post<ScaleNodeResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.SCALE.NODE,
+      { type: "json", data },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async sendTestEmail(
+    data: SendTestEmailRequest,
+  ): Promise<SendTestEmailResponse> {
+    const result = await client.post<SendTestEmailResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.SCALE.SEND_TEST_EMAIL,
+      { type: "json", data },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
   },
 };

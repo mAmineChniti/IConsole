@@ -1,12 +1,3 @@
-export type InstanceStatus =
-  | "ACTIVE"
-  | "SHUTOFF"
-  | "ERROR"
-  | "BUILD"
-  | "DELETED";
-
-export type ImageStatus = "active" | "queued" | "saving";
-
 type ServiceStatus = "enabled" | "disabled";
 type ServiceState = "up" | "down";
 
@@ -16,7 +7,7 @@ export interface LoginResponse {
   message: string;
 }
 
-export interface ProjectInfo {
+interface ProjectInfo {
   project_id: string;
   project_name: string;
   roles: string[];
@@ -30,7 +21,7 @@ export interface LogoutResponse {
   message: string;
 }
 
-export interface InstanceListItem {
+interface InstanceListItem {
   instance_name: string;
   image_name: string;
   ip_address: string;
@@ -50,25 +41,25 @@ export interface NovaActionResponse {
   message: string;
 }
 
-export interface FlavorDetails {
+interface FlavorDetails {
   name: string;
   ram: string;
   vcpus: number;
   disk: string;
 }
 
-export interface ImageDetails {
+interface ImageDetails {
   name: string;
   id: string;
 }
 
-export interface NetworkDetails {
+interface NetworkDetails {
   network: string;
   ip: string;
   type: string;
 }
 
-export interface VolumeDetails {
+interface VolumeDetails {
   id: string;
   name: string;
   size: string;
@@ -130,11 +121,11 @@ export interface CreateFromDescriptionResponse {
   floating_ip: string;
 }
 
-export interface NetworkReference {
+interface NetworkReference {
   uuid: string;
 }
 
-export interface ResourceFlavor {
+interface ResourceFlavor {
   id: string;
   name: string;
   ram: number;
@@ -146,21 +137,21 @@ export interface ResourceFlavor {
   extra_specs: Record<string, unknown>;
 }
 
-export interface ResourceImage {
+interface ResourceImage {
   id: string;
   name: string;
 }
 
-export interface ResourceNetwork {
+interface ResourceNetwork {
   id: string;
   name: string;
 }
 
-export interface ResourceKeypair {
+interface ResourceKeypair {
   name: string;
 }
 
-export interface ResourceSecurityGroup {
+interface ResourceSecurityGroup {
   name: string;
 }
 
@@ -172,7 +163,7 @@ export interface ResourcesResponse {
   security_groups: ResourceSecurityGroup[];
 }
 
-export interface Project {
+interface Project {
   id: string;
   name: string;
   description: string;
@@ -198,7 +189,7 @@ export interface UserRole {
   role_name: string;
 }
 
-export interface UnassignedUser {
+interface UnassignedUser {
   user_id: string;
   user_name: string;
 }
@@ -235,7 +226,7 @@ export interface UserCreateResponse {
   name: string;
 }
 
-export interface User {
+interface User {
   id: string;
   name: string;
   project: string;
@@ -259,7 +250,7 @@ export interface UserDeleteResponse {
   message: string;
 }
 
-export interface Role {
+interface Role {
   id: string;
   name: string;
 }
@@ -272,22 +263,10 @@ export interface ImageImportFromUrlResponse {
   format: string;
 }
 
-interface Image {
-  id: string;
-  name: string;
-  status: ImageStatus;
+export interface ImageImportFromNameResponse
+  extends ImageImportFromUrlResponse {
+  source_url: string;
 }
-
-export type ImageListResponse = Image[];
-
-interface Instance {
-  id: string;
-  name: string;
-  status: InstanceStatus;
-}
-
-export type NovaInstancesResponse = Instance[];
-
 interface PlatformInfo {
   nodes: number;
   projects: number;
@@ -354,7 +333,7 @@ export interface DashboardOverviewResponse {
   network_services: NetworkService[];
 }
 
-export interface NetworkListItem {
+interface NetworkListItem {
   id: string;
   name: string;
   status: string;
@@ -380,4 +359,35 @@ export interface RouterAddInterfaceResponse {
 
 export interface NetworkDeleteResponse {
   message: string;
+}
+
+export interface QemuImgCheckResponse {
+  installed: boolean;
+  version?: string;
+}
+
+export interface ScaleNodeResponse {
+  message: string;
+  hostname: string;
+  ip: string;
+  deploy_tag: string;
+  logs?: string;
+}
+
+export interface ScaleHealthResponse {
+  status: string;
+}
+
+export interface SendTestEmailResponse {
+  message: string;
+  to: string;
+}
+
+export interface DebugRoleAssignmentsResponse {
+  user_id: string;
+  assignments: Array<{
+    project_id: string;
+    project_name?: string;
+    roles: string[];
+  }>;
 }

@@ -14,22 +14,8 @@ export interface VMCreateRequest {
   network_id: string;
   key_name: string;
   security_group: string;
-  admin_password: string;
-  admin_username: string;
-}
-
-export interface VMwareImportRequest {
-  vm_name: string;
-  description?: string;
-  min_disk?: number;
-  min_ram?: number;
-  is_public?: boolean;
-  flavor_id: string;
-  network_id: string;
-  key_name: string;
-  security_group: string;
-  admin_password: string;
-  vmdk_file: File;
+  admin_password?: string;
+  admin_username?: string;
 }
 
 export interface CreateFromDescriptionRequest {
@@ -43,7 +29,7 @@ export interface ProjectCreateRequest {
   description?: string;
   domain_id?: string;
   enabled: boolean;
-  assignments: ProjectAssignment[];
+  assignments?: ProjectAssignment[];
 }
 
 export interface ProjectAssignment {
@@ -76,7 +62,7 @@ export interface UpdateUserRolesRequest {
 
 export interface UserCreateRequest {
   name: string;
-  email: string;
+  email?: string;
   password: string;
   project_id?: string;
   roles: string[];
@@ -89,8 +75,7 @@ export interface UserUpdateRequest {
   enabled?: boolean;
   projects?: UserProjectAssignment[];
 }
-
-export interface UserProjectAssignment {
+interface UserProjectAssignment {
   project_id: string;
   roles: string[];
 }
@@ -98,6 +83,10 @@ export interface UserProjectAssignment {
 export interface ImageImportFromUrlRequest {
   image_url: string;
   image_name: string;
+  visibility?: "private" | "public";
+}
+export interface ImageImportFromNameRequest {
+  description: string;
   visibility?: "private" | "public";
 }
 
@@ -110,10 +99,9 @@ export interface NetworkCreateRequest {
   availability_zone_hints?: string[];
   subnet?: SubnetCreateRequest;
 }
-
-export interface SubnetCreateRequest {
+interface SubnetCreateRequest {
   name: string;
-  ip_version: number;
+  ip_version: 4 | 6;
   cidr: string;
   gateway_ip: string;
   enable_dhcp: boolean;
@@ -121,8 +109,7 @@ export interface SubnetCreateRequest {
   dns_nameservers: string[];
   host_routes: string[];
 }
-
-export interface AllocationPool {
+interface AllocationPool {
   start: string;
   end: string;
 }
@@ -173,3 +160,19 @@ export interface CombinedVMData
     ImageFormData,
     NetworkFormData,
     VMDetailsFormData {}
+
+// Scale service requests
+export interface ScaleNodeRequest {
+  ip: string;
+  hostname: string;
+  type: "control" | "compute" | "storage";
+  neutron_external_interface: string;
+  network_interface: string;
+  ssh_user: string;
+  ssh_password: string;
+  deploy_tag: string;
+}
+
+export interface SendTestEmailRequest {
+  to?: string;
+}

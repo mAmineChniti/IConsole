@@ -75,7 +75,6 @@ export default function Login() {
       await setCookie(
         "user",
         JSON.stringify({
-          username: response.username,
           projects: response.projects,
           loginTime: new Date().toISOString(),
         }),
