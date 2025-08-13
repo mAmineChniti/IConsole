@@ -4,13 +4,14 @@ import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteCookie, setCookie } from "cookies-next";
 import {
+  Boxes,
   ChevronDown,
-  HardDrive,
-  LayoutGrid,
+  Image as ImageIcon,
+  LayoutDashboard,
   LogOut,
-  MonitorStop,
   Moon,
   Server,
+  ServerCog,
   Shield,
   Sun,
 } from "lucide-react";
@@ -46,12 +47,12 @@ import Link from "next/link";
 const sidebarItems = [
   {
     title: "Overview",
-    icon: LayoutGrid,
+    icon: LayoutDashboard,
     href: "/dashboard/overview",
   },
   {
     title: "Images",
-    icon: HardDrive,
+    icon: ImageIcon,
     href: "/dashboard/images",
   },
 ] as const;
@@ -64,7 +65,7 @@ const computeSubItems = [
   },
   {
     title: "Create Instance",
-    icon: MonitorStop,
+    icon: ServerCog,
     href: "/dashboard/create-instance",
   },
 ] as const;
@@ -320,7 +321,7 @@ export function Sidebar() {
                         : "text-slate-700 dark:text-slate-300",
                     )}
                   >
-                    <LayoutGrid className="h-4 w-4 mr-3" />
+                    <Boxes className="h-4 w-4 mr-3" />
                     <span className="text-sm font-medium">Projects</span>
                   </Link>
                 );
