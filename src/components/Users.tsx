@@ -2,13 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, Plus, RefreshCw, Shield, Trash2, User } from "lucide-react";
+import { Edit, Plus, RefreshCw, Shield, Trash2, User, X } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { UserService } from "@/lib/requests";
+import { AuthService, UserService } from "@/lib/requests";
 import type {
+  ProjectsResponse,
   RolesResponse,
   UserDetailsResponse,
   UserListResponse,
@@ -35,6 +36,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -59,6 +67,7 @@ export function UsersManager() {
   const [editingUser, setEditingUser] = useState<
     UserDetailsResponse | undefined
   >();
+  const [projectsModified, setProjectsModified] = useState(false);
 
   const createForm = useForm<UserCreateRequest>({
     resolver: zodResolver(UserCreateRequestSchema),
@@ -66,6 +75,7 @@ export function UsersManager() {
       name: "",
       email: "",
       password: "",
+      project_id: "",
       roles: ["member"],
     },
   });
@@ -76,7 +86,18 @@ export function UsersManager() {
       name: "",
       email: "",
       password: "",
+      projects: undefined,
     },
+  });
+
+  const {
+    fields: projectFields,
+    append: appendProject,
+    remove: removeProject,
+    update: updateProject,
+  } = useFieldArray({
+    control: editForm.control,
+    name: "projects",
   });
 
   const {
@@ -98,6 +119,12 @@ export function UsersManager() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: availableProjects } = useQuery<ProjectsResponse>({
+    queryKey: ["auth", "projects"],
+    queryFn: () => AuthService.getProjects(),
+    staleTime: 5 * 60 * 1000,
+  });
+
   const createMutation = useMutation({
     mutationFn: async () => {
       const values = createForm.getValues();
@@ -110,6 +137,7 @@ export function UsersManager() {
         name: "",
         email: "",
         password: "",
+        project_id: "",
         roles: ["member"],
       });
       await queryClient.invalidateQueries({ queryKey: ["users", "list"] });
@@ -121,15 +149,28 @@ export function UsersManager() {
     mutationFn: async () => {
       if (!editingUser) throw new Error("No user selected");
       const values = editForm.getValues();
+
+      let projectsToSend: typeof values.projects = undefined;
+
+      if (projectsModified) {
+        const projects = values.projects;
+        projectsToSend =
+          projects && projects.length > 0
+            ? projects.filter((p) => p.project_id && p.project_id.trim() !== "")
+            : [];
+      }
+
       return UserService.update(editingUser.id, {
         name: values.name ?? undefined,
         email: values.email ?? undefined,
         password: values.password ?? undefined,
+        ...(projectsModified && { projects: projectsToSend }),
       });
     },
     onSuccess: async () => {
       toast.success("User updated");
       setEditingUser(undefined);
+      setProjectsModified(false);
       editForm.reset();
       await queryClient.invalidateQueries({ queryKey: ["users", "list"] });
     },
@@ -154,10 +195,15 @@ export function UsersManager() {
     try {
       const details = await UserService.get(id);
       setEditingUser(details);
+      setProjectsModified(false);
       editForm.reset({
         name: details.name,
         email: details.email,
         password: "",
+        projects: details.projects.map((p) => ({
+          project_id: p.project_id,
+          roles: p.roles,
+        })),
       });
     } catch (e) {
       toast.error((e as Error).message);
@@ -327,8 +373,8 @@ export function UsersManager() {
           <DialogHeader>
             <DialogTitle>Create User</DialogTitle>
             <DialogDescription>
-              Provide basic user information. Role assignments beyond the
-              default project can be managed later.
+              Create a new user and assign them to a project with specific
+              roles.
             </DialogDescription>
           </DialogHeader>
           <Form {...createForm}>
@@ -385,6 +431,31 @@ export function UsersManager() {
               />
               <FormField
                 control={createForm.control}
+                name="project_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Project</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a project (optional)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">No project</SelectItem>
+                        {availableProjects?.projects?.map((p) => (
+                          <SelectItem key={p.project_id} value={p.project_id}>
+                            {p.project_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={createForm.control}
                 name="roles"
                 render={({ field }) => {
                   const current = field.value || [];
@@ -396,7 +467,7 @@ export function UsersManager() {
                   };
                   return (
                     <FormItem>
-                      <FormLabel>Roles (default project)</FormLabel>
+                      <FormLabel>Roles</FormLabel>
                       <div className="flex flex-wrap gap-2">
                         {roles && roles.length > 0 ? (
                           roles.map((r) => {
@@ -446,14 +517,17 @@ export function UsersManager() {
       <Dialog
         open={!!editingUser}
         onOpenChange={(o) => {
-          if (!o) setEditingUser(undefined);
+          if (!o) {
+            setEditingUser(undefined);
+            setProjectsModified(false);
+          }
         }}
       >
         <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
-              Update basic attributes for the user.
+              Update user information and manage project assignments with roles.
             </DialogDescription>
           </DialogHeader>
           <Form {...editForm}>
@@ -500,11 +574,174 @@ export function UsersManager() {
                   </FormItem>
                 )}
               />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Project Assignments
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Assign projects and roles. Click role badges to toggle, use
+                    X button to remove project assignments.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {projectFields.map((field, index) => (
+                    <div
+                      key={field.id}
+                      className="p-3 border rounded-md space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">
+                          Project #{index + 1}
+                        </span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                removeProject(index);
+                                setProjectsModified(true);
+                              }}
+                              className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Remove project assignment
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-muted-foreground">
+                          Project
+                        </label>
+                        <Select
+                          value={field.project_id}
+                          onValueChange={(value) => {
+                            if (
+                              value &&
+                              projectFields.some(
+                                (p, i) => i !== index && p.project_id === value,
+                              )
+                            ) {
+                              toast.error("This project is already assigned");
+                              return;
+                            }
+                            const updatedField = {
+                              ...field,
+                              project_id: value,
+                              ...(value === "" && { roles: [] }),
+                            };
+                            updateProject(index, updatedField);
+                            setProjectsModified(true);
+                          }}
+                        >
+                          <SelectTrigger className="w-full mt-1 text-sm">
+                            <SelectValue placeholder="Select a project" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">No project</SelectItem>
+                            {availableProjects?.projects?.map((p) => (
+                              <SelectItem
+                                key={p.project_id}
+                                value={p.project_id}
+                              >
+                                {p.project_name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-muted-foreground">
+                          Roles (click to toggle)
+                        </label>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {roles?.map((role) => {
+                            const isSelected = field.roles.includes(role.name);
+                            return (
+                              <Tooltip key={role.id}>
+                                <TooltipTrigger asChild>
+                                  <Badge
+                                    variant={isSelected ? "default" : "outline"}
+                                    onClick={() => {
+                                      const newRoles = isSelected
+                                        ? field.roles.filter(
+                                            (r) => r !== role.name,
+                                          )
+                                        : [...field.roles, role.name];
+                                      const updatedField = {
+                                        ...field,
+                                        roles: newRoles,
+                                      };
+                                      updateProject(index, updatedField);
+                                      setProjectsModified(true);
+                                    }}
+                                    className="cursor-pointer select-none text-xs hover:opacity-80 transition-opacity"
+                                  >
+                                    {role.name}
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {isSelected
+                                    ? `Remove ${role.name} role`
+                                    : `Add ${role.name} role`}
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                        {field.roles.length === 0 && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            No roles assigned. Click role badges above to
+                            assign.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {projectFields.length === 0 && (
+                    <div className="text-center py-4 text-muted-foreground text-sm border-2 border-dashed border-muted-foreground/20 rounded-md">
+                      No project assignments yet. Use the button below to add
+                      project assignments.
+                    </div>
+                  )}
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (projectFields.some((p) => !p.project_id)) {
+                        toast.message(
+                          "Finish selecting a project before adding another assignment",
+                        );
+                        return;
+                      }
+                      appendProject({ project_id: "", roles: [] });
+                      setProjectsModified(true);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Project Assignment
+                  </Button>
+                </div>
+              </div>
               <DialogFooter className="gap-2">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setEditingUser(undefined)}
+                  onClick={() => {
+                    setEditingUser(undefined);
+                    setProjectsModified(false);
+                  }}
                   className="cursor-pointer"
                 >
                   Cancel
