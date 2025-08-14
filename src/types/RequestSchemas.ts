@@ -1,178 +1,563 @@
 import * as z from "zod";
 
 export const LoginRequestSchema = z.object({
-  username: z.string(),
-  password: z.string(),
+  username: z
+    .string()
+    .min(2, "Username must be at least 2 characters")
+    .max(32, "Username cannot exceed 32 characters")
+    .regex(
+      /^[a-zA-Z][a-zA-Z0-9._-]*$/,
+      "Username must start with a letter and contain only alphanumeric, dot, underscore, or hyphen",
+    )
+    .trim(),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(72, "Password cannot exceed 72 characters"),
 });
 
 export const SwitchProjectRequestSchema = z.object({
-  project_id: z.string(),
+  project_id: z.uuid("Invalid project ID format"),
 });
 
 export const VMCreateRequestSchema = z.object({
-  name: z.string(),
-  image_id: z.string(),
-  flavor_id: z.string(),
-  network_id: z.string(),
-  key_name: z.string(),
-  security_group: z.string(),
-  admin_password: z.string(),
-  admin_username: z.string(),
+  name: z
+    .string()
+    .min(1, "VM name is required")
+    .max(63, "VM name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
+      "VM name must start and end with alphanumeric characters",
+    )
+    .trim(),
+  image_id: z.uuid("Invalid image ID format"),
+  flavor_id: z.uuid("Invalid flavor ID format"),
+  network_id: z.uuid("Invalid network ID format"),
+  key_name: z
+    .string()
+    .min(1, "Key pair name is required")
+    .max(64, "Key pair name too long"),
+  security_group: z
+    .string()
+    .min(1, "Security group name is required")
+    .max(64, "Security group name too long"),
+  admin_password: z
+    .string()
+    .min(8, "Admin password must be at least 8 characters")
+    .max(72, "Admin password too long")
+    .optional(),
+  admin_username: z
+    .string()
+    .min(1, "Admin username is required")
+    .max(32, "Admin username too long")
+    .regex(/^[a-zA-Z][a-zA-Z0-9_-]*$/, "Invalid username format")
+    .optional(),
 });
 
 export const VMwareImportRequestSchema = z.object({
-  vm_name: z.string(),
-  description: z.string().optional(),
-  min_disk: z.number().optional(),
-  min_ram: z.number().optional(),
+  vm_name: z
+    .string()
+    .min(1, "VM name is required")
+    .max(63, "VM name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
+      "VM name must start and end with alphanumeric characters",
+    )
+    .trim(),
+  description: z.string().max(500, "Description too long").trim().optional(),
+  min_disk: z
+    .number()
+    .min(1, "Minimum disk size must be at least 1 GB")
+    .max(1000, "Minimum disk size too large")
+    .optional(),
+  min_ram: z
+    .number()
+    .min(128, "Minimum RAM must be at least 128 MB")
+    .max(65536, "Minimum RAM too large")
+    .optional(),
   is_public: z.boolean().default(false),
-  flavor_id: z.string(),
-  network_id: z.string(),
-  key_name: z.string(),
-  security_group: z.string(),
-  admin_password: z.string(),
+  flavor_id: z.uuid("Invalid flavor ID format"),
+  network_id: z.uuid("Invalid network ID format"),
+  key_name: z
+    .string()
+    .min(1, "Key name is required")
+    .max(64, "Key name too long"),
+  security_group: z
+    .string()
+    .min(1, "Security group is required")
+    .max(64, "Security group name too long"),
+  admin_password: z
+    .string()
+    .min(8, "Admin password must be at least 8 characters")
+    .max(72, "Admin password too long")
+    .optional(),
   vmdk_file: z.instanceof(File),
 });
 
 export const CreateFromDescriptionRequestSchema = z.object({
-  description: z.string(),
-  vm_name: z.string().optional(),
-  timeout: z.number().optional(),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(500, "Description too long")
+    .trim(),
+  vm_name: z
+    .string()
+    .max(63, "VM name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
+      "VM name must start and end with alphanumeric characters",
+    )
+    .trim()
+    .optional(),
+  timeout: z
+    .number()
+    .int("Timeout must be an integer")
+    .min(60, "Timeout must be at least 60 seconds")
+    .max(3600, "Timeout cannot exceed 1 hour")
+    .optional(),
 });
 
 export const ProjectAssignmentSchema = z.object({
-  user_id: z.string(),
-  roles: z.array(z.string()),
+  user_id: z.uuid("Invalid user ID format"),
+  roles: z
+    .array(
+      z
+        .string()
+        .min(1, "Role name cannot be empty")
+        .max(64, "Role name too long"),
+    )
+    .min(1, "At least one role is required"),
 });
 
 export const ProjectCreateRequestSchema = z.object({
-  name: z.string().nonempty(),
-  description: z.string().optional(),
-  domain_id: z.string().optional(),
+  name: z
+    .string()
+    .min(1, "Project name is required")
+    .max(64, "Project name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
+      "Project name must start and end with alphanumeric characters",
+    )
+    .trim(),
+  description: z.string().max(500, "Description too long").trim().optional(),
+  domain_id: z.uuid("Invalid domain ID format").optional(),
   enabled: z.boolean(),
-  assignments: z.array(ProjectAssignmentSchema),
+  assignments: z.array(ProjectAssignmentSchema).default([]),
 });
 
 export const ProjectUpdateRequestSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
+  name: z
+    .string()
+    .min(1, "Project name is required")
+    .max(64, "Project name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
+      "Project name must start and end with alphanumeric characters",
+    )
+    .trim()
+    .optional(),
+  description: z.string().max(500, "Description too long").trim().optional(),
   enabled: z.boolean().optional(),
 });
 
 export const AssignUserToProjectRequestSchema = z.object({
-  user_id: z.string(),
-  project_id: z.string(),
-  role_names: z.array(z.string()),
+  user_id: z.uuid("Invalid user ID format"),
+  project_id: z.uuid("Invalid project ID format"),
+  role_names: z
+    .array(
+      z
+        .string()
+        .min(1, "Role name cannot be empty")
+        .max(64, "Role name too long"),
+    )
+    .min(1, "At least one role must be assigned"),
 });
 
 export const RemoveUserFromProjectRequestSchema = z.object({
-  user_id: z.string(),
-  project_id: z.string(),
+  user_id: z.uuid("Invalid user ID format"),
+  project_id: z.uuid("Invalid project ID format"),
 });
 
 export const UpdateUserRolesRequestSchema = z.object({
-  user_id: z.string(),
-  project_id: z.string(),
-  role_ids: z.array(z.string()),
+  user_id: z.uuid("Invalid user ID format"),
+  project_id: z.uuid("Invalid project ID format"),
+  role_ids: z
+    .array(z.uuid("Invalid role ID format"))
+    .min(1, "At least one role must be assigned"),
 });
 
 export const UserCreateRequestSchema = z.object({
-  name: z.string(),
-  email: z.string(),
-  password: z.string(),
-  project_id: z.string().optional(),
-  roles: z.array(z.string()),
+  name: z
+    .string()
+    .min(1, "Username is required")
+    .max(64, "Username too long")
+    .regex(
+      /^[a-zA-Z][a-zA-Z0-9._-]*$/,
+      "Username must start with a letter and contain only letters, numbers, dots, underscores, or hyphens",
+    )
+    .trim(),
+  email: z
+    .email("Invalid email format")
+    .max(254, "Email too long")
+    .toLowerCase()
+    .optional(),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password too long")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    ),
+  project_id: z.uuid("Invalid project ID format").optional(),
+  roles: z
+    .array(z.string().min(1, "Role name cannot be empty"))
+    .min(1, "At least one role is required"),
 });
 
 export const UserProjectAssignmentSchema = z.object({
-  project_id: z.string(),
-  roles: z.array(z.string()),
+  project_id: z.uuid("Invalid project ID format"),
+  roles: z
+    .array(
+      z
+        .string()
+        .min(1, "Role name cannot be empty")
+        .max(64, "Role name too long"),
+    )
+    .min(1, "At least one role is required"),
 });
 
 export const UserUpdateRequestSchema = z.object({
-  name: z.string().optional(),
-  email: z.string().optional(),
-  password: z.string().optional(),
+  name: z
+    .string()
+    .min(1, "Username is required")
+    .max(64, "Username too long")
+    .regex(
+      /^[a-zA-Z][a-zA-Z0-9._-]*$/,
+      "Username must start with a letter and contain only letters, numbers, dots, underscores, or hyphens",
+    )
+    .trim()
+    .optional(),
+  email: z
+    .email("Invalid email format")
+    .max(254, "Email too long")
+    .toLowerCase()
+    .optional(),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password too long")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    )
+    .optional(),
   enabled: z.boolean().optional(),
   projects: z.array(UserProjectAssignmentSchema).optional(),
 });
 
 export const ImageImportFromUrlRequestSchema = z.object({
-  image_url: z.string(),
-  image_name: z.string(),
-  visibility: z.enum(["private", "public"]).optional(),
+  image_url: z
+    .string()
+    .url("Invalid URL format")
+    .min(1, "Image URL is required")
+    .max(2000, "URL too long"),
+  image_name: z
+    .string()
+    .min(1, "Image name is required")
+    .max(64, "Image name too long")
+    .regex(
+      /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
+      "Image name must start with alphanumeric character",
+    )
+    .trim(),
+  visibility: z.enum(["private", "public"]).default("private").optional(),
+});
+
+export const ImageImportFromNameRequestSchema = z.object({
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(500, "Description too long")
+    .trim(),
+  visibility: z.enum(["private", "public"]).default("private").optional(),
 });
 
 export const AllocationPoolSchema = z.object({
-  start: z.string(),
-  end: z.string(),
+  start: z
+    .string()
+    .min(1, "Start IP is required")
+    .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid start IP address format")
+    .refine(
+      (ip) =>
+        ip.split(".").every((oct) => {
+          const n = Number(oct);
+          return !Number.isNaN(n) && n >= 0 && n <= 255;
+        }),
+      "Invalid start IP address",
+    ),
+  end: z
+    .string()
+    .min(1, "End IP is required")
+    .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid end IP address format")
+    .refine(
+      (ip) =>
+        ip.split(".").every((oct) => {
+          const n = Number(oct);
+          return !Number.isNaN(n) && n >= 0 && n <= 255;
+        }),
+      "Invalid end IP address",
+    ),
 });
 
 export const SubnetCreateRequestSchema = z.object({
-  name: z.string(),
-  ip_version: z.number(),
-  cidr: z.string(),
-  gateway_ip: z.string(),
+  name: z
+    .string()
+    .min(1, "Subnet name is required")
+    .max(63, "Subnet name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
+      "Subnet name must start and end with alphanumeric characters",
+    )
+    .trim(),
+  ip_version: z
+    .number()
+    .int("IP version must be an integer")
+    .refine((val) => val === 4 || val === 6, "IP version must be 4 or 6"),
+  cidr: z
+    .string()
+    .regex(
+      /^(\d{1,3}\.){3}\d{1,3}\/([0-9]|[1-2][0-9]|3[0-2])$/,
+      "Invalid CIDR format (e.g., 192.168.1.0/24)",
+    ),
+  gateway_ip: z
+    .string()
+    .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid gateway IP address format")
+    .refine(
+      (ip) =>
+        ip.split(".").every((oct) => {
+          const n = Number(oct);
+          return !Number.isNaN(n) && n >= 0 && n <= 255;
+        }),
+      "Invalid gateway IP address",
+    ),
   enable_dhcp: z.boolean(),
-  allocation_pools: z.array(AllocationPoolSchema),
-  dns_nameservers: z.array(z.string()),
-  host_routes: z.array(z.string()),
+  allocation_pools: z.array(AllocationPoolSchema).default([]),
+  dns_nameservers: z
+    .array(
+      z
+        .string()
+        .regex(
+          /^(?:\d{1,3}\.){3}\d{1,3}$/,
+          "Invalid DNS server IP address format",
+        )
+        .refine(
+          (ip) =>
+            ip.split(".").every((oct) => {
+              const n = Number(oct);
+              return !Number.isNaN(n) && n >= 0 && n <= 255;
+            }),
+          "Invalid DNS server IP address",
+        ),
+    )
+    .default([]),
+  host_routes: z
+    .array(
+      z
+        .string()
+        .regex(
+          /^(\d{1,3}\.){3}\d{1,3}\/([0-9]|[1-2][0-9]|3[0-2])$/,
+          "Invalid host route format (must be CIDR notation, e.g., 10.0.0.0/24)",
+        ),
+    )
+    .default([]),
 });
 
 export const NetworkCreateRequestSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  mtu: z.number().optional(),
+  name: z
+    .string()
+    .min(1, "Network name is required")
+    .max(63, "Network name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
+      "Network name must start and end with alphanumeric characters",
+    )
+    .trim(),
+  description: z.string().max(500, "Description too long").trim().optional(),
+  mtu: z
+    .number()
+    .int("MTU must be an integer")
+    .min(68, "MTU too small")
+    .max(9000, "MTU too large")
+    .optional(),
   shared: z.boolean().optional(),
   port_security_enabled: z.boolean().optional(),
-  availability_zone_hints: z.array(z.string()).optional(),
+  availability_zone_hints: z
+    .array(
+      z
+        .string()
+        .min(1, "Availability zone name cannot be empty")
+        .max(64, "Availability zone name too long")
+        .regex(
+          /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/,
+          "Invalid availability zone name format",
+        ),
+    )
+    .optional(),
   subnet: SubnetCreateRequestSchema.optional(),
 });
 
 export const RouterCreateRequestSchema = z.object({
-  router_name: z.string(),
-  external_network_id: z.string(),
+  router_name: z
+    .string()
+    .min(1, "Router name is required")
+    .max(63, "Router name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
+      "Router name must start and end with alphanumeric characters",
+    )
+    .trim(),
+  external_network_id: z.uuid("Invalid external network ID format"),
 });
 
 export const RouterAddInterfaceRequestSchema = z.object({
-  subnet_id: z.string(),
+  subnet_id: z.uuid("Invalid subnet ID format"),
 });
 
 export const flavorSchema = z.object({
-  flavor_id: z.string().min(1, "Please select a flavor"),
+  flavor_id: z.uuid("Invalid flavor ID format"),
 });
 
 export const imageSchema = z.object({
-  image_id: z.string().min(1, "Please select an image"),
+  image_id: z.uuid("Invalid image ID format"),
 });
 
 export const networkSchema = z.object({
-  network_id: z.string().min(1, "Please select a network"),
-  key_name: z.string().min(1, "Please select a key pair"),
-  security_group: z.string().min(1, "Please select a security group"),
+  network_id: z.uuid("Invalid network ID format"),
+  key_name: z
+    .string()
+    .min(1, "Key pair name is required")
+    .max(64, "Key pair name too long"),
+  security_group: z
+    .string()
+    .min(1, "Security group is required")
+    .max(64, "Security group name too long"),
 });
 
 export const vmDetailsSchema = z.object({
-  name: z.string().min(1, "VM name is required").max(50, "Name too long"),
+  name: z
+    .string()
+    .min(1, "VM name is required")
+    .max(63, "VM name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
+      "VM name must start and end with alphanumeric characters",
+    )
+    .trim(),
   admin_username: z
     .string()
     .min(1, "Admin username is required")
-    .max(30, "Username too long"),
+    .max(32, "Username too long")
+    .regex(
+      /^[a-zA-Z][a-zA-Z0-9_-]*$/,
+      "Username must start with a letter and contain only alphanumeric, underscore, or hyphen",
+    )
+    .trim(),
   admin_password: z
     .string()
     .min(8, "Password must be at least 8 characters")
-    .max(50, "Password too long"),
+    .max(72, "Password too long"),
 });
 
 export const importVMSchema = z.object({
-  vm_name: z.string().min(1, "VM name is required"),
-  description: z.string().optional(),
-  min_disk: z.number().min(1).optional(),
-  min_ram: z.number().min(1).optional(),
+  vm_name: z
+    .string()
+    .min(1, "VM name is required")
+    .max(63, "VM name too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
+      "VM name must start and end with alphanumeric characters",
+    )
+    .trim(),
+  description: z.string().max(500, "Description too long").trim().optional(),
+  min_disk: z
+    .number()
+    .min(1, "Minimum disk size must be at least 1 GB")
+    .max(1000, "Minimum disk size too large")
+    .optional(),
+  min_ram: z
+    .number()
+    .min(128, "Minimum RAM must be at least 128 MB")
+    .max(65536, "Minimum RAM too large")
+    .optional(),
   is_public: z.boolean(),
-  flavor_id: z.string().min(1, "Please select a flavor"),
-  network_id: z.string().min(1, "Please select a network"),
-  key_name: z.string().min(1, "Please select a key pair"),
-  security_group: z.string().min(1, "Please select a security group"),
-  admin_password: z.string().min(8, "Password must be at least 8 characters"),
+  flavor_id: z.uuid("Invalid flavor ID format"),
+  network_id: z.uuid("Invalid network ID format"),
+  key_name: z
+    .string()
+    .min(1, "Key pair name is required")
+    .max(64, "Key pair name too long"),
+  security_group: z
+    .string()
+    .min(1, "Security group is required")
+    .max(64, "Security group name too long"),
+  admin_password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(72, "Password too long"),
+});
+
+export const ScaleNodeRequestSchema = z.object({
+  ip: z
+    .string()
+    .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid IP address format")
+    .refine(
+      (v) =>
+        v.split(".").every((oct) => {
+          const n = Number(oct);
+          return !Number.isNaN(n) && n >= 0 && n <= 255;
+        }),
+      "Invalid IP address",
+    ),
+  hostname: z
+    .string()
+    .min(1, "Hostname is required")
+    .max(63, "Hostname too long")
+    .regex(
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
+      "Invalid hostname format",
+    ),
+  type: z.enum(["control", "compute", "storage"]),
+  neutron_external_interface: z
+    .string()
+    .min(1, "Neutron external interface is required")
+    .max(15, "Interface name too long")
+    .regex(/^[a-zA-Z0-9]+$/, "Invalid interface name format"),
+  network_interface: z
+    .string()
+    .min(1, "Network interface is required")
+    .max(15, "Interface name too long")
+    .regex(/^[a-zA-Z0-9]+$/, "Invalid interface name format"),
+  ssh_user: z
+    .string()
+    .min(1, "SSH user is required")
+    .max(32, "SSH username too long")
+    .regex(/^[a-zA-Z][a-zA-Z0-9_-]*$/, "Invalid SSH username format"),
+  ssh_password: z
+    .string()
+    .min(8, "SSH password must be at least 8 characters")
+    .max(128, "SSH password too long"),
+  deploy_tag: z
+    .string()
+    .min(1, "Deploy tag is required")
+    .max(64, "Deploy tag too long")
+    .regex(/^[a-zA-Z][a-zA-Z0-9_-]*$/, "Invalid deploy tag format"),
+});
+
+export const SendTestEmailRequestSchema = z.object({
+  to: z
+    .email("Invalid email format")
+    .max(254, "Email address too long")
+    .toLowerCase()
+    .optional(),
 });

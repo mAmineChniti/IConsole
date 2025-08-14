@@ -253,7 +253,10 @@ export function Instances() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i}>
+            <Card
+              key={i}
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-32" />
