@@ -25,7 +25,7 @@ export function ImageStep({
           <Skeleton className="h-5 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
@@ -54,7 +54,7 @@ export function ImageStep({
           name="image_id"
           render={({ field }) => (
             <FormItem>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {resources?.images.map((image) => (
                   <Card
                     key={image.id}

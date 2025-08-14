@@ -27,17 +27,17 @@ export function DetailsStep({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-2 text-base font-medium">
-                <MonitorStop className="h-4 w-4" />
-                VM Name
+                <MonitorStop className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">VM Name</span>
               </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   placeholder="Enter VM name"
-                  className="h-11"
+                  className="h-11 w-full"
                 />
               </FormControl>
-              <FormDescription className="text-sm text-muted-foreground">
+              <FormDescription className="text-sm text-muted-foreground leading-relaxed">
                 A unique name to identify your virtual machine
               </FormDescription>
               <FormMessage />
@@ -45,24 +45,24 @@ export function DetailsStep({
           )}
         />
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="admin_username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-base font-medium">
+                <FormLabel className="text-sm font-medium">
                   Admin Username
                 </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     placeholder="Enter admin username"
-                    className="h-11"
+                    className="h-11 w-full"
                   />
                 </FormControl>
-                <FormDescription className="text-sm text-muted-foreground">
-                  Default administrator account name
+                <FormDescription className="text-sm text-muted-foreground leading-relaxed">
+                  The administrative username for the VM
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -74,7 +74,7 @@ export function DetailsStep({
             name="admin_password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-base font-medium">
+                <FormLabel className="text-sm font-medium">
                   Admin Password
                 </FormLabel>
                 <FormControl>
@@ -82,11 +82,11 @@ export function DetailsStep({
                     {...field}
                     type="password"
                     placeholder="Enter admin password"
-                    className="h-12"
+                    className="h-11 w-full"
                   />
                 </FormControl>
-                <FormDescription className="text-sm text-muted-foreground">
-                  Minimum 8 characters required
+                <FormDescription className="text-sm text-muted-foreground leading-relaxed">
+                  The password for the administrative user
                 </FormDescription>
                 <FormMessage />
               </FormItem>

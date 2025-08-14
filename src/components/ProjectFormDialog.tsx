@@ -185,12 +185,12 @@ export function ProjectFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 left-[calc(50%+8rem)] translate-x-[-50%] max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-slate-900 dark:text-white">
+      <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 mx-4 sm:mx-auto max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="text-slate-900 dark:text-white text-lg">
             {isEditing ? "Edit Project" : "Create New Project"}
           </DialogTitle>
-          <DialogDescription className="text-slate-600 dark:text-slate-400">
+          <DialogDescription className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
             {isEditing
               ? "Update the project details"
               : "Create a new project and assign users with roles"}
@@ -269,7 +269,7 @@ export function ProjectFormDialog({
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid gap-4 md:grid-cols-2">
+                      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                             Select User
@@ -424,27 +424,31 @@ export function ProjectFormDialog({
               </>
             )}
 
-            <div className="flex justify-end gap-2 pt-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="cursor-pointer rounded-full group transition-all duration-200"
+                className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto order-2 sm:order-1"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="cursor-pointer rounded-full group transition-all duration-200"
+                className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
               >
                 {createMutation.isPending || updateMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isEditing ? "Updating..." : "Creating..."}
+                    <span className="truncate">
+                      {isEditing ? "Updating..." : "Creating..."}
+                    </span>
                   </>
                 ) : (
-                  <>{isEditing ? "Update Project" : "Create Project"}</>
+                  <span className="truncate">
+                    {isEditing ? "Update Project" : "Create Project"}
+                  </span>
                 )}
               </Button>
             </div>

@@ -96,7 +96,7 @@ export function ImportVMTab({
 
             <Separator />
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-10 w-full" />
@@ -107,7 +107,7 @@ export function ImportVMTab({
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-28" />
                 <Skeleton className="h-10 w-full" />
@@ -118,7 +118,7 @@ export function ImportVMTab({
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-12" />
                 <Skeleton className="h-10 w-full" />
@@ -129,7 +129,7 @@ export function ImportVMTab({
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-10 w-full" />
@@ -148,8 +148,8 @@ export function ImportVMTab({
 
             <Separator />
 
-            <div className="flex justify-end">
-              <Skeleton className="h-10 w-48" />
+            <div className="flex justify-center sm:justify-end">
+              <Skeleton className="h-10 w-full sm:w-48" />
             </div>
           </div>
         </CardContent>
@@ -210,7 +210,7 @@ export function ImportVMTab({
 
             <Separator />
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="vm_name"
@@ -240,7 +240,7 @@ export function ImportVMTab({
               />
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="min_disk"
@@ -278,7 +278,7 @@ export function ImportVMTab({
               />
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="flavor_id"
@@ -330,7 +330,7 @@ export function ImportVMTab({
               />
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="key_name"
@@ -405,21 +405,21 @@ export function ImportVMTab({
 
             <Separator />
 
-            <div className="flex justify-end">
+            <div className="flex justify-center sm:justify-end">
               <Button
                 type="submit"
                 disabled={isCreating || !importFile}
-                className="bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                className="bg-purple-600 hover:bg-purple-700 cursor-pointer w-full sm:w-auto"
               >
                 {isCreating ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Importing VM...
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                    <span className="truncate">Importing VM...</span>
                   </>
                 ) : (
                   <>
-                    <Download className="h-4 w-4 mr-2" />
-                    Import Virtual Machine
+                    <Download className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">Import Virtual Machine</span>
                   </>
                 )}
               </Button>

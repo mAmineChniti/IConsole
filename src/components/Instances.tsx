@@ -251,7 +251,7 @@ export function Instances() {
           <Skeleton className="h-4 w-32" />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
@@ -384,7 +384,7 @@ export function Instances() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
         <div className="text-sm text-muted-foreground">
           {totalItems} instance{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
@@ -396,7 +396,7 @@ export function Instances() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visibleData.map((instance) => (
           <Card
             key={instance.id}

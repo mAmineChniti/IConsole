@@ -90,54 +90,60 @@ export function ScaleOperations() {
   });
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ServerCog className="h-5 w-5" /> Add Node
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
+      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <ServerCog className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span className="truncate">Add Node</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Register a new control / compute / storage node and initiate
             targeted kolla-ansible deploy.
           </p>
           <Button
             variant="outline"
             onClick={() => setShowNodeDialog(true)}
-            className="cursor-pointer"
+            className="cursor-pointer w-full sm:w-auto min-w-[120px]"
           >
-            <PlusCircle className="h-4 w-4 mr-2" /> Add Node
+            <PlusCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Add Node</span>
           </Button>
         </CardContent>
       </Card>
 
-      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5" /> Test Alert Email
+      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Mail className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span className="truncate">Test Alert Email</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Trigger a background task sending a test alert email to validate
             SMTP configuration.
           </p>
           <Button
             variant="outline"
             onClick={() => setShowEmailDialog(true)}
-            className="cursor-pointer"
+            className="cursor-pointer w-full sm:w-auto min-w-[140px]"
           >
-            <Mail className="h-4 w-4 mr-2" /> Send Test Email
+            <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Send Test Email</span>
           </Button>
         </CardContent>
       </Card>
 
       <Dialog open={showNodeDialog} onOpenChange={setShowNodeDialog}>
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add Node</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg font-semibold truncate">
+              Add Node
+            </DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed">
               Provide node connection and classification parameters.
             </DialogDescription>
           </DialogHeader>
@@ -148,15 +154,19 @@ export function ScaleOperations() {
               )}
               className="space-y-4"
             >
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                 <FormField
                   control={nodeForm.control}
                   name="ip"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>IP</FormLabel>
+                      <FormLabel className="text-sm font-medium">IP</FormLabel>
                       <FormControl>
-                        <Input placeholder="192.168.1.10" {...field} />
+                        <Input
+                          placeholder="192.168.1.10"
+                          className="h-10 w-full"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
@@ -167,9 +177,15 @@ export function ScaleOperations() {
                   name="hostname"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>Hostname</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        Hostname
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="node-compute-01" {...field} />
+                        <Input
+                          placeholder="node-compute-01"
+                          className="h-10 w-full"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
@@ -180,20 +196,28 @@ export function ScaleOperations() {
                   name="type"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>Type</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        Type
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full cursor-pointer">
+                          <SelectTrigger className="w-full cursor-pointer h-10">
                             <SelectValue placeholder="Select node type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="control">Control</SelectItem>
-                          <SelectItem value="compute">Compute</SelectItem>
-                          <SelectItem value="storage">Storage</SelectItem>
+                          <SelectItem value="control">
+                            <span className="truncate">Control</span>
+                          </SelectItem>
+                          <SelectItem value="compute">
+                            <span className="truncate">Compute</span>
+                          </SelectItem>
+                          <SelectItem value="storage">
+                            <span className="truncate">Storage</span>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -205,9 +229,15 @@ export function ScaleOperations() {
                   name="neutron_external_interface"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>Neutron External Interface</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        Neutron External Interface
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="eth1" {...field} />
+                        <Input
+                          placeholder="eth1"
+                          className="h-10 w-full"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
@@ -218,9 +248,15 @@ export function ScaleOperations() {
                   name="network_interface"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>Network Interface</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        Network Interface
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="eth0" {...field} />
+                        <Input
+                          placeholder="eth0"
+                          className="h-10 w-full"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
@@ -231,9 +267,15 @@ export function ScaleOperations() {
                   name="ssh_user"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>SSH User</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        SSH User
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="kollauser" {...field} />
+                        <Input
+                          placeholder="kollauser"
+                          className="h-10 w-full"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
@@ -244,9 +286,15 @@ export function ScaleOperations() {
                   name="ssh_password"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>SSH Password</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        SSH Password
+                      </FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input
+                          type="password"
+                          className="h-10 w-full"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
@@ -257,30 +305,38 @@ export function ScaleOperations() {
                   name="deploy_tag"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel>Deploy Tag</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        Deploy Tag
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="compute" {...field} />
+                        <Input
+                          placeholder="compute"
+                          className="h-10 w-full"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
                   )}
                 />
               </div>
-              <DialogFooter className="gap-2">
+              <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowNodeDialog(false)}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
                 >
-                  Cancel
+                  <span className="truncate">Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   disabled={addNodeMutation.isPending}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[120px]"
                 >
-                  {addNodeMutation.isPending ? "Submitting..." : "Submit"}
+                  <span className="truncate">
+                    {addNodeMutation.isPending ? "Submitting..." : "Submit"}
+                  </span>
                 </Button>
               </DialogFooter>
             </form>
@@ -289,10 +345,12 @@ export function ScaleOperations() {
       </Dialog>
 
       <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Send Test Email</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg font-semibold truncate">
+              Send Test Email
+            </DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed">
               Provide destination address (leave blank to use backend default if
               configured).
             </DialogDescription>
@@ -309,11 +367,12 @@ export function ScaleOperations() {
                 name="to"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-sm font-medium">Email</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
                         placeholder="ops@example.com"
+                        className="h-10 w-full"
                         {...field}
                       />
                     </FormControl>
@@ -321,21 +380,23 @@ export function ScaleOperations() {
                   </div>
                 )}
               />
-              <DialogFooter className="gap-2">
+              <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowEmailDialog(false)}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
                 >
-                  Cancel
+                  <span className="truncate">Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   disabled={testEmailMutation.isPending}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[100px]"
                 >
-                  {testEmailMutation.isPending ? "Sending..." : "Send"}
+                  <span className="truncate">
+                    {testEmailMutation.isPending ? "Sending..." : "Send"}
+                  </span>
                 </Button>
               </DialogFooter>
             </form>

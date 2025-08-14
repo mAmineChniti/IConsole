@@ -36,6 +36,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -119,11 +120,12 @@ export function UsersManager() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: availableProjects } = useQuery<ProjectsResponse>({
-    queryKey: ["auth", "projects"],
-    queryFn: () => AuthService.getProjects(),
-    staleTime: 5 * 60 * 1000,
-  });
+  const { data: availableProjects, isLoading: isProjectsLoading } =
+    useQuery<ProjectsResponse>({
+      queryKey: ["auth", "projects"],
+      queryFn: () => AuthService.getProjects(),
+      staleTime: 5 * 60 * 1000,
+    });
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -220,7 +222,7 @@ export function UsersManager() {
             <Skeleton className="h-9 w-24" />
           </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
@@ -268,7 +270,7 @@ export function UsersManager() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="text-sm text-muted-foreground">
           {list.length} user{list.length !== 1 ? "s" : ""}
         </div>
@@ -291,7 +293,9 @@ export function UsersManager() {
             onClick={() => setShowCreate(true)}
             className="cursor-pointer"
           >
-            <Plus className="h-4 w-4 mr-2" /> New User
+            <Plus className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">New User</span>
+            <span className="sm:hidden">New</span>
           </Button>
         </div>
       </div>
@@ -306,7 +310,7 @@ export function UsersManager() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((u) => (
             <Card
               key={u.id}
@@ -349,18 +353,20 @@ export function UsersManager() {
                     </Tooltip>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded">
-                  ID: {u.id}
+                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded overflow-hidden">
+                  <span className="block truncate">ID: {u.id}</span>
                 </p>
               </CardHeader>
               <CardContent className="space-y-3 pt-0">
-                <div className="flex items-center gap-2 text-sm">
-                  <User className="h-4 w-4 text-muted-foreground" />{" "}
-                  {u.email || "(no email)"}
+                <div className="flex items-start gap-2 text-sm min-w-0">
+                  <User className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <span className="truncate">{u.email || "(no email)"}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Shield className="h-4 w-4 text-muted-foreground" /> Default
-                  Project: {u.project || "-"}
+                <div className="flex items-start gap-2 text-sm min-w-0">
+                  <Shield className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <span className="truncate">
+                    Default Project: {u.project || "-"}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -369,7 +375,7 @@ export function UsersManager() {
       )}
 
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
+        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create User</DialogTitle>
             <DialogDescription>
@@ -435,21 +441,56 @@ export function UsersManager() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Project</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a project (optional)" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="">No project</SelectItem>
-                        {availableProjects?.projects?.map((p) => (
-                          <SelectItem key={p.project_id} value={p.project_id}>
-                            {p.project_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger
+                            disabled={
+                              isProjectsLoading ||
+                              (availableProjects?.projects?.length ?? 0) === 0
+                            }
+                            className="flex-1"
+                          >
+                            <SelectValue placeholder="Select a project (optional)" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {isProjectsLoading ? (
+                            <SelectItem value="__loading" disabled>
+                              Loading projects…
+                            </SelectItem>
+                          ) : (availableProjects?.projects?.length ?? 0) ===
+                            0 ? (
+                            <SelectItem value="__no-projects" disabled>
+                              No projects available
+                            </SelectItem>
+                          ) : (
+                            availableProjects?.projects?.map((p) => (
+                              <SelectItem
+                                key={p.project_id}
+                                value={p.project_id}
+                              >
+                                {p.project_name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      {field.value && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => field.onChange("")}
+                          className="h-10 px-2 flex-shrink-0"
+                        >
+                          Clear
+                        </Button>
+                      )}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -477,7 +518,7 @@ export function UsersManager() {
                                 key={r.id}
                                 variant={selected ? "default" : "outline"}
                                 onClick={() => toggle(r.name)}
-                                className="cursor-pointer select-none"
+                                className="cursor-pointer select-none max-w-[200px] truncate"
                               >
                                 {r.name}
                               </Badge>
@@ -492,19 +533,19 @@ export function UsersManager() {
                   );
                 }}
               />
-              <DialogFooter className="gap-2">
+              <DialogFooter className="gap-2 flex-col sm:flex-row">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowCreate(false)}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto"
                 >
                   {createMutation.isPending ? "Creating..." : "Create"}
                 </Button>
@@ -523,7 +564,7 @@ export function UsersManager() {
           }
         }}
       >
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
+        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
@@ -576,9 +617,9 @@ export function UsersManager() {
               />
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                     Project Assignments
-                  </label>
+                  </Label>
                   <p className="text-xs text-muted-foreground">
                     Assign projects and roles. Click role badges to toggle, use
                     X button to remove project assignments.
@@ -588,10 +629,10 @@ export function UsersManager() {
                   {projectFields.map((field, index) => (
                     <div
                       key={field.id}
-                      className="p-3 border rounded-md space-y-2"
+                      className="p-3 sm:p-4 border rounded-md space-y-3"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-medium truncate">
                           Project #{index + 1}
                         </span>
                         <Tooltip>
@@ -604,7 +645,7 @@ export function UsersManager() {
                                 removeProject(index);
                                 setProjectsModified(true);
                               }}
-                              className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                              className="h-6 w-6 p-0 text-destructive hover:text-destructive flex-shrink-0"
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -616,9 +657,12 @@ export function UsersManager() {
                       </div>
 
                       <div>
-                        <label className="text-xs text-muted-foreground">
+                        <Label
+                          id={`project-label-${index}`}
+                          className="text-xs text-muted-foreground"
+                        >
                           Project
-                        </label>
+                        </Label>
                         <Select
                           value={field.project_id}
                           onValueChange={(value) => {
@@ -640,28 +684,46 @@ export function UsersManager() {
                             setProjectsModified(true);
                           }}
                         >
-                          <SelectTrigger className="w-full mt-1 text-sm">
+                          <SelectTrigger
+                            id={`project-select-${index}`}
+                            aria-labelledby={`project-label-${index}`}
+                            className="w-full mt-1 text-sm"
+                            disabled={
+                              isProjectsLoading ||
+                              (availableProjects?.projects?.length ?? 0) === 0
+                            }
+                          >
                             <SelectValue placeholder="Select a project" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">No project</SelectItem>
-                            {availableProjects?.projects?.map((p) => (
-                              <SelectItem
-                                key={p.project_id}
-                                value={p.project_id}
-                              >
-                                {p.project_name}
+                            {isProjectsLoading ? (
+                              <SelectItem value="__loading" disabled>
+                                Loading projects…
                               </SelectItem>
-                            ))}
+                            ) : (availableProjects?.projects?.length ?? 0) ===
+                              0 ? (
+                              <SelectItem value="__no-projects" disabled>
+                                No projects available
+                              </SelectItem>
+                            ) : (
+                              availableProjects?.projects?.map((p) => (
+                                <SelectItem
+                                  key={p.project_id}
+                                  value={p.project_id}
+                                >
+                                  {p.project_name}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div>
-                        <label className="text-xs text-muted-foreground">
+                        <Label className="text-xs text-muted-foreground">
                           Roles (click to toggle)
-                        </label>
-                        <div className="flex flex-wrap gap-1 mt-1">
+                        </Label>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
                           {roles?.map((role) => {
                             const isSelected = field.roles.includes(role.name);
                             return (
@@ -682,7 +744,7 @@ export function UsersManager() {
                                       updateProject(index, updatedField);
                                       setProjectsModified(true);
                                     }}
-                                    className="cursor-pointer select-none text-xs hover:opacity-80 transition-opacity"
+                                    className="cursor-pointer select-none text-xs hover:opacity-80 transition-opacity max-w-[200px] truncate"
                                   >
                                     {role.name}
                                   </Badge>
@@ -734,7 +796,7 @@ export function UsersManager() {
                   </Button>
                 </div>
               </div>
-              <DialogFooter className="gap-2">
+              <DialogFooter className="gap-2 flex-col sm:flex-row">
                 <Button
                   type="button"
                   variant="outline"
@@ -742,14 +804,14 @@ export function UsersManager() {
                     setEditingUser(undefined);
                     setProjectsModified(false);
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto"
                 >
                   {updateMutation.isPending ? "Saving..." : "Save"}
                 </Button>
@@ -768,11 +830,11 @@ export function UsersManager() {
             <DialogDescription>This action cannot be undone.</DialogDescription>
           </DialogHeader>
           <Separator />
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 flex-col sm:flex-row">
             <Button
               variant="outline"
               onClick={() => setShowDelete(false)}
-              className="cursor-pointer"
+              className="cursor-pointer w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -780,7 +842,7 @@ export function UsersManager() {
               variant="destructive"
               onClick={() => deleteMutation.mutate()}
               disabled={deleteMutation.isPending}
-              className="cursor-pointer"
+              className="cursor-pointer w-full sm:w-auto"
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}
             </Button>

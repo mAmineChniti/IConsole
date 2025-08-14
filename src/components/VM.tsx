@@ -230,14 +230,14 @@ export function VM() {
   return (
     <div className="space-y-6">
       <div
-        className="flex items-center space-x-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 rounded-xl p-1"
+        className="flex items-center space-x-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 rounded-xl p-1 overflow-hidden"
         role="tablist"
         aria-label="VM tabs"
       >
         <Button
           variant={activeTab === "create" ? "default" : "ghost"}
           className={cn(
-            "flex-1 h-10 cursor-pointer",
+            "flex-1 h-10 cursor-pointer min-w-0",
             activeTab === "create" &&
               "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
           )}
@@ -247,13 +247,13 @@ export function VM() {
           aria-controls="create-tab-panel"
           id="create-tab"
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Create VM
+          <Plus className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
+          <span className="truncate">Create VM</span>
         </Button>
         <Button
           variant={activeTab === "import" ? "default" : "ghost"}
           className={cn(
-            "flex-1 h-10 cursor-pointer",
+            "flex-1 h-10 cursor-pointer min-w-0",
             activeTab === "import" &&
               "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
           )}
@@ -263,8 +263,8 @@ export function VM() {
           aria-controls="import-tab-panel"
           id="import-tab"
         >
-          <Upload className="h-4 w-4 mr-2" />
-          Import VM
+          <Upload className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
+          <span className="truncate">Import VM</span>
         </Button>
       </div>
 
@@ -276,9 +276,9 @@ export function VM() {
           aria-labelledby="create-tab"
           tabIndex={0}
         >
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
-            <CardContent className="p-6">
-              <div className="flex items-center w-full">
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex items-center w-full overflow-x-auto">
                 {steps.map((step, index) => {
                   const isActive = step.key === currentStep;
                   const isCompleted = index < currentStepIndex;
@@ -287,15 +287,16 @@ export function VM() {
                   return (
                     <div
                       key={step.key}
-                      className="flex items-center"
+                      className="flex items-center flex-shrink-0"
                       style={{
                         flex: index === steps.length - 1 ? "0 0 auto" : "1",
+                        minWidth: "120px",
                       }}
                     >
                       <div className="flex flex-col items-center">
                         <div
                           className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
+                            "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all",
                             isActive
                               ? "bg-blue-600 border-blue-600 text-white"
                               : isCompleted
@@ -304,14 +305,14 @@ export function VM() {
                           )}
                         >
                           {isCompleted ? (
-                            <CheckCircle className="h-5 w-5" />
+                            <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                           ) : (
-                            <StepIcon className="h-5 w-5" />
+                            <StepIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                           )}
                         </div>
                         <span
                           className={cn(
-                            "mt-2 text-sm font-medium text-center whitespace-nowrap",
+                            "mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-center max-w-[100px] leading-tight",
                             isActive
                               ? "text-blue-600 dark:text-blue-400"
                               : isCompleted
@@ -325,7 +326,7 @@ export function VM() {
                       {index < steps.length - 1 && (
                         <div
                           className={cn(
-                            "flex-1 h-0.5 mx-4 transition-all min-w-[60px]",
+                            "flex-1 h-0.5 mx-2 sm:mx-4 transition-all min-w-[40px] sm:min-w-[60px]",
                             index < currentStepIndex
                               ? "bg-green-600"
                               : "bg-muted-foreground/30",
@@ -339,23 +340,23 @@ export function VM() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+            <CardHeader className="space-y-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 {(() => {
                   const step = steps.find((s) => s.key === currentStep);
                   const StepIcon = step?.icon ?? Cpu;
                   return (
                     <>
-                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                        <StepIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full flex-shrink-0">
+                        <StepIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      {step?.title}
+                      <span className="truncate">{step?.title}</span>
                     </>
                   );
                 })()}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm leading-relaxed">
                 {currentStep === "flavor" &&
                   "Select the flavor and verify available resources for your VM"}
                 {currentStep === "image" &&
@@ -407,19 +408,22 @@ export function VM() {
             {currentStep !== "summary" && (
               <CardContent className="pt-0">
                 <Separator className="mb-6" />
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row justify-between gap-3">
                   <Button
                     variant="outline"
                     onClick={goToPreviousStep}
                     disabled={currentStepIndex === 0}
-                    className="cursor-pointer"
+                    className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Previous
+                    <ArrowLeft className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">Previous</span>
                   </Button>
-                  <Button onClick={goToNextStep} className="cursor-pointer">
-                    Next
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                  <Button
+                    onClick={goToNextStep}
+                    className="cursor-pointer w-full sm:w-auto order-1 sm:order-2"
+                  >
+                    <span className="truncate">Next</span>
+                    <ArrowRight className="h-4 w-4 ml-2 flex-shrink-0" />
                   </Button>
                 </div>
               </CardContent>

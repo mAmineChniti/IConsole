@@ -152,30 +152,30 @@ export function NetworksManager() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 px-2 sm:px-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
           <Skeleton className="h-4 w-20" />
           <div className="flex gap-2">
-            <Skeleton className="h-9 w-9" />
+            <Skeleton className="h-9 w-9 flex-shrink-0" />
             <Skeleton className="h-9 w-28" />
           </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
             >
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <Skeleton className="h-6 w-32" />
-                  <div className="flex gap-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Skeleton className="h-5 sm:h-6 w-32 flex-1" />
+                  <div className="flex gap-2 flex-shrink-0">
                     <Skeleton className="h-6 w-16" />
                     <Skeleton className="h-8 w-8" />
                     <Skeleton className="h-8 w-8" />
                   </div>
                 </div>
-                <Skeleton className="h-6 w-full mt-2" />
+                <Skeleton className="h-4 sm:h-6 w-full mt-2" />
               </CardHeader>
               <CardContent className="space-y-3 pt-0">
                 <Skeleton className="h-4 w-24" />
@@ -202,9 +202,9 @@ export function NetworksManager() {
   const list = networks ?? [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
+    <div className="space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+        <div className="text-sm text-muted-foreground leading-relaxed">
           {list.length} network{list.length !== 1 ? "s" : ""}
         </div>
         <div className="flex gap-2">
@@ -213,85 +213,90 @@ export function NetworksManager() {
             size="sm"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="cursor-pointer"
+            className="cursor-pointer w-10 h-9 p-0 sm:w-auto sm:px-3"
           >
             {isFetching ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
             ) : (
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4 flex-shrink-0" />
             )}
+            <span className="sr-only sm:not-sr-only sm:ml-2">Refresh</span>
           </Button>
           <Button
             size="sm"
             onClick={() => setShowCreate(true)}
-            className="cursor-pointer"
+            className="cursor-pointer flex-1 sm:flex-none min-w-[120px]"
           >
-            <Plus className="h-4 w-4 mr-2" /> New Network
+            <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="truncate">New Network</span>
           </Button>
         </div>
       </div>
 
       {list.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="p-8 text-center">
-            <Network className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
+        <Card className="border-dashed overflow-hidden">
+          <CardContent className="p-6 sm:p-8 text-center">
+            <Network className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mb-4 flex-shrink-0" />
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               No networks found. Create your first network.
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((n) => (
             <Card
               key={n.id}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
             >
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold truncate flex-1 mr-2">
-                    {n.name || n.id}
-                  </CardTitle>
-                  <div className="flex gap-2">
+                <div className="flex items-start sm:items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base sm:text-lg font-semibold break-words leading-tight">
+                      {n.name || n.id}
+                    </CardTitle>
+                  </div>
+                  <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                     <Badge
                       variant={n.is_external ? "default" : "secondary"}
-                      className={
+                      className={`text-xs ${
                         n.is_external
                           ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
-                          : undefined
-                      }
+                          : ""
+                      }`}
                     >
-                      {n.is_external ? "External" : "Internal"}
+                      {n.is_external ? "Ext" : "Int"}
                     </Badge>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 w-8 p-0 cursor-pointer"
+                      className="h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0"
                       onClick={() => {
                         setSelectedNetworkId(n.id);
                         setShowRouterDialog(true);
                       }}
                     >
-                      <Router className="h-4 w-4" />
+                      <Router className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 w-8 p-0 cursor-pointer"
+                      className="h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0"
                       onClick={() => deleteMutation.mutate(n.id)}
                       disabled={deleteMutation.isPending}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded">
+                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded leading-relaxed">
                   ID: {n.id}
                 </p>
               </CardHeader>
               <CardContent className="space-y-3 pt-0">
                 <div className="flex items-center gap-2 text-sm">
-                  Status: {n.status}
+                  <span className="text-muted-foreground">Status:</span>
+                  <span className="truncate">{n.status}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Subnets: {n.subnets.length}
@@ -303,9 +308,11 @@ export function NetworksManager() {
       )}
 
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Create network</DialogTitle>
+            <DialogTitle className="text-lg font-semibold truncate">
+              Create network
+            </DialogTitle>
           </DialogHeader>
           <Form {...networkForm}>
             <form
@@ -319,9 +326,15 @@ export function NetworksManager() {
                 name="name"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <FormLabel>Network Name</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Network Name
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="network-name" {...field} />
+                      <Input
+                        placeholder="network-name"
+                        className="h-10 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </div>
@@ -332,9 +345,13 @@ export function NetworksManager() {
                 name="cidr"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <FormLabel>CIDR</FormLabel>
+                    <FormLabel className="text-sm font-medium">CIDR</FormLabel>
                     <FormControl>
-                      <Input placeholder="10.10.10.0/24" {...field} />
+                      <Input
+                        placeholder="10.10.10.0/24"
+                        className="h-10 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </div>
@@ -345,9 +362,15 @@ export function NetworksManager() {
                 name="gateway_ip"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <FormLabel>Gateway IP</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Gateway IP
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="10.10.10.1" {...field} />
+                      <Input
+                        placeholder="10.10.10.1"
+                        className="h-10 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </div>
@@ -358,17 +381,29 @@ export function NetworksManager() {
                 name="dns_nameservers"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <FormLabel>DNS (comma separated)</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      DNS (comma separated)
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="1.1.1.1,8.8.8.8" {...field} />
+                      <Input
+                        placeholder="1.1.1.1,8.8.8.8"
+                        className="h-10 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </div>
                 )}
               />
-              <DialogFooter>
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? "Creating..." : "Create"}
+              <DialogFooter className="pt-4">
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending}
+                  className="w-full sm:w-auto min-w-[100px]"
+                >
+                  <span className="truncate">
+                    {createMutation.isPending ? "Creating..." : "Create"}
+                  </span>
                 </Button>
               </DialogFooter>
             </form>
@@ -377,10 +412,12 @@ export function NetworksManager() {
       </Dialog>
 
       <Dialog open={showRouterDialog} onOpenChange={setShowRouterDialog}>
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Create Router</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg font-semibold truncate">
+              Create Router
+            </DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed">
               Attach a router to an external network (then interface).
             </DialogDescription>
           </DialogHeader>
@@ -396,9 +433,15 @@ export function NetworksManager() {
                 name="router_name"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <FormLabel>Router Name</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Router Name
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="router-name" {...field} />
+                      <Input
+                        placeholder="router-name"
+                        className="h-10 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </div>
@@ -409,29 +452,37 @@ export function NetworksManager() {
                 name="external_network_id"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <FormLabel>External Network ID</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      External Network ID
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="external-network-id" {...field} />
+                      <Input
+                        placeholder="external-network-id"
+                        className="h-10 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </div>
                 )}
               />
-              <DialogFooter className="gap-2">
+              <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowRouterDialog(false)}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
                 >
-                  Cancel
+                  <span className="truncate">Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   disabled={createRouterMutation.isPending}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[100px]"
                 >
-                  {createRouterMutation.isPending ? "Creating..." : "Create"}
+                  <span className="truncate">
+                    {createRouterMutation.isPending ? "Creating..." : "Create"}
+                  </span>
                 </Button>
               </DialogFooter>
             </form>

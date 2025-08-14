@@ -164,34 +164,34 @@ export function SummaryStep({
 
       <Separator />
 
-      <div className="flex justify-between items-center">
-        <p className="text-muted-foreground">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <p className="text-muted-foreground text-center sm:text-left">
           Ready to create your virtual machine?
         </p>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             onClick={onCancel}
             disabled={isCreating}
             variant="outline"
-            className="cursor-pointer"
+            className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Details
+            <ArrowLeft className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Back to Details</span>
           </Button>
           <Button
             onClick={onCreateVM}
             disabled={isCreating}
-            className="bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+            className="bg-green-600 hover:bg-green-700 text-white cursor-pointer w-full sm:w-auto order-1 sm:order-2"
           >
             {isCreating ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Creating VM...
+                <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                <span className="truncate">Creating VM...</span>
               </>
             ) : (
               <>
-                <Zap className="h-4 w-4 mr-2" />
-                Create Virtual Machine
+                <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate">Create Virtual Machine</span>
               </>
             )}
           </Button>
