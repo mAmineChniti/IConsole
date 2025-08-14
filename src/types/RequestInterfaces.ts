@@ -92,12 +92,12 @@ export interface ImageImportFromNameRequest {
 
 export interface NetworkCreateRequest {
   name: string;
-  description?: string;
-  mtu?: number;
-  shared?: boolean;
-  port_security_enabled?: boolean;
-  availability_zone_hints?: string[];
-  subnet?: SubnetCreateRequest;
+  description: string;
+  mtu: number;
+  shared: boolean;
+  port_security_enabled: boolean;
+  availability_zone_hints: string[];
+  subnet: SubnetCreateRequest;
 }
 interface SubnetCreateRequest {
   name: string;
@@ -109,7 +109,7 @@ interface SubnetCreateRequest {
   dns_nameservers: string[];
   host_routes: string[];
 }
-interface AllocationPool {
+export interface AllocationPool {
   start: string;
   end: string;
 }
@@ -161,7 +161,6 @@ export interface CombinedVMData
     NetworkFormData,
     VMDetailsFormData {}
 
-// Scale service requests
 export interface ScaleNodeRequest {
   ip: string;
   hostname: string;
