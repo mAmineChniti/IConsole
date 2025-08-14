@@ -36,7 +36,7 @@ export function Overview() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card
               key={i}
@@ -56,7 +56,7 @@ export function Overview() {
           ))}
         </div>
 
-        <div className="grid gap-3 md:gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
+        <div className="grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
@@ -97,7 +97,7 @@ export function Overview() {
           ))}
         </div>
 
-        <div className="grid gap-3 md:gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
+        <div className="grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
@@ -130,7 +130,7 @@ export function Overview() {
           ))}
         </div>
 
-        <div className="grid gap-3 md:gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
+        <div className="grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
@@ -327,7 +327,7 @@ export function Overview() {
         </Card>
       </div>
 
-      <div className="grid gap-3 md:gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
         <Card className="w-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -429,7 +429,7 @@ export function Overview() {
         </Card>
       </div>
 
-      <div className="grid gap-3 md:gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
         <Card className="w-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -567,7 +567,7 @@ export function Overview() {
         </Card>
       </div>
 
-      <div className="grid gap-3 md:gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-2">
         <Card className="w-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">

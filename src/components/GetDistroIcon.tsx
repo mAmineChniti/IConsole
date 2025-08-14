@@ -153,11 +153,11 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
               alt={matchedDistro.alt}
               width={32}
               height={32}
-              className="w-8 h-8"
+              className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
               onError={() => setImageError(true)}
             />
           ) : (
-            <Server className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+            <Server className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600 dark:text-gray-400 flex-shrink-0" />
           )}
         </div>
       );
@@ -171,11 +171,11 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
             alt={matchedDistro.alt}
             width={32}
             height={32}
-            className="w-8 h-8"
+            className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
             onError={() => setImageError(true)}
           />
         ) : (
-          <Server className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+          <Server className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600 dark:text-gray-400 flex-shrink-0" />
         )}
       </div>
     );
@@ -183,7 +183,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
 
   return (
     <div className="flex-shrink-0">
-      <Server className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+      <Server className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600 dark:text-gray-400 flex-shrink-0" />
     </div>
   );
 }

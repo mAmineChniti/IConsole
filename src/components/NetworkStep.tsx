@@ -31,30 +31,30 @@ export function NetworkStep({
   if (isLoading)
     return (
       <div className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-4 flex-shrink-0" />
               <Skeleton className="h-4 w-16" />
             </div>
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-11 w-full" />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-4 flex-shrink-0" />
               <Skeleton className="h-4 w-16" />
             </div>
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-11 w-full" />
           </div>
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-4 flex-shrink-0" />
             <Skeleton className="h-4 w-24" />
           </div>
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-11 w-full" />
         </div>
       </div>
     );
@@ -62,26 +62,26 @@ export function NetworkStep({
   return (
     <Form {...form}>
       <div className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="network_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Network className="h-4 w-4" />
-                  Network
+                <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                  <Network className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">Network</span>
                 </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="!h-12 w-full cursor-pointer">
+                    <SelectTrigger className="h-11 w-full cursor-pointer">
                       <SelectValue placeholder="Select network" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {resources?.networks?.map((network) => (
                       <SelectItem key={network.id} value={network.id}>
-                        {network.name}
+                        <span className="truncate">{network.name}</span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -96,20 +96,20 @@ export function NetworkStep({
             name="key_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  Key Pair
+                <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                  <Shield className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">Key Pair</span>
                 </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="!h-12 w-full cursor-pointer">
+                    <SelectTrigger className="h-11 w-full cursor-pointer">
                       <SelectValue placeholder="Select key pair" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {resources?.keypairs?.map((keypair) => (
                       <SelectItem key={keypair.name} value={keypair.name}>
-                        {keypair.name}
+                        <span className="truncate">{keypair.name}</span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -125,20 +125,20 @@ export function NetworkStep({
           name="security_group"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                Security Group
+              <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                <Shield className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Security Group</span>
               </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="!h-12 w-full cursor-pointer">
+                  <SelectTrigger className="h-11 w-full cursor-pointer">
                     <SelectValue placeholder="Select security group" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {resources?.security_groups?.map((group) => (
                     <SelectItem key={group.name} value={group.name}>
-                      {group.name}
+                      <span className="truncate">{group.name}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>

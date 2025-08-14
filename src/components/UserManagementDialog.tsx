@@ -169,23 +169,26 @@ export function UserManagementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 left-[calc(50%+8rem)] translate-x-[-50%]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Manage Users - {project.name}
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 mx-4 sm:mx-auto">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <Users className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">Manage Users - {project.name}</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm leading-relaxed">
             Assign users to this project and manage their roles
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                <Label
+                  id="select-user-label"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2"
+                >
+                  <User className="h-4 w-4 flex-shrink-0" />
                   Select User
                 </Label>
                 <Combobox
@@ -199,7 +202,10 @@ export function UserManagementDialog({
                   value={selectedUser}
                   onValueChange={setSelectedUser}
                 >
-                  <ComboboxTrigger className="w-full cursor-pointer h-11 rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" />
+                  <ComboboxTrigger
+                    aria-labelledby="select-user-label"
+                    className="w-full cursor-pointer h-11 rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                  />
                   <ComboboxContent
                     popoverOptions={{
                       className:
@@ -305,25 +311,31 @@ export function UserManagementDialog({
                   key={assignment.user_id}
                   className="p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 hover:shadow-md transition-all duration-200"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <Avatar className="h-10 w-10 flex-shrink-0">
                         <AvatarFallback className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white text-xs font-medium">
                           {assignment.user_name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <p className="font-medium">{assignment.user_name}</p>
-                        <div className="flex flex-wrap gap-1 mt-1">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">
+                          {assignment.user_name}
+                        </p>
+                        <div className="flex flex-wrap gap-1 mt-1 max-w-full">
                           {assignment.roles.map((role) => (
-                            <Badge key={role.role_id} variant="secondary">
+                            <Badge
+                              key={role.role_id}
+                              variant="secondary"
+                              className="text-xs max-w-full truncate"
+                            >
                               {role.role_name}
                             </Badge>
                           ))}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
                         variant="outline"
                         size="sm"
@@ -363,15 +375,17 @@ export function UserManagementDialog({
             open={!!editingUser}
             onOpenChange={() => setEditingUser(undefined)}
           >
-            <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 left-[calc(50%+8rem)] translate-x-[-50%]">
-              <DialogHeader>
-                <DialogTitle className="text-slate-900 dark:text-white flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  Edit Roles - {editingUser.userName}
+            <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 mx-4 sm:mx-auto max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader className="space-y-3">
+                <DialogTitle className="text-slate-900 dark:text-white flex items-center gap-2 text-lg">
+                  <Settings className="h-5 w-5 flex-shrink-0" />
+                  <span className="truncate">
+                    Edit Roles - {editingUser.userName}
+                  </span>
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 transition-all duration-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 transition-all duration-200">
                   {roles?.map((role) => {
                     const isChecked = pendingRoleIds.includes(role.id);
                     return (
@@ -397,28 +411,28 @@ export function UserManagementDialog({
                     );
                   })}
                 </div>
-                <div className="flex justify-end gap-2">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                   <Button
                     variant="outline"
                     onClick={() => setEditingUser(undefined)}
-                    className="cursor-pointer rounded-full"
+                    className="cursor-pointer rounded-full w-full sm:w-auto order-2 sm:order-1"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={() => handleUpdateRoles(pendingRoleIds)}
                     disabled={updateRolesMutation.isPending}
-                    className="cursor-pointer rounded-full group transition-all duration-200"
+                    className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
                   >
                     {updateRolesMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Updating...
+                        <span className="truncate">Updating...</span>
                       </>
                     ) : (
                       <>
                         <Settings className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
-                        Update Roles
+                        <span className="truncate">Update Roles</span>
                       </>
                     )}
                   </Button>

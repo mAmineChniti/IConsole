@@ -203,19 +203,19 @@ export function Sidebar() {
   };
 
   return (
-    <ShadcnSidebar className="w-64">
-      <SidebarHeader className="border-b p-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 rounded-full flex items-center justify-center">
-            <Shield className="w-5 h-5 text-white" />
+    <ShadcnSidebar className="w-64 overflow-hidden">
+      <SidebarHeader className="border-b p-3 sm:p-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent select-none">
+          <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent select-none truncate">
             IConsole
           </span>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-2">
+      <SidebarContent className="p-2 overflow-y-auto">
         <SidebarGroup>
           <SidebarMenu className="space-y-2">
             <SidebarMenuItem>
@@ -232,7 +232,7 @@ export function Sidebar() {
               >
                 <ComboboxTrigger
                   className={cn(
-                    "w-full justify-start h-10 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-700 dark:text-slate-300 border-0 bg-transparent shadow-none text-sm font-medium",
+                    "w-full justify-start h-10 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-700 dark:text-slate-300 border-0 bg-transparent shadow-none text-sm font-medium min-w-0",
                     switchProjectMutation.isPending &&
                       "opacity-50 cursor-not-allowed",
                   )}
@@ -240,7 +240,7 @@ export function Sidebar() {
                 <ComboboxContent
                   popoverOptions={{
                     className:
-                      "w-[--radix-popover-trigger-width] p-0 border-slate-200 dark:border-slate-700 shadow-lg",
+                      "w-[--radix-popover-trigger-width] p-0 border-slate-200 dark:border-slate-700 shadow-lg max-h-[300px]",
                   }}
                 >
                   <ComboboxInput
@@ -258,9 +258,11 @@ export function Sidebar() {
                           key={project.project_id}
                           value={project.project_id}
                           keywords={[project.project_name]}
-                          className="px-3 py-2 text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-700 dark:text-slate-300 rounded-sm mx-1 transition-colors"
+                          className="px-3 py-2 text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-700 dark:text-slate-300 rounded-sm mx-1 transition-colors truncate"
                         >
-                          {project.project_name}
+                          <span className="truncate">
+                            {project.project_name}
+                          </span>
                         </ComboboxItem>
                       ))
                     ) : (
@@ -278,14 +280,16 @@ export function Sidebar() {
                   <Link
                     href={item.href}
                     className={cn(
-                      "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
+                      "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white min-w-0",
                       isActive
                         ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
                         : "text-slate-700 dark:text-slate-300",
                     )}
                   >
-                    <item.icon className="h-4 w-4 mr-3" />
-                    <span className="text-sm font-medium">{item.title}</span>
+                    <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                    <span className="text-sm font-medium truncate">
+                      {item.title}
+                    </span>
                   </Link>
                 </SidebarMenuItem>
               );
@@ -294,17 +298,20 @@ export function Sidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                className="w-full justify-start h-10 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                className="w-full justify-start h-10 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white min-w-0"
               >
                 <Button
                   variant="ghost"
                   onClick={() => setComputeOpen(!computeOpen)}
+                  className="w-full justify-start p-0 h-auto"
                 >
-                  <Server className="h-4 w-4 mr-3" />
-                  <span className="text-sm font-medium">Compute</span>
+                  <Server className="h-4 w-4 mr-3 flex-shrink-0" />
+                  <span className="text-sm font-medium flex-1 truncate text-left">
+                    Compute
+                  </span>
                   <ChevronDown
                     className={cn(
-                      "ml-auto h-4 w-4 transition-transform",
+                      "h-4 w-4 transition-transform flex-shrink-0",
                       computeOpen && "rotate-180",
                     )}
                   />
@@ -320,14 +327,14 @@ export function Sidebar() {
                         <Link
                           href={subItem.href}
                           className={cn(
-                            "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
+                            "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white min-w-0",
                             isSubActive
                               ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
                               : "text-slate-700 dark:text-slate-300",
                           )}
                         >
-                          <subItem.icon className="h-4 w-4 mr-3" />
-                          <span className="text-sm font-medium">
+                          <subItem.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                          <span className="text-sm font-medium truncate">
                             {subItem.title}
                           </span>
                         </Link>
@@ -345,14 +352,16 @@ export function Sidebar() {
                   <Link
                     href={item.href}
                     className={cn(
-                      "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white",
+                      "w-full flex items-center justify-start h-10 px-3 cursor-pointer rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white min-w-0",
                       isActive
                         ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
                         : "text-slate-700 dark:text-slate-300",
                     )}
                   >
-                    <item.icon className="h-4 w-4 mr-3" />
-                    <span className="text-sm font-medium">{item.title}</span>
+                    <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                    <span className="text-sm font-medium truncate">
+                      {item.title}
+                    </span>
                   </Link>
                 </SidebarMenuItem>
               );
@@ -361,23 +370,24 @@ export function Sidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 space-y-2">
+      <SidebarFooter className="p-3 sm:p-4 space-y-2">
         <SidebarMenuButton
           asChild
-          className="w-full h-10 justify-start px-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+          className="w-full h-10 justify-start px-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer min-w-0"
         >
           <Button
             variant="ghost"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="w-full justify-start p-0 h-auto"
           >
             {!mounted ? (
-              <Sun className="h-4 w-4 mr-3" />
+              <Sun className="h-4 w-4 mr-3 flex-shrink-0" />
             ) : theme === "dark" ? (
-              <Sun className="h-4 w-4 mr-3" />
+              <Sun className="h-4 w-4 mr-3 flex-shrink-0" />
             ) : (
-              <Moon className="h-4 w-4 mr-3" />
+              <Moon className="h-4 w-4 mr-3 flex-shrink-0" />
             )}
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium truncate">
               {!mounted
                 ? "Toggle Theme"
                 : theme === "dark"
@@ -389,11 +399,15 @@ export function Sidebar() {
 
         <SidebarMenuButton
           asChild
-          className="w-full h-10 justify-start px-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 cursor-pointer"
+          className="w-full h-10 justify-start px-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 cursor-pointer min-w-0"
         >
-          <Button variant="ghost" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-3" />
-            <span className="text-sm font-medium">Sign Out</span>
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="w-full justify-start p-0 h-auto"
+          >
+            <LogOut className="h-4 w-4 mr-3 flex-shrink-0" />
+            <span className="text-sm font-medium truncate">Sign Out</span>
           </Button>
         </SidebarMenuButton>
       </SidebarFooter>

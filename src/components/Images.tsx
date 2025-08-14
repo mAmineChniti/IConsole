@@ -107,26 +107,26 @@ export function Images() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 px-2 sm:px-0">
         <div className="flex items-center justify-between">
           <Skeleton className="h-4 w-32" />
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <Skeleton className="h-10 w-full max-w-md" />
-          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-full sm:w-32" />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <Card
               key={index}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full flex-shrink-0" />
+                  <Skeleton className="h-5 sm:h-6 w-3/4" />
                 </div>
                 <Skeleton className="h-4 w-1/2 mt-2" />
               </CardHeader>
@@ -156,9 +156,9 @@ export function Images() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
+    <div className="space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+        <div className="text-sm text-muted-foreground leading-relaxed">
           {totalItems} image{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -169,31 +169,38 @@ export function Images() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        <div className="relative flex-1 max-w-full sm:max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground flex-shrink-0" />
           <Input
             placeholder="Search images..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-10 w-full"
           />
         </div>
 
         <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="gap-2 cursor-pointer">
-              <Plus className="h-4 w-4" />
-              Import Image
+            <Button
+              variant="outline"
+              className="gap-2 cursor-pointer w-full sm:w-auto min-w-[140px]"
+            >
+              <Plus className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate">Import Image</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 left-[calc(50%+8rem)] translate-x-[-50%]">
+          <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 left-1/2 translate-x-[-50%]">
             <DialogHeader>
-              <DialogTitle>Import Image from URL</DialogTitle>
+              <DialogTitle className="text-lg font-semibold truncate">
+                Import Image from URL
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleImportImage} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
+                <Label htmlFor="imageUrl" className="text-sm font-medium">
+                  Image URL
+                </Label>
                 <Input
                   id="imageUrl"
                   type="url"
@@ -202,11 +209,14 @@ export function Images() {
                   onChange={(e) =>
                     setImportForm({ ...importForm, imageUrl: e.target.value })
                   }
+                  className="h-10 w-full"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="imageName">Image Name</Label>
+                <Label htmlFor="imageName" className="text-sm font-medium">
+                  Image Name
+                </Label>
                 <Input
                   id="imageName"
                   placeholder="My Custom Image"
@@ -214,51 +224,58 @@ export function Images() {
                   onChange={(e) =>
                     setImportForm({ ...importForm, imageName: e.target.value })
                   }
+                  className="h-10 w-full"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="visibility">Visibility</Label>
+                <Label htmlFor="visibility" className="text-sm font-medium">
+                  Visibility
+                </Label>
                 <Select
                   value={importForm.visibility}
                   onValueChange={(value: "private" | "public") =>
                     setImportForm({ ...importForm, visibility: value })
                   }
                 >
-                  <SelectTrigger className="w-full cursor-pointer">
+                  <SelectTrigger className="w-full cursor-pointer h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="private">Private</SelectItem>
-                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="private">
+                      <span className="truncate">Private</span>
+                    </SelectItem>
+                    <SelectItem value="public">
+                      <span className="truncate">Public</span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <Button
                   type="button"
                   variant="outline"
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
                   onClick={() => setIsImportDialogOpen(false)}
                   disabled={importMutation.isPending}
                 >
-                  Cancel
+                  <span className="truncate">Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   variant="outline"
                   disabled={importMutation.isPending}
-                  className="gap-2 cursor-pointer"
+                  className="gap-2 cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[140px]"
                 >
                   {importMutation.isPending ? (
                     <>
-                      <Upload className="h-4 w-4 animate-spin" />
-                      Importing...
+                      <Upload className="h-4 w-4 animate-spin flex-shrink-0" />
+                      <span className="truncate">Importing...</span>
                     </>
                   ) : (
                     <>
-                      <Upload className="h-4 w-4" />
-                      Import Image
+                      <Upload className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">Import Image</span>
                     </>
                   )}
                 </Button>
@@ -269,59 +286,63 @@ export function Images() {
       </div>
 
       {filteredImages.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="p-8 text-center">
-            <HardDrive className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+        <Card className="border-dashed overflow-hidden">
+          <CardContent className="p-6 sm:p-8 text-center">
+            <HardDrive className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mb-4 flex-shrink-0" />
             {searchTerm ? (
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words">
                 No images found matching &ldquo;{searchTerm}&rdquo;.
               </p>
             ) : (
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 No images found. Import your first image to get started.
               </p>
             )}
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {visibleData.map((image) => (
             <Card
               key={image.id}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start gap-3">
                   <GetDistroIcon
                     imageName={typeof image.name === "string" ? image.name : ""}
                   />
-                  <CardTitle className="text-lg font-semibold text-foreground whitespace-normal break-words">
-                    {image.name}
-                  </CardTitle>
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base sm:text-lg font-semibold text-foreground break-words leading-tight">
+                      {image.name}
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded-md leading-relaxed">
+                      ID: {image.id}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded-md">
-                  ID: {image.id}
-                </p>
               </CardHeader>
             </Card>
           ))}
         </div>
       )}
 
-      <div className="flex justify-center">
+      <div className="flex justify-center px-4 sm:px-0">
         <Button
           onClick={handleShowMore}
           variant="outline"
           disabled={!hasMore}
-          className={`transition-all duration-200 px-6 py-2 ${
+          className={`transition-all duration-200 px-4 sm:px-6 py-2 w-full sm:w-auto max-w-xs ${
             hasMore
               ? "hover:bg-accent hover:text-accent-foreground hover:scale-105"
               : "opacity-50 cursor-not-allowed"
           }`}
         >
-          {hasMore
-            ? `Show More (${Math.min(6, totalItems - visibleCount)} more)`
-            : "All images loaded"}
+          <span className="truncate">
+            {hasMore
+              ? `Show More (${Math.min(6, totalItems - visibleCount)} more)`
+              : "All images loaded"}
+          </span>
         </Button>
       </div>
     </div>

@@ -27,7 +27,7 @@ export function FlavorStep({
           <Skeleton className="h-5 w-32" />
           <Skeleton className="h-4 w-80" />
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
@@ -68,7 +68,7 @@ export function FlavorStep({
           name="flavor_id"
           render={({ field }) => (
             <FormItem>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {resources?.flavors.length === 0 ? (
                   <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
                     <div className="rounded-full bg-muted/50 p-3 mb-4">
