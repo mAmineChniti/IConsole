@@ -100,6 +100,7 @@ export function Sidebar() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
 
   const initialComputeOpen = computeSubItems.some(
     (item) => pathname === item.href,
@@ -107,6 +108,10 @@ export function Sidebar() {
   const [computeOpen, setComputeOpen] = useState(initialComputeOpen);
 
   const [selectedProject, setSelectedProject] = useState<string>("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const savedProject = localStorage.getItem("selectedProject");
@@ -365,13 +370,19 @@ export function Sidebar() {
             variant="ghost"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            {theme === "dark" ? (
+            {!mounted ? (
+              <Sun className="h-4 w-4 mr-3" />
+            ) : theme === "dark" ? (
               <Sun className="h-4 w-4 mr-3" />
             ) : (
               <Moon className="h-4 w-4 mr-3" />
             )}
             <span className="text-sm font-medium">
-              {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              {!mounted
+                ? "Toggle Theme"
+                : theme === "dark"
+                  ? "Light Mode"
+                  : "Dark Mode"}
             </span>
           </Button>
         </SidebarMenuButton>

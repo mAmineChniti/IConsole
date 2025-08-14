@@ -82,7 +82,7 @@ const API_CONFIG = {
     OVERVIEW: "/dashboard/overview",
   },
   PROJECTS: {
-    BASE: "/projects/",
+    BASE: "/projects",
     ASSIGN_USER: "/projects/assign-user",
     REMOVE_USER: "/projects/remove-user",
     UPDATE_USER_ROLES: "/projects/update-user-roles",
@@ -158,19 +158,12 @@ export const AuthService = {
 };
 
 export const ProjectService = {
-  async list(): Promise<ProjectListResponse> {
-    const result = await client.get<ProjectListResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE,
-      { headers: { Accept: "application/json" } },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
   async listDetails(): Promise<ProjectDetailsResponse[]> {
-    const projects = await this.list();
-    if (projects.length === 0) return [];
+    const projectsResponse = await AuthService.getProjects();
+    if (!projectsResponse.projects || projectsResponse.projects.length === 0)
+      return [];
     const settled = await Promise.allSettled(
-      projects.map((p) => this.get(p.id)),
+      projectsResponse.projects.map((p) => this.get(p.project_id)),
     );
     return settled
       .filter(
@@ -382,28 +375,40 @@ export const ImageService = {
   async importFromUrl(
     params: ImageImportFromUrlRequest,
   ): Promise<ImageImportFromUrlResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const url =
       API_CONFIG.BASE_URL +
       API_CONFIG.IMAGE.IMPORT_FROM_URL +
       `?image_url=${encodeURIComponent(params.image_url)}&image_name=${encodeURIComponent(params.image_name)}${params.visibility ? `&visibility=${params.visibility}` : ""}`;
-    const result = await client.post<ImageImportFromUrlResponse>(url, {
-      type: "json",
-      data: {},
-    });
+    const result = await client.post<ImageImportFromUrlResponse>(
+      url,
+      {
+        type: "json",
+        data: {},
+      },
+      { headers: token },
+    );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async importFromName(
     params: ImageImportFromNameRequest,
   ): Promise<ImageImportFromNameResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const url =
       API_CONFIG.BASE_URL +
       API_CONFIG.IMAGE.IMPORT_FROM_NAME +
       `?description=${encodeURIComponent(params.description)}${params.visibility ? `&visibility=${params.visibility}` : ""}`;
-    const result = await client.post<ImageImportFromNameResponse>(url, {
-      type: "json",
-      data: {},
-    });
+    const result = await client.post<ImageImportFromNameResponse>(
+      url,
+      {
+        type: "json",
+        data: {},
+      },
+      { headers: token },
+    );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
@@ -411,24 +416,33 @@ export const ImageService = {
 
 export const NetworkService = {
   async list(): Promise<NetworkListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<NetworkListResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.NETWORK.LIST,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async create(data: NetworkCreateRequest): Promise<NetworkCreateResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<NetworkCreateResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.NETWORK.CREATE,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async createRouter(data: RouterCreateRequest): Promise<RouterCreateResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<RouterCreateResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.NETWORK.ROUTER_CREATE,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -437,18 +451,24 @@ export const NetworkService = {
     routerId: string,
     data: RouterAddInterfaceRequest,
   ): Promise<RouterAddInterfaceResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<RouterAddInterfaceResponse>(
       API_CONFIG.BASE_URL +
         API_CONFIG.NETWORK.ROUTER_ADD_INTERFACE +
         `${routerId}/add-interface`,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
   async delete(networkId: string): Promise<NetworkDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.delete<NetworkDeleteResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.NETWORK.DELETE + networkId,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -457,8 +477,11 @@ export const NetworkService = {
 
 export const InfraService = {
   async listInstances(): Promise<InstanceListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<InstanceListResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.INSTANCES,
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error fetching instances: ${result.error.message}`);
@@ -472,10 +495,13 @@ export const InfraService = {
   async getInstanceDetails(
     instanceId: string,
   ): Promise<InstanceDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<InstanceDetailsResponse>(
       API_CONFIG.BASE_URL +
         API_CONFIG.INFRA.INSTANCE_DETAILS +
         `/${instanceId}`,
+      { headers: token },
     );
     if (result.error) {
       throw new Error(
@@ -489,9 +515,12 @@ export const InfraService = {
   },
 
   async createVM(vmData: VMCreateRequest): Promise<VMCreateResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<VMCreateResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.CREATE_VM,
       { type: "json", data: vmData },
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error creating VM: ${result.error.message}`);
@@ -504,9 +533,12 @@ export const InfraService = {
   async createFromDescription(
     data: CreateFromDescriptionRequest,
   ): Promise<CreateFromDescriptionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<CreateFromDescriptionResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.CREATE_FROM_DESCRIPTION,
       { type: "json", data },
+      { headers: token },
     );
     if (result.error) {
       throw new Error(
@@ -519,8 +551,11 @@ export const InfraService = {
     return result.data;
   },
   async checkQemuImg(): Promise<QemuImgCheckResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<QemuImgCheckResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.CHECK_QEMU,
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error checking qemu-img: ${result.error.message}`);
@@ -532,9 +567,12 @@ export const InfraService = {
   },
 
   async importVMwareVM(formData: FormData): Promise<VMwareImportResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<VMwareImportResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.IMPORT_VMWARE,
       { type: "form", data: formData },
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error importing VMware VM: ${result.error.message}`);
@@ -546,8 +584,11 @@ export const InfraService = {
   },
 
   async listResources(): Promise<ResourcesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<ResourcesResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.RESOURCES,
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error fetching resources: ${result.error.message}`);
@@ -559,9 +600,12 @@ export const InfraService = {
   },
 
   async startInstance(instanceId: string): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<NovaActionResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.START_INSTANCE + `/${instanceId}`,
       { type: "json", data: {} },
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error starting instance: ${result.error.message}`);
@@ -573,9 +617,12 @@ export const InfraService = {
   },
 
   async stopInstance(instanceId: string): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<NovaActionResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.STOP_INSTANCE + `/${instanceId}`,
       { type: "json", data: {} },
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error stopping instance: ${result.error.message}`);
@@ -587,9 +634,12 @@ export const InfraService = {
   },
 
   async rebootInstance(instanceId: string): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<NovaActionResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.REBOOT_INSTANCE + `/${instanceId}`,
       { type: "json", data: {} },
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error rebooting instance: ${result.error.message}`);
@@ -601,8 +651,11 @@ export const InfraService = {
   },
 
   async deleteInstance(instanceId: string): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.delete<NovaActionResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.DELETE_INSTANCE + `/${instanceId}`,
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error deleting instance: ${result.error.message}`);
@@ -614,8 +667,11 @@ export const InfraService = {
   },
 
   async getOverview(): Promise<DashboardOverviewResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<DashboardOverviewResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.INFRA.OVERVIEW,
+      { headers: token },
     );
     if (result.error) {
       throw new Error(`Error fetching overview: ${result.error.message}`);
