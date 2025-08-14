@@ -206,7 +206,7 @@ export const UserCreateRequestSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .max(128, "Password too long")
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^_\-+=])[A-Za-z\d@$!%*?&#^_\-+=]/,
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     ),
   project_id: z.uuid("Invalid project ID format").optional(),
@@ -248,7 +248,7 @@ export const UserUpdateRequestSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .max(128, "Password too long")
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^_\-+=])[A-Za-z\d@$!%*?&#^_\-+=]/,
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     )
     .optional(),
@@ -283,32 +283,52 @@ export const ImageImportFromNameRequestSchema = z.object({
   visibility: z.enum(["private", "public"]).default("private").optional(),
 });
 
-export const AllocationPoolSchema = z.object({
-  start: z
-    .string()
-    .min(1, "Start IP is required")
-    .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid start IP address format")
-    .refine(
-      (ip) =>
-        ip.split(".").every((oct) => {
-          const n = Number(oct);
-          return !Number.isNaN(n) && n >= 0 && n <= 255;
-        }),
-      "Invalid start IP address",
-    ),
-  end: z
-    .string()
-    .min(1, "End IP is required")
-    .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid end IP address format")
-    .refine(
-      (ip) =>
-        ip.split(".").every((oct) => {
-          const n = Number(oct);
-          return !Number.isNaN(n) && n >= 0 && n <= 255;
-        }),
-      "Invalid end IP address",
-    ),
-});
+export const AllocationPoolSchema = z
+  .object({
+    start: z
+      .string()
+      .min(1, "Start IP is required")
+      .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid start IP address format")
+      .refine(
+        (ip) =>
+          ip.split(".").every((oct) => {
+            const n = Number(oct);
+            return !Number.isNaN(n) && n >= 0 && n <= 255;
+          }),
+        "Invalid start IP address",
+      ),
+    end: z
+      .string()
+      .min(1, "End IP is required")
+      .regex(/^(?:\d{1,3}\.){3}\d{1,3}$/, "Invalid end IP address format")
+      .refine(
+        (ip) =>
+          ip.split(".").every((oct) => {
+            const n = Number(oct);
+            return !Number.isNaN(n) && n >= 0 && n <= 255;
+          }),
+        "Invalid end IP address",
+      ),
+  })
+  .refine(
+    (data) => {
+      const startOctets = data.start.split(".").map(Number);
+      const endOctets = data.end.split(".").map(Number);
+
+      if (startOctets.length !== 4 || endOctets.length !== 4) return false;
+
+      for (let i = 0; i < 4; i++) {
+        const startOctet = startOctets[i];
+        const endOctet = endOctets[i];
+
+        if (startOctet === undefined || endOctet === undefined) return false;
+        if (startOctet < endOctet) return true;
+        if (startOctet > endOctet) return false;
+      }
+      return true;
+    },
+    { message: "Start IP must be less than or equal to end IP", path: ["end"] },
+  );
 
 export const SubnetCreateRequestSchema = z.object({
   name: z
@@ -532,12 +552,18 @@ export const ScaleNodeRequestSchema = z.object({
     .string()
     .min(1, "Neutron external interface is required")
     .max(15, "Interface name too long")
-    .regex(/^[a-zA-Z0-9]+$/, "Invalid interface name format"),
+    .regex(
+      /^[a-zA-Z][a-zA-Z0-9\-_]*[a-zA-Z0-9]$/,
+      "Invalid interface name format",
+    ),
   network_interface: z
     .string()
     .min(1, "Network interface is required")
     .max(15, "Interface name too long")
-    .regex(/^[a-zA-Z0-9]+$/, "Invalid interface name format"),
+    .regex(
+      /^[a-zA-Z][a-zA-Z0-9\-_]*[a-zA-Z0-9]$/,
+      "Invalid interface name format",
+    ),
   ssh_user: z
     .string()
     .min(1, "SSH user is required")

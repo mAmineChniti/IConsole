@@ -83,9 +83,9 @@ const API_CONFIG = {
   },
   PROJECTS: {
     BASE: "/projects/",
-    ASSIGN_USER: "/projects/projects/assign-user",
-    REMOVE_USER: "/projects/projects/remove-user",
-    UPDATE_USER_ROLES: "/projects/projects/update-user-roles",
+    ASSIGN_USER: "/projects/assign-user",
+    REMOVE_USER: "/projects/remove-user",
+    UPDATE_USER_ROLES: "/projects/update-user-roles",
   },
   USERS: {
     BASE: "/users/users",
@@ -220,7 +220,9 @@ export const ProjectService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<AssignUserResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.ASSIGN_USER,
+      API_CONFIG.BASE_URL +
+        API_CONFIG.PROJECTS.BASE +
+        API_CONFIG.PROJECTS.ASSIGN_USER,
       { type: "json", data },
       { headers: token },
     );
@@ -233,7 +235,9 @@ export const ProjectService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<RemoveUserResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.REMOVE_USER,
+      API_CONFIG.BASE_URL +
+        API_CONFIG.PROJECTS.BASE +
+        API_CONFIG.PROJECTS.REMOVE_USER,
       { type: "json", data },
       { headers: token },
     );
@@ -246,7 +250,9 @@ export const ProjectService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.put<UpdateUserRolesResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.UPDATE_USER_ROLES,
+      API_CONFIG.BASE_URL +
+        API_CONFIG.PROJECTS.BASE +
+        API_CONFIG.PROJECTS.UPDATE_USER_ROLES,
       { type: "json", data },
       { headers: token },
     );
