@@ -98,7 +98,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Users
@@ -333,14 +333,14 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                   type="button"
                   variant="outline"
                   onClick={onBack}
-                  className="min-w-[100px]"
+                  className="min-w-[100px] cursor-pointer"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="min-w-[100px]"
+                  className="min-w-[100px] cursor-pointer"
                 >
                   {createMutation.isPending ? (
                     <>

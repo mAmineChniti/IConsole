@@ -178,7 +178,7 @@ export function UsersManager() {
               <CardContent className="space-y-4 pt-0 relative">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
                       <Skeleton className="h-4 w-4 rounded" />
                     </div>
                     <div className="flex-1 min-w-0 space-y-2">
@@ -187,7 +187,7 @@ export function UsersManager() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
                       <Skeleton className="h-4 w-4 rounded" />
                     </div>
                     <div className="flex-1 min-w-0 space-y-2">
@@ -200,7 +200,7 @@ export function UsersManager() {
                   <Separator className="mb-4" />
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
                         <Skeleton className="h-3 w-3 rounded-full" />
                       </div>
                       <Skeleton className="h-4 w-16" />
@@ -290,7 +290,7 @@ export function UsersManager() {
                   size="sm"
                   onClick={() => refetch()}
                   disabled={isFetching}
-                  className="h-9 w-9 p-0 rounded-lg hover:bg-muted transition-all duration-200 hover:scale-105"
+                  className="h-9 w-9 p-0 rounded-lg hover:bg-muted transition-all duration-200 hover:scale-105 cursor-pointer"
                 >
                   <RefreshCw
                     className={`h-4 w-4 transition-transform duration-200 ${
@@ -304,7 +304,7 @@ export function UsersManager() {
             <Button
               size="sm"
               onClick={() => setViewMode("create")}
-              className="gap-2 px-4 rounded-lg font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
+              className="gap-2 px-4 rounded-lg font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">New User</span>
@@ -372,7 +372,7 @@ export function UsersManager() {
                         </div>
                         <Badge
                           variant="outline"
-                          className="text-xs px-2 py-0 h-5 bg-green-50 text-green-700 border-green-200"
+                          className="text-xs px-2 py-0 h-5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700"
                         >
                           <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1" />
                           Active
@@ -417,8 +417,8 @@ export function UsersManager() {
               <CardContent className="space-y-4 pt-0 relative">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <AtSign className="h-4 w-4 text-blue-600" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <AtSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-muted-foreground font-medium mb-0.5">
@@ -431,8 +431,8 @@ export function UsersManager() {
                   </div>
 
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                      <Building className="h-4 w-4 text-purple-600" />
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <Building className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-muted-foreground font-medium mb-0.5">
@@ -449,8 +449,8 @@ export function UsersManager() {
                   <Separator className="mb-4" />
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
-                        <Crown className="h-3 w-3 text-amber-600" />
+                      <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                        <Crown className="h-3 w-3 text-amber-600 dark:text-amber-400" />
                       </div>
                       <span className="text-sm font-medium text-muted-foreground">
                         Member
