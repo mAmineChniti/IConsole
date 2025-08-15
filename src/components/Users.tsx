@@ -327,15 +327,15 @@ export function UsersManager() {
           {list.map((user) => (
             <Card
               key={user.id}
-              className="group relative overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm ring-1 ring-border/50 hover:ring-primary/20"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 flex flex-col overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 transition-opacity duration-300 pointer-events-none" />
 
               <CardHeader className="pb-4 relative">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="relative">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ring-1 ring-primary/10 group-hover:ring-primary/20 transition-all duration-300">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ring-1 ring-primary/10 transition-all duration-300">
                         <UserCheck className="h-6 w-6 text-primary" />
                       </div>
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card flex items-center justify-center">
@@ -343,7 +343,7 @@ export function UsersManager() {
                       </div>
                     </div>
                     <div className="space-y-1 flex-1 min-w-0">
-                      <CardTitle className="text-lg font-bold truncate group-hover:text-primary transition-colors duration-200">
+                      <CardTitle className="text-lg font-bold truncate transition-colors duration-200">
                         {user.name}
                       </CardTitle>
                       <div className="flex items-center gap-2">
@@ -360,7 +360,7 @@ export function UsersManager() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-1 ml-3">
+                  <div className="flex gap-1 ml-3 z-10">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
