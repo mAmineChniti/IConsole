@@ -253,26 +253,6 @@ export function UsersManager() {
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl ring-1 ring-primary/10">
-              <UsersIcon className="h-8 w-8 text-primary" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-              User Management
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Manage user accounts, permissions, and project assignments
-            </p>
-          </div>
-        </div>
-        <Separator />
-
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
@@ -380,7 +360,7 @@ export function UsersManager() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-1 ml-3 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                  <div className="flex gap-1 ml-3">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
