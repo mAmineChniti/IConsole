@@ -187,7 +187,7 @@ export const ProjectService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.get<ProjectDetailsResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + projectId,
+      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + `${projectId}`,
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
