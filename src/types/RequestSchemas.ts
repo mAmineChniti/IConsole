@@ -334,16 +334,13 @@ export const SubnetCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Subnet name is required")
-    .max(63, "Subnet name too long")
+    .max(128, "Subnet name too long")
     .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
-      "Subnet name must start and end with alphanumeric characters",
+      /^[\w\-\.\(\)\[\]\:\^']+$/,
+      "Subnet name contains invalid characters",
     )
     .trim(),
-  ip_version: z
-    .number()
-    .int("IP version must be an integer")
-    .refine((val) => val === 4 || val === 6, "IP version must be 4 or 6"),
+  ip_version: z.union([z.literal(4), z.literal(6)]),
   cidr: z
     .string()
     .regex(
@@ -362,69 +359,31 @@ export const SubnetCreateRequestSchema = z.object({
       "Invalid gateway IP address",
     ),
   enable_dhcp: z.boolean(),
-  allocation_pools: z.array(AllocationPoolSchema).default([]),
-  dns_nameservers: z
-    .array(
-      z
-        .string()
-        .regex(
-          /^(?:\d{1,3}\.){3}\d{1,3}$/,
-          "Invalid DNS server IP address format",
-        )
-        .refine(
-          (ip) =>
-            ip.split(".").every((oct) => {
-              const n = Number(oct);
-              return !Number.isNaN(n) && n >= 0 && n <= 255;
-            }),
-          "Invalid DNS server IP address",
-        ),
-    )
-    .default([]),
-  host_routes: z
-    .array(
-      z
-        .string()
-        .regex(
-          /^(\d{1,3}\.){3}\d{1,3}\/([0-9]|[1-2][0-9]|3[0-2])$/,
-          "Invalid host route format (must be CIDR notation, e.g., 10.0.0.0/24)",
-        ),
-    )
-    .default([]),
-});
-
-export const NetworkCreateRequestSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Network name is required")
-    .max(63, "Network name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
-      "Network name must start and end with alphanumeric characters",
-    )
-    .trim(),
-  description: z.string().max(500, "Description too long").trim().optional(),
-  mtu: z
-    .number()
-    .int("MTU must be an integer")
-    .min(68, "MTU too small")
-    .max(9000, "MTU too large")
-    .optional(),
-  shared: z.boolean().optional(),
-  port_security_enabled: z.boolean().optional(),
-  availability_zone_hints: z
-    .array(
-      z
-        .string()
-        .min(1, "Availability zone name cannot be empty")
-        .max(64, "Availability zone name too long")
-        .regex(
-          /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/,
-          "Invalid availability zone name format",
-        ),
-    )
-    .optional(),
-  subnet: SubnetCreateRequestSchema.optional(),
+  allocation_pools: z.array(AllocationPoolSchema),
+  dns_nameservers: z.array(
+    z
+      .string()
+      .regex(
+        /^(?:\d{1,3}\.){3}\d{1,3}$/,
+        "Invalid DNS server IP address format",
+      )
+      .refine(
+        (ip) =>
+          ip.split(".").every((oct) => {
+            const n = Number(oct);
+            return !Number.isNaN(n) && n >= 0 && n <= 255;
+          }),
+        "Invalid DNS server IP address",
+      ),
+  ),
+  host_routes: z.array(
+    z
+      .string()
+      .regex(
+        /^(\d{1,3}\.){3}\d{1,3}\/([0-9]|[1-2][0-9]|3[0-2])$/,
+        "Invalid host route format (must be CIDR notation, e.g., 10.0.0.0/24)",
+      ),
+  ),
 });
 
 export const RouterCreateRequestSchema = z.object({
@@ -586,4 +545,26 @@ export const SendTestEmailRequestSchema = z.object({
     .max(254, "Email address too long")
     .toLowerCase()
     .optional(),
+});
+
+export const NetworkCreateFormDataSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Network name is required")
+    .max(128, "Network name too long")
+    .regex(
+      /^[\w\-\.\(\)\[\]\:\^']+$/,
+      "Network name contains invalid characters",
+    )
+    .trim(),
+  description: z.string().max(500, "Description too long").trim(),
+  mtu: z
+    .number()
+    .int("MTU must be an integer")
+    .min(68, "MTU too small")
+    .max(9000, "MTU too large"),
+  shared: z.boolean(),
+  port_security_enabled: z.boolean(),
+  availability_zone_hints: z.array(z.string().min(1).trim()),
+  subnet: SubnetCreateRequestSchema,
 });

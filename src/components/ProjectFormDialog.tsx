@@ -199,7 +199,6 @@ export function ProjectFormDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Basic Project Information */}
             <div className="space-y-4">
               <FormField
                 control={form.control}
@@ -245,7 +244,6 @@ export function ProjectFormDialog({
               />
             </div>
 
-            {/* User Assignment Section - Only show during creation */}
             {!isEditing && (
               <>
                 <Separator />
@@ -260,7 +258,6 @@ export function ProjectFormDialog({
                     Assign users to this project and define their roles
                   </p>
 
-                  {/* Add User Assignment Form */}
                   <Card className="bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
@@ -373,7 +370,6 @@ export function ProjectFormDialog({
                     </CardContent>
                   </Card>
 
-                  {/* Current Assignments */}
                   {assignments.length > 0 && (
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">

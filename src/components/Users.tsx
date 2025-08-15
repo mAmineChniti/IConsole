@@ -1,21 +1,32 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, Plus, RefreshCw, Shield, Trash2, User, X } from "lucide-react";
+import {
+  Activity,
+  AtSign,
+  Building,
+  Clock,
+  Crown,
+  Edit,
+  Plus,
+  RefreshCw,
+  Trash2,
+  User,
+  UserCheck,
+  Users as UsersIcon,
+} from "lucide-react";
 import { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { AuthService, UserService } from "@/lib/requests";
+import { UserService } from "@/lib/requests";
 import type {
-  ProjectsResponse,
-  RolesResponse,
-  UserDetailsResponse,
+  UserDeleteResponse,
   UserListResponse,
 } from "@/types/ResponseInterfaces";
 
 import { ErrorCard } from "@/components/ErrorCard";
+import { UserCreateForm } from "@/components/UserCreateForm";
+import { UserEditForm } from "@/components/UserEditForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,23 +38,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -51,55 +45,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type {
-  UserCreateRequest,
-  UserUpdateRequest,
-} from "@/types/RequestInterfaces";
-import {
-  UserCreateRequestSchema,
-  UserUpdateRequestSchema,
-} from "@/types/RequestSchemas";
+
+type ViewMode = "list" | "create" | "edit";
 
 export function UsersManager() {
   const queryClient = useQueryClient();
-  const [showCreate, setShowCreate] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [editingUserId, setEditingUserId] = useState<string | undefined>();
   const [showDelete, setShowDelete] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | undefined>();
-  const [editingUser, setEditingUser] = useState<
-    UserDetailsResponse | undefined
-  >();
-  const [projectsModified, setProjectsModified] = useState(false);
-
-  const createForm = useForm<UserCreateRequest>({
-    resolver: zodResolver(UserCreateRequestSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      project_id: "",
-      roles: ["member"],
-    },
-  });
-
-  const editForm = useForm<UserUpdateRequest>({
-    resolver: zodResolver(UserUpdateRequestSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      projects: undefined,
-    },
-  });
-
-  const {
-    fields: projectFields,
-    append: appendProject,
-    remove: removeProject,
-    update: updateProject,
-  } = useFieldArray({
-    control: editForm.control,
-    name: "projects",
-  });
 
   const {
     data: users,
@@ -114,138 +68,148 @@ export function UsersManager() {
     staleTime: 15000,
   });
 
-  const { data: roles } = useQuery<RolesResponse>({
-    queryKey: ["users", "roles"],
-    queryFn: () => UserService.getRoles(),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const { data: availableProjects, isLoading: isProjectsLoading } =
-    useQuery<ProjectsResponse>({
-      queryKey: ["auth", "projects"],
-      queryFn: () => AuthService.getProjects(),
-      staleTime: 5 * 60 * 1000,
-    });
-
-  const createMutation = useMutation({
-    mutationFn: async () => {
-      const values = createForm.getValues();
-      return UserService.create(values);
-    },
+  const deleteMutation = useMutation<UserDeleteResponse, Error, string>({
+    mutationFn: (id: string) => UserService.delete(id),
     onSuccess: async () => {
-      toast.success("User created");
-      setShowCreate(false);
-      createForm.reset({
-        name: "",
-        email: "",
-        password: "",
-        project_id: "",
-        roles: ["member"],
-      });
-      await queryClient.invalidateQueries({ queryKey: ["users", "list"] });
-    },
-    onError: (error) => toast.error(error.message),
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async () => {
-      if (!editingUser) throw new Error("No user selected");
-      const values = editForm.getValues();
-
-      let projectsToSend: typeof values.projects = undefined;
-
-      if (projectsModified) {
-        const projects = values.projects;
-        projectsToSend =
-          projects && projects.length > 0
-            ? projects.filter((p) => p.project_id && p.project_id.trim() !== "")
-            : [];
-      }
-
-      return UserService.update(editingUser.id, {
-        name: values.name ?? undefined,
-        email: values.email ?? undefined,
-        password: values.password ?? undefined,
-        ...(projectsModified && { projects: projectsToSend }),
-      });
-    },
-    onSuccess: async () => {
-      toast.success("User updated");
-      setEditingUser(undefined);
-      setProjectsModified(false);
-      editForm.reset();
-      await queryClient.invalidateQueries({ queryKey: ["users", "list"] });
-    },
-    onError: (error) => toast.error(error.message),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: () => {
-      if (!userToDelete) throw new Error("No user to delete");
-      return UserService.delete(userToDelete);
-    },
-    onSuccess: async () => {
-      toast.success("User deleted");
+      toast.success("User deleted successfully");
       setShowDelete(false);
       setUserToDelete(undefined);
       await queryClient.invalidateQueries({ queryKey: ["users", "list"] });
     },
-    onError: (error) => toast.error(error.message),
+    onError: (err) => toast.error(err.message),
   });
 
-  const openEdit = async (id: string) => {
-    try {
-      const details = await UserService.get(id);
-      setEditingUser(details);
-      setProjectsModified(false);
-      editForm.reset({
-        name: details.name,
-        email: details.email,
-        password: "",
-        projects: details.projects.map((p) => ({
-          project_id: p.project_id,
-          roles: p.roles,
-        })),
-      });
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
+  const handleEdit = (userId: string) => {
+    setEditingUserId(userId);
+    setViewMode("edit");
   };
+
+  const handleBackToList = () => {
+    setViewMode("list");
+    setEditingUserId(undefined);
+  };
+
+  const handleSuccessAction = () => {
+    setViewMode("list");
+    setEditingUserId(undefined);
+  };
+
+  if (viewMode === "create") {
+    return (
+      <UserCreateForm
+        onBack={handleBackToList}
+        onSuccess={handleSuccessAction}
+      />
+    );
+  }
+
+  if (viewMode === "edit" && editingUserId) {
+    return (
+      <UserEditForm
+        userId={editingUserId}
+        onBack={handleBackToList}
+        onSuccess={handleSuccessAction}
+      />
+    );
+  }
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-16" />
-          <div className="flex gap-2">
-            <Skeleton className="h-9 w-9" />
-            <Skeleton className="h-9 w-24" />
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 ring-1 ring-primary/10 flex items-center justify-center">
+                <UsersIcon className="h-8 w-8 text-primary opacity-60" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500/60 rounded-full border-2 border-background flex items-center justify-center">
+                <div className="w-2 h-2 bg-white/80 rounded-full" />
+              </div>
+            </div>
+            <div className="space-y-3 flex-1 min-w-0">
+              <Skeleton className="h-9 w-64" />
+              <Skeleton className="h-5 w-80 max-w-full" />
+            </div>
+          </div>
+          <Separator />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
+                <Skeleton className="h-4 w-20" />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Skeleton className="h-9 w-9 rounded-lg" />
+              <Skeleton className="h-9 w-32 rounded-lg" />
+            </div>
           </div>
         </div>
-        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm ring-1 ring-border/50"
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <Skeleton className="h-6 w-32" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-8 w-8" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <CardHeader className="pb-4 relative">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
+                        <Skeleton className="h-6 w-6 rounded-md" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500/40 rounded-full border-2 border-card" />
+                    </div>
+                    <div className="space-y-2 flex-1 min-w-0">
+                      <Skeleton className="h-6 w-40" />
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-5 w-14" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 ml-3 opacity-100">
+                    <Skeleton className="h-8 w-8 rounded-lg" />
+                    <Skeleton className="h-8 w-8 rounded-lg" />
                   </div>
                 </div>
-                <Skeleton className="h-6 w-full mt-2" />
               </CardHeader>
-              <CardContent className="space-y-3 pt-0">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-4 w-4" />
-                  <Skeleton className="h-4 w-40" />
+              <CardContent className="space-y-4 pt-0 relative">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <Skeleton className="h-4 w-4 rounded" />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <Skeleton className="h-3 w-14" />
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                      <Skeleton className="h-4 w-4 rounded" />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-4 w-4" />
-                  <Skeleton className="h-4 w-32" />
+                <div className="pt-2">
+                  <Separator className="mb-4" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                        <Skeleton className="h-3 w-3 rounded-full" />
+                      </div>
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                    <div className="flex items-center gap-2 bg-muted/40 px-2 py-1 rounded-md">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-3 w-10" />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -257,78 +221,173 @@ export function UsersManager() {
 
   if (error) {
     return (
-      <ErrorCard
-        title="Failed to Load Users"
-        message={error?.message || "Unable to load users"}
-        onRetry={() => refetch()}
-        isRetrying={isFetching}
-      />
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <UsersIcon className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                User Management
+              </h1>
+              <p className="text-muted-foreground">
+                Manage user accounts, permissions, and project assignments
+              </p>
+            </div>
+          </div>
+          <Separator />
+        </div>
+        <ErrorCard
+          title="Failed to Load Users"
+          message={error?.message || "Unable to load users"}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
+      </div>
     );
   }
 
   const list = users ?? [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="text-sm text-muted-foreground">
-          {list.length} user{list.length !== 1 ? "s" : ""}
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl ring-1 ring-primary/10">
+              <UsersIcon className="h-8 w-8 text-primary" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            </div>
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+              User Management
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Manage user accounts, permissions, and project assignments
+            </p>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="cursor-pointer"
-          >
-            {isFetching ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => setShowCreate(true)}
-            className="cursor-pointer"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">New User</span>
-            <span className="sm:hidden">New</span>
-          </Button>
+        <Separator />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              <span className="font-semibold text-primary">
+                {list.length} user{list.length !== 1 ? "s" : ""} total
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetch()}
+                  disabled={isFetching}
+                  className="h-9 w-9 p-0 rounded-lg hover:bg-muted transition-all duration-200 hover:scale-105"
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 transition-transform duration-200 ${
+                      isFetching ? "animate-spin" : ""
+                    }`}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Refresh users list</TooltipContent>
+            </Tooltip>
+            <Button
+              size="sm"
+              onClick={() => setViewMode("create")}
+              className="gap-2 px-4 rounded-lg font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">New User</span>
+              <span className="sm:hidden">New</span>
+            </Button>
+          </div>
         </div>
       </div>
 
       {list.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="p-8 text-center">
-            <User className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
-              No users found. Create your first user.
+        <Card className="border-dashed border-2 border-muted-foreground/20 bg-gradient-to-br from-muted/30 to-muted/10">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="relative mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
+                <User className="h-8 w-8 text-primary" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-muted rounded-full border-2 border-card flex items-center justify-center">
+                <Plus className="h-3 w-3 text-muted-foreground" />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-foreground">
+              No users found
+            </h3>
+            <p className="text-muted-foreground mb-8 max-w-md leading-relaxed">
+              Get started by creating your first user account. You can assign
+              them to projects and define their roles to manage access and
+              permissions.
             </p>
+            <Button
+              onClick={() => setViewMode("create")}
+              className="gap-2 px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 transition-all duration-300"
+            >
+              <Plus className="h-4 w-4" />
+              Create First User
+            </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((u) => (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {list.map((user) => (
             <Card
-              key={u.id}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              key={user.id}
+              className="group relative overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm ring-1 ring-border/50 hover:ring-primary/20"
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold truncate flex-1 mr-2">
-                    {u.name}
-                  </CardTitle>
-                  <div className="flex gap-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              <CardHeader className="pb-4 relative">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ring-1 ring-primary/10 group-hover:ring-primary/20 transition-all duration-300">
+                        <UserCheck className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card flex items-center justify-center">
+                        <Activity className="h-2 w-2 text-white" />
+                      </div>
+                    </div>
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <CardTitle className="text-lg font-bold truncate group-hover:text-primary transition-colors duration-200">
+                        {user.name}
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-muted-foreground/80 font-mono bg-muted/40 px-2 py-0.5 rounded-md truncate">
+                          {user.id.slice(0, 8)}...
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className="text-xs px-2 py-0 h-5 bg-green-50 text-green-700 border-green-200"
+                        >
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1" />
+                          Active
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 ml-3 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="h-8 w-8 p-0 cursor-pointer"
-                          onClick={() => openEdit(u.id)}
+                          variant="ghost"
+                          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary rounded-lg transition-all duration-200 hover:scale-105"
+                          onClick={() => handleEdit(user.id)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -339,10 +398,10 @@ export function UsersManager() {
                       <TooltipTrigger asChild>
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="h-8 w-8 p-0 cursor-pointer"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all duration-200 hover:scale-105"
                           onClick={() => {
-                            setUserToDelete(u.id);
+                            setUserToDelete(user.id);
                             setShowDelete(true);
                           }}
                         >
@@ -353,20 +412,55 @@ export function UsersManager() {
                     </Tooltip>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded overflow-hidden">
-                  <span className="block truncate">ID: {u.id}</span>
-                </p>
               </CardHeader>
-              <CardContent className="space-y-3 pt-0">
-                <div className="flex items-start gap-2 text-sm min-w-0">
-                  <User className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                  <span className="truncate">{u.email || "(no email)"}</span>
+
+              <CardContent className="space-y-4 pt-0 relative">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <AtSign className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground font-medium mb-0.5">
+                        Email
+                      </p>
+                      <p className="text-sm font-medium truncate">
+                        {user.email || "No email provided"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                      <Building className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground font-medium mb-0.5">
+                        Project
+                      </p>
+                      <p className="text-sm font-medium truncate">
+                        {user.project || "None assigned"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-start gap-2 text-sm min-w-0">
-                  <Shield className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                  <span className="truncate">
-                    Default Project: {u.project || "-"}
-                  </span>
+
+                <div className="pt-2">
+                  <Separator className="mb-4" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                        <Crown className="h-3 w-3 text-amber-600" />
+                      </div>
+                      <span className="text-sm font-medium text-muted-foreground">
+                        Member
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/40 px-2 py-1 rounded-md">
+                      <Clock className="h-3 w-3" />
+                      <span>Active</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -374,477 +468,34 @@ export function UsersManager() {
         </div>
       )}
 
-      <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Create User</DialogTitle>
-            <DialogDescription>
-              Create a new user and assign them to a project with specific
-              roles.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...createForm}>
-            <form
-              onSubmit={createForm.handleSubmit(() => createMutation.mutate())}
-              className="space-y-4"
-            >
-              <FormField
-                control={createForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="jdoe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={createForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="user@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={createForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={createForm.control}
-                name="project_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Project</FormLabel>
-                    <div className="flex items-center gap-2">
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger
-                            disabled={
-                              isProjectsLoading ||
-                              (availableProjects?.projects?.length ?? 0) === 0
-                            }
-                            className="flex-1"
-                          >
-                            <SelectValue placeholder="Select a project (optional)" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {isProjectsLoading ? (
-                            <SelectItem value="__loading" disabled>
-                              Loading projects…
-                            </SelectItem>
-                          ) : (availableProjects?.projects?.length ?? 0) ===
-                            0 ? (
-                            <SelectItem value="__no-projects" disabled>
-                              No projects available
-                            </SelectItem>
-                          ) : (
-                            availableProjects?.projects?.map((p) => (
-                              <SelectItem
-                                key={p.project_id}
-                                value={p.project_id}
-                              >
-                                {p.project_name}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                      {field.value && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => field.onChange("")}
-                          className="h-10 px-2 flex-shrink-0"
-                        >
-                          Clear
-                        </Button>
-                      )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={createForm.control}
-                name="roles"
-                render={({ field }) => {
-                  const current = field.value || [];
-                  const toggle = (roleName: string) => {
-                    const next = current.includes(roleName)
-                      ? current.filter((r: string) => r !== roleName)
-                      : [...current, roleName];
-                    field.onChange(next);
-                  };
-                  return (
-                    <FormItem>
-                      <FormLabel>Roles</FormLabel>
-                      <div className="flex flex-wrap gap-2">
-                        {roles && roles.length > 0 ? (
-                          roles.map((r) => {
-                            const selected = current.includes(r.name);
-                            return (
-                              <Badge
-                                key={r.id}
-                                variant={selected ? "default" : "outline"}
-                                onClick={() => toggle(r.name)}
-                                className="cursor-pointer select-none max-w-[200px] truncate"
-                              >
-                                {r.name}
-                              </Badge>
-                            );
-                          })
-                        ) : (
-                          <Badge variant="outline">No roles available</Badge>
-                        )}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
-              <DialogFooter className="gap-2 flex-col sm:flex-row">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowCreate(false)}
-                  className="cursor-pointer w-full sm:w-auto"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending}
-                  className="cursor-pointer w-full sm:w-auto"
-                >
-                  {createMutation.isPending ? "Creating..." : "Create"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={!!editingUser}
-        onOpenChange={(o) => {
-          if (!o) {
-            setEditingUser(undefined);
-            setProjectsModified(false);
-          }
-        }}
-      >
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>
-              Update user information and manage project assignments with roles.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...editForm}>
-            <form
-              onSubmit={editForm.handleSubmit(() => updateMutation.mutate())}
-              className="space-y-4"
-            >
-              <FormField
-                control={editForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Project Assignments
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Assign projects and roles. Click role badges to toggle, use
-                    X button to remove project assignments.
-                  </p>
-                </div>
-                <div className="space-y-3">
-                  {projectFields.map((field, index) => (
-                    <div
-                      key={field.id}
-                      className="p-3 sm:p-4 border rounded-md space-y-3"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-medium truncate">
-                          Project #{index + 1}
-                        </span>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                removeProject(index);
-                                setProjectsModified(true);
-                              }}
-                              className="h-6 w-6 p-0 text-destructive hover:text-destructive flex-shrink-0"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Remove project assignment
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-
-                      <div>
-                        <Label
-                          id={`project-label-${index}`}
-                          className="text-xs text-muted-foreground"
-                        >
-                          Project
-                        </Label>
-                        <Select
-                          value={field.project_id}
-                          onValueChange={(value) => {
-                            if (
-                              value &&
-                              projectFields.some(
-                                (p, i) => i !== index && p.project_id === value,
-                              )
-                            ) {
-                              toast.error("This project is already assigned");
-                              return;
-                            }
-                            const updatedField = {
-                              ...field,
-                              project_id: value,
-                              ...(value === "" && { roles: [] }),
-                            };
-                            updateProject(index, updatedField);
-                            setProjectsModified(true);
-                          }}
-                        >
-                          <SelectTrigger
-                            id={`project-select-${index}`}
-                            aria-labelledby={`project-label-${index}`}
-                            className="w-full mt-1 text-sm"
-                            disabled={
-                              isProjectsLoading ||
-                              (availableProjects?.projects?.length ?? 0) === 0
-                            }
-                          >
-                            <SelectValue placeholder="Select a project" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {isProjectsLoading ? (
-                              <SelectItem value="__loading" disabled>
-                                Loading projects…
-                              </SelectItem>
-                            ) : (availableProjects?.projects?.length ?? 0) ===
-                              0 ? (
-                              <SelectItem value="__no-projects" disabled>
-                                No projects available
-                              </SelectItem>
-                            ) : (
-                              availableProjects?.projects?.map((p) => (
-                                <SelectItem
-                                  key={p.project_id}
-                                  value={p.project_id}
-                                >
-                                  {p.project_name}
-                                </SelectItem>
-                              ))
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label className="text-xs text-muted-foreground">
-                          Roles (click to toggle)
-                        </Label>
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          {roles?.map((role) => {
-                            const isSelected = field.roles.includes(role.name);
-                            return (
-                              <Tooltip key={role.id}>
-                                <TooltipTrigger asChild>
-                                  <Badge
-                                    variant={isSelected ? "default" : "outline"}
-                                    onClick={() => {
-                                      const newRoles = isSelected
-                                        ? field.roles.filter(
-                                            (r) => r !== role.name,
-                                          )
-                                        : [...field.roles, role.name];
-                                      const updatedField = {
-                                        ...field,
-                                        roles: newRoles,
-                                      };
-                                      updateProject(index, updatedField);
-                                      setProjectsModified(true);
-                                    }}
-                                    className="cursor-pointer select-none text-xs hover:opacity-80 transition-opacity max-w-[200px] truncate"
-                                  >
-                                    {role.name}
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  {isSelected
-                                    ? `Remove ${role.name} role`
-                                    : `Add ${role.name} role`}
-                                </TooltipContent>
-                              </Tooltip>
-                            );
-                          })}
-                        </div>
-                        {field.roles.length === 0 && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            No roles assigned. Click role badges above to
-                            assign.
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-
-                  {projectFields.length === 0 && (
-                    <div className="text-center py-4 text-muted-foreground text-sm border-2 border-dashed border-muted-foreground/20 rounded-md">
-                      No project assignments yet. Use the button below to add
-                      project assignments.
-                    </div>
-                  )}
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (projectFields.some((p) => !p.project_id)) {
-                        toast.message(
-                          "Finish selecting a project before adding another assignment",
-                        );
-                        return;
-                      }
-                      appendProject({ project_id: "", roles: [] });
-                      setProjectsModified(true);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Project Assignment
-                  </Button>
-                </div>
-              </div>
-              <DialogFooter className="gap-2 flex-col sm:flex-row">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setEditingUser(undefined);
-                    setProjectsModified(false);
-                  }}
-                  className="cursor-pointer w-full sm:w-auto"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={updateMutation.isPending}
-                  className="cursor-pointer w-full sm:w-auto"
-                >
-                  {updateMutation.isPending ? "Saving..." : "Save"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={showDelete} onOpenChange={setShowDelete}>
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Trash2 className="h-5 w-5" /> Delete User
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              Delete User
             </DialogTitle>
-            <DialogDescription>This action cannot be undone.</DialogDescription>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete the
+              user account and remove all associated data.
+            </DialogDescription>
           </DialogHeader>
-          <Separator />
-          <DialogFooter className="gap-2 flex-col sm:flex-row">
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setShowDelete(false)}
-              className="cursor-pointer w-full sm:w-auto"
+              disabled={deleteMutation.isPending}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="cursor-pointer w-full sm:w-auto"
+              onClick={() =>
+                userToDelete && deleteMutation.mutate(userToDelete)
+              }
+              disabled={deleteMutation.isPending || !userToDelete}
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? "Deleting..." : "Delete User"}
             </Button>
           </DialogFooter>
         </DialogContent>

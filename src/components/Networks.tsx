@@ -3,20 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Network, Plus, RefreshCw, Router, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-import { NetworkService } from "@/lib/requests";
-import type {
-  NetworkCreateRequest,
-  RouterCreateRequest,
-} from "@/types/RequestInterfaces";
-import { RouterCreateRequestSchema } from "@/types/RequestSchemas";
-import type {
-  NetworkListResponse,
-  RouterCreateResponse,
-} from "@/types/ResponseInterfaces";
 
 import { ErrorCard } from "@/components/ErrorCard";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +27,29 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { NetworkService } from "@/lib/requests";
+import type {
+  AllocationPool,
+  NetworkCreateRequest,
+  RouterCreateRequest,
+} from "@/types/RequestInterfaces";
+import {
+  NetworkCreateFormDataSchema,
+  RouterCreateRequestSchema,
+} from "@/types/RequestSchemas";
+import type {
+  NetworkListResponse,
+  RouterCreateResponse,
+} from "@/types/ResponseInterfaces";
 
 export function NetworksManager() {
   const queryClient = useQueryClient();
@@ -48,14 +59,34 @@ export function NetworksManager() {
     string | undefined
   >(undefined);
 
-  const networkForm = useForm({
+  const networkForm = useForm<NetworkCreateRequest>({
+    resolver: zodResolver(NetworkCreateFormDataSchema),
     defaultValues: {
       name: "",
-      cidr: "10.10.10.0/24",
-      gateway_ip: "10.10.10.1",
-      dns_nameservers: "1.1.1.1,8.8.8.8",
+      description: "",
+      mtu: 1500,
+      shared: false,
+      port_security_enabled: true,
+      availability_zone_hints: [],
+      subnet: {
+        name: "",
+        ip_version: 4 as const,
+        cidr: "10.10.10.0/24",
+        gateway_ip: "10.10.10.1",
+        enable_dhcp: true,
+        dns_nameservers: ["1.1.1.1", "8.8.8.8"],
+        allocation_pools: [],
+        host_routes: [],
+      },
     },
   });
+
+  const [allocationPoolsText, setAllocationPoolsText] = useState("");
+  // keep text in sync with form state so it reflects resets/defaults
+  useEffect(() => {
+    const pools = networkForm.getValues("subnet.allocation_pools") ?? [];
+    setAllocationPoolsText(JSON.stringify(pools));
+  }, [showCreate, networkForm]); // re-sync when dialog opens/closes; adjust as needed
 
   const routerForm = useForm<RouterCreateRequest>({
     resolver: zodResolver(RouterCreateRequestSchema),
@@ -79,34 +110,31 @@ export function NetworksManager() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (formData: {
-      name: string;
-      cidr: string;
-      gateway_ip: string;
-      dns_nameservers: string;
-    }) => {
-      const dns_nameservers = formData.dns_nameservers
-        .split(",")
-        .map((d) => d.trim())
-        .filter(Boolean);
-
-      const data: NetworkCreateRequest = {
-        name: formData.name,
-        port_security_enabled: true,
-        shared: false,
+    mutationFn: async (formData: NetworkCreateRequest) => {
+      const payload: NetworkCreateRequest = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        mtu: formData.mtu,
+        shared: formData.shared,
+        port_security_enabled: formData.port_security_enabled,
+        availability_zone_hints: formData.availability_zone_hints.map((s) =>
+          s.trim(),
+        ),
         subnet: {
-          name: `${formData.name}-subnet`,
-          ip_version: 4,
-          cidr: formData.cidr,
-          gateway_ip: formData.gateway_ip,
-          enable_dhcp: true,
-          allocation_pools: [],
-          dns_nameservers,
-          host_routes: [],
+          name: formData.subnet.name.trim(),
+          ip_version: formData.subnet.ip_version,
+          cidr: formData.subnet.cidr.trim(),
+          gateway_ip: formData.subnet.gateway_ip.trim(),
+          enable_dhcp: formData.subnet.enable_dhcp,
+          allocation_pools: formData.subnet.allocation_pools.map((ap) => ({
+            start: ap.start.trim(),
+            end: ap.end.trim(),
+          })),
+          dns_nameservers: formData.subnet.dns_nameservers.map((d) => d.trim()),
+          host_routes: formData.subnet.host_routes.map((r) => r.trim()),
         },
       };
-
-      return NetworkService.create(data);
+      return NetworkService.create(payload);
     },
     onSuccess: async () => {
       toast.success("Network created");
@@ -123,14 +151,18 @@ export function NetworksManager() {
     },
     onSuccess: async (_router: RouterCreateResponse) => {
       if (selectedNetworkId) {
-        try {
-          await NetworkService.addRouterInterface(selectedNetworkId, {
-            subnet_id: selectedNetworkId,
-          });
-        } catch {
-          toast.error(
-            "Attached router but failed subnet interface (adjust later)",
-          );
+        const net = networks?.find((n) => n.id === selectedNetworkId);
+        const firstSubnetId = net?.subnets?.[0];
+        if (firstSubnetId) {
+          try {
+            await NetworkService.addRouterInterface(selectedNetworkId, {
+              subnet_id: firstSubnetId,
+            });
+          } catch {
+            toast.error(
+              "Router created but failed to attach first subnet (attach manually)",
+            );
+          }
         }
       }
       toast.success("Router created");
@@ -308,7 +340,7 @@ export function NetworksManager() {
       )}
 
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md overflow-hidden">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl overflow-hidden max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Create network
@@ -321,80 +353,387 @@ export function NetworksManager() {
               )}
               className="space-y-4"
             >
-              <FormField
-                control={networkForm.control}
-                name="name"
-                render={({ field }) => (
-                  <div className="space-y-2">
-                    <FormLabel className="text-sm font-medium">
-                      Network Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="network-name"
-                        className="h-10 w-full"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                )}
-              />
-              <FormField
-                control={networkForm.control}
-                name="cidr"
-                render={({ field }) => (
-                  <div className="space-y-2">
-                    <FormLabel className="text-sm font-medium">CIDR</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="10.10.10.0/24"
-                        className="h-10 w-full"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                )}
-              />
-              <FormField
-                control={networkForm.control}
-                name="gateway_ip"
-                render={({ field }) => (
-                  <div className="space-y-2">
-                    <FormLabel className="text-sm font-medium">
-                      Gateway IP
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="10.10.10.1"
-                        className="h-10 w-full"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                )}
-              />
-              <FormField
-                control={networkForm.control}
-                name="dns_nameservers"
-                render={({ field }) => (
-                  <div className="space-y-2">
-                    <FormLabel className="text-sm font-medium">
-                      DNS (comma separated)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="1.1.1.1,8.8.8.8"
-                        className="h-10 w-full"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                )}
-              />
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold">Network Settings</h3>
+                <FormField
+                  control={networkForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <FormLabel className="text-sm font-medium">
+                        Network Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="network-name"
+                          className="h-10 w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                <FormField
+                  control={networkForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <FormLabel className="text-sm font-medium">
+                        Description
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Network description"
+                          className="h-10 w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={networkForm.control}
+                    name="shared"
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="shared"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="h-4 w-4"
+                        />
+                        <FormLabel
+                          htmlFor="shared"
+                          className="text-sm font-medium"
+                        >
+                          Shared
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
+                    )}
+                  />
+                  <FormField
+                    control={networkForm.control}
+                    name="port_security_enabled"
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="port_security"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="h-4 w-4"
+                        />
+                        <FormLabel
+                          htmlFor="port_security"
+                          className="text-sm font-medium"
+                        >
+                          Port Security
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={networkForm.control}
+                  name="mtu"
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <FormLabel className="text-sm font-medium">MTU</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="1500"
+                          className="h-10 w-full"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                <FormField
+                  control={networkForm.control}
+                  name="availability_zone_hints"
+                  render={({ field }) => {
+                    const value = Array.isArray(field.value)
+                      ? field.value.join(",")
+                      : "";
+                    return (
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-medium">
+                          Availability Zone Hints (comma separated)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="zone1,zone2"
+                            className="h-10 w-full"
+                            value={value}
+                            onChange={(e) => {
+                              const arr = e.target.value
+                                .split(",")
+                                .map((s) => s.trim())
+                                .filter(Boolean);
+                              field.onChange(arr);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    );
+                  }}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold">Subnet Settings</h3>
+                <FormField
+                  control={networkForm.control}
+                  name="subnet.name"
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <FormLabel className="text-sm font-medium">
+                        Subnet Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="subnet-name (auto-generated if empty)"
+                          className="h-10 w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={networkForm.control}
+                    name="subnet.ip_version"
+                    render={({ field }) => (
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-medium">
+                          IP Version
+                        </FormLabel>
+                        <Select
+                          value={String(field.value)}
+                          onValueChange={(v) =>
+                            field.onChange(Number(v) as 4 | 6)
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="h-10 w-full">
+                              <SelectValue placeholder="Select IP Version" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="4">IPv4</SelectItem>
+                            <SelectItem value="6">IPv6</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </div>
+                    )}
+                  />
+                  <FormField
+                    control={networkForm.control}
+                    name="subnet.enable_dhcp"
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2 pt-7">
+                        <input
+                          type="checkbox"
+                          id="enable_dhcp"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="h-4 w-4"
+                        />
+                        <FormLabel
+                          htmlFor="enable_dhcp"
+                          className="text-sm font-medium"
+                        >
+                          Enable DHCP
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={networkForm.control}
+                  name="subnet.cidr"
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <FormLabel className="text-sm font-medium">
+                        CIDR
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="10.10.10.0/24"
+                          className="h-10 w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                <FormField
+                  control={networkForm.control}
+                  name="subnet.gateway_ip"
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <FormLabel className="text-sm font-medium">
+                        Gateway IP
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="10.10.10.1"
+                          className="h-10 w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                <FormField
+                  control={networkForm.control}
+                  name="subnet.dns_nameservers"
+                  render={({ field }) => {
+                    const value = Array.isArray(field.value)
+                      ? field.value.join(",")
+                      : "";
+                    return (
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-medium">
+                          DNS Nameservers (comma separated)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="1.1.1.1,8.8.8.8"
+                            className="h-10 w-full"
+                            value={value}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  .split(",")
+                                  .map((d) => d.trim())
+                                  .filter(Boolean),
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    );
+                  }}
+                />
+                <FormField
+                  control={networkForm.control}
+                  name="subnet.allocation_pools"
+                  render={({ field }) => {
+                    return (
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-medium">
+                          Allocation Pools (optional, JSON array)
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder='[{"start": "10.10.10.10", "end": "10.10.10.100"}]'
+                            className="min-h-[88px] w-full font-mono text-xs"
+                            value={allocationPoolsText}
+                            onChange={(e) =>
+                              setAllocationPoolsText(e.target.value)
+                            }
+                            onBlur={() => {
+                              const raw = allocationPoolsText.trim();
+                              if (!raw) {
+                                field.onChange([]);
+                                networkForm.clearErrors(
+                                  "subnet.allocation_pools",
+                                );
+                                return;
+                              }
+                              try {
+                                const parsed = JSON.parse(
+                                  raw,
+                                ) as AllocationPool[];
+                                if (
+                                  Array.isArray(parsed) &&
+                                  parsed.every(
+                                    (p) =>
+                                      typeof p?.start === "string" &&
+                                      typeof p?.end === "string",
+                                  )
+                                ) {
+                                  field.onChange(
+                                    parsed as { start: string; end: string }[],
+                                  );
+                                  networkForm.clearErrors(
+                                    "subnet.allocation_pools",
+                                  );
+                                } else {
+                                  throw new Error("Invalid structure");
+                                }
+                              } catch {
+                                networkForm.setError(
+                                  "subnet.allocation_pools",
+                                  {
+                                    type: "manual",
+                                    message:
+                                      "Invalid JSON for allocation pools",
+                                  },
+                                );
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    );
+                  }}
+                />
+                <FormField
+                  control={networkForm.control}
+                  name="subnet.host_routes"
+                  render={({ field }) => {
+                    const value = Array.isArray(field.value)
+                      ? field.value.join(",")
+                      : "";
+                    return (
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-medium">
+                          Host Routes (optional, comma separated CIDR)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="10.0.0.0/24,192.168.0.0/24"
+                            className="h-10 w-full"
+                            value={value}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  .split(",")
+                                  .map((r) => r.trim())
+                                  .filter(Boolean),
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    );
+                  }}
+                />
+              </div>
               <DialogFooter className="pt-4">
                 <Button
                   type="submit"
