@@ -27,7 +27,9 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageService, InfraService } from "@/lib/requests";
+import { cn } from "@/lib/utils";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
+import { toast } from "sonner";
 
 interface ImportImageForm {
   imageUrl: string;
@@ -77,8 +79,14 @@ export function Images() {
       setIsImportDialogOpen(false);
       void queryClient.invalidateQueries({ queryKey: ["images"] });
     },
-    onError: (err) => {
-      console.error("Error importing image:", err);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -121,7 +129,9 @@ export function Images() {
           {Array.from({ length: 6 }).map((_, index) => (
             <Card
               key={index}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
+              className={cn(
+                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl overflow-hidden",
+              )}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
@@ -176,7 +186,7 @@ export function Images() {
             placeholder="Search images..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-10 w-full"
+            className="pl-10 h-10 w-full rounded-full"
           />
         </div>
 
@@ -184,13 +194,13 @@ export function Images() {
           <DialogTrigger asChild>
             <Button
               variant="outline"
-              className="gap-2 cursor-pointer w-full sm:w-auto min-w-[140px]"
+              className="gap-2 cursor-pointer w-full sm:w-auto min-w-[140px] rounded-full"
             >
               <Plus className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">Import Image</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 left-1/2 translate-x-[-50%]">
+          <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold truncate">
                 Import Image from URL
@@ -209,7 +219,7 @@ export function Images() {
                   onChange={(e) =>
                     setImportForm({ ...importForm, imageUrl: e.target.value })
                   }
-                  className="h-10 w-full"
+                  className="h-10 w-full rounded-full"
                   required
                 />
               </div>
@@ -224,7 +234,7 @@ export function Images() {
                   onChange={(e) =>
                     setImportForm({ ...importForm, imageName: e.target.value })
                   }
-                  className="h-10 w-full"
+                  className="h-10 w-full rounded-full"
                   required
                 />
               </div>
@@ -238,7 +248,7 @@ export function Images() {
                     setImportForm({ ...importForm, visibility: value })
                   }
                 >
-                  <SelectTrigger className="w-full cursor-pointer h-10">
+                  <SelectTrigger className="w-full cursor-pointer !h-10 rounded-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -255,7 +265,7 @@ export function Images() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
+                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1 rounded-full"
                   onClick={() => setIsImportDialogOpen(false)}
                   disabled={importMutation.isPending}
                 >
@@ -265,7 +275,7 @@ export function Images() {
                   type="submit"
                   variant="outline"
                   disabled={importMutation.isPending}
-                  className="gap-2 cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[140px]"
+                  className="gap-2 cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[140px] rounded-full"
                 >
                   {importMutation.isPending ? (
                     <>
@@ -286,8 +296,12 @@ export function Images() {
       </div>
 
       {filteredImages.length === 0 ? (
-        <Card className="border-dashed overflow-hidden">
-          <CardContent className="p-6 sm:p-8 text-center">
+        <Card
+          className={cn(
+            "border-dashed bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl overflow-hidden",
+          )}
+        >
+          <CardContent className="p-8 text-center">
             <HardDrive className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mb-4 flex-shrink-0" />
             {searchTerm ? (
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words">
@@ -305,7 +319,9 @@ export function Images() {
           {visibleData.map((image) => (
             <Card
               key={image.id}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
+              className={cn(
+                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl overflow-hidden",
+              )}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start gap-3">
@@ -316,7 +332,7 @@ export function Images() {
                     <CardTitle className="text-base sm:text-lg font-semibold text-foreground break-words leading-tight">
                       {image.name}
                     </CardTitle>
-                    <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded-md leading-relaxed">
+                    <p className="text-xs text-muted-foreground w-fit font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded-md leading-relaxed">
                       ID: {image.id}
                     </p>
                   </div>
@@ -332,11 +348,12 @@ export function Images() {
           onClick={handleShowMore}
           variant="outline"
           disabled={!hasMore}
-          className={`transition-all duration-200 px-4 sm:px-6 py-2 w-full sm:w-auto max-w-xs ${
+          className={cn(
+            "rounded-full transition-all duration-200 px-4 sm:px-6 py-2 w-full sm:w-auto max-w-xs bg-background text-foreground border-border/50",
             hasMore
               ? "hover:bg-accent hover:text-accent-foreground hover:scale-105"
-              : "opacity-50 cursor-not-allowed"
-          }`}
+              : "opacity-50 cursor-not-allowed",
+          )}
         >
           <span className="truncate">
             {hasMore

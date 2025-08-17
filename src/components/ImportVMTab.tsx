@@ -65,7 +65,7 @@ export function ImportVMTab({
 
   if (isLoading)
     return (
-      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
+      <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
@@ -157,11 +157,11 @@ export function ImportVMTab({
     );
 
   return (
-    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50">
+    <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-            <Upload className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          <div className="p-2 bg-muted rounded-full">
+            <Upload className="h-5 w-5 text-primary" />
           </div>
           Import Virtual Machine
         </CardTitle>
@@ -218,7 +218,11 @@ export function ImportVMTab({
                   <FormItem>
                     <FormLabel>VM Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter VM name" />
+                      <Input
+                        {...field}
+                        placeholder="Enter VM name"
+                        className="rounded-full bg-input text-foreground"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -232,7 +236,11 @@ export function ImportVMTab({
                   <FormItem>
                     <FormLabel>Description (Optional)</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Brief description" />
+                      <Input
+                        {...field}
+                        placeholder="Brief description"
+                        className="rounded-full bg-input text-foreground"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -252,6 +260,7 @@ export function ImportVMTab({
                         {...field}
                         type="number"
                         onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="rounded-full bg-input text-foreground"
                       />
                     </FormControl>
                     <FormMessage />
@@ -270,6 +279,7 @@ export function ImportVMTab({
                         {...field}
                         type="number"
                         onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="rounded-full bg-input text-foreground"
                       />
                     </FormControl>
                     <FormMessage />
@@ -287,7 +297,7 @@ export function ImportVMTab({
                     <FormLabel>Flavor</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full rounded-full cursor-pointer">
                           <SelectValue placeholder="Select flavor" />
                         </SelectTrigger>
                       </FormControl>
@@ -312,7 +322,7 @@ export function ImportVMTab({
                     <FormLabel>Network</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full rounded-full cursor-pointer">
                           <SelectValue placeholder="Select network" />
                         </SelectTrigger>
                       </FormControl>
@@ -339,7 +349,7 @@ export function ImportVMTab({
                     <FormLabel>Key Pair</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full rounded-full cursor-pointer">
                           <SelectValue placeholder="Select key pair" />
                         </SelectTrigger>
                       </FormControl>
@@ -364,7 +374,7 @@ export function ImportVMTab({
                     <FormLabel>Security Group</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full rounded-full cursor-pointer">
                           <SelectValue placeholder="Select security group" />
                         </SelectTrigger>
                       </FormControl>
@@ -393,6 +403,7 @@ export function ImportVMTab({
                       {...field}
                       type="password"
                       placeholder="Enter admin password"
+                      className="rounded-full bg-input text-foreground"
                     />
                   </FormControl>
                   <FormDescription>
@@ -409,7 +420,7 @@ export function ImportVMTab({
               <Button
                 type="submit"
                 disabled={isCreating || !importFile}
-                className="bg-purple-600 hover:bg-purple-700 cursor-pointer w-full sm:w-auto"
+                className="rounded-full bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer w-full sm:w-auto"
               >
                 {isCreating ? (
                   <>

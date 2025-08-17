@@ -31,7 +31,7 @@ export function FlavorStep({
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="bg-card text-card-foreground border border-border/50 shadow-lg"
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -46,7 +46,7 @@ export function FlavorStep({
                 <div className="space-y-3">
                   {Array.from({ length: 3 }).map((_, j) => (
                     <div key={j} className="flex items-center gap-2">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                      <div className="flex h-6 w-6 items-center justify-center bg-muted">
                         <Skeleton className="h-3 w-3" />
                       </div>
                       <Skeleton className="h-3 w-16" />
@@ -87,9 +87,9 @@ export function FlavorStep({
                     <Card
                       key={flavor.id}
                       className={cn(
-                        "cursor-pointer transition-all hover:shadow-md border-2",
+                        "cursor-pointer transition-all hover:shadow-md border-2 rounded-md bg-card text-card-foreground",
                         field.value === flavor.id
-                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                          ? "border-primary bg-primary/5"
                           : "border-border hover:border-border/80",
                       )}
                       onClick={() => field.onChange(flavor.id)}
@@ -117,7 +117,7 @@ export function FlavorStep({
                         </div>
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
                               <Cpu className="h-3 w-3 text-muted-foreground" />
                             </div>
                             <div className="flex-1">
@@ -128,7 +128,7 @@ export function FlavorStep({
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
                               <MemoryStick className="h-3 w-3 text-muted-foreground" />
                             </div>
                             <div className="flex-1">
@@ -141,7 +141,7 @@ export function FlavorStep({
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
                               <HardDrive className="h-3 w-3 text-muted-foreground" />
                             </div>
                             <div className="flex-1">
@@ -152,7 +152,7 @@ export function FlavorStep({
                           </div>
                           {flavor.ephemeral > 0 && (
                             <div className="flex items-center gap-2">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
                                 <HardDrive className="h-3 w-3 text-muted-foreground/60" />
                               </div>
                               <div className="flex-1">
@@ -164,7 +164,7 @@ export function FlavorStep({
                           )}
                           {flavor.swap > 0 && (
                             <div className="flex items-center gap-2">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
                                 <MemoryStick className="h-3 w-3 text-muted-foreground/60" />
                               </div>
                               <div className="flex-1">

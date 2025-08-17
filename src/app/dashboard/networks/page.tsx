@@ -1,6 +1,6 @@
 import { type Metadata } from "next";
 
-import { NetworksManager } from "@/components/Networks";
+import { Networks } from "@/components/Networks";
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -23,7 +23,7 @@ export default function NetworksPage() {
               Provision networks, subnets and routers for connectivity
             </p>
           </div>
-          <NetworksManager />
+          <Networks />
         </div>
       </SidebarInset>
     </SidebarProvider>

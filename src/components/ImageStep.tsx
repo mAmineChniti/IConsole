@@ -29,11 +29,11 @@ export function ImageStep({
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="bg-card text-card-foreground shadow-lg rounded-xl border border-border"
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-full">
+                  <div className="p-2 bg-accent rounded-full">
                     <Skeleton className="h-5 w-5" />
                   </div>
                   <Skeleton className="h-5 w-24" />
@@ -59,30 +59,30 @@ export function ImageStep({
                   <Card
                     key={image.id}
                     className={cn(
-                      "cursor-pointer transition-all hover:shadow-md border-2",
+                      "cursor-pointer transition-all hover:shadow-lg border-2 rounded-xl bg-card text-card-foreground",
                       field.value === image.id
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                        : "border-border hover:border-border/80",
+                        ? "border-primary ring-2 ring-primary/30"
+                        : "border-border hover:border-accent",
                     )}
                     onClick={() => field.onChange(image.id)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 rounded-full">
+                        <div className="p-2 rounded-full bg-accent">
                           <GetDistroIcon
                             imageName={
                               typeof image.name === "string" ? image.name : ""
                             }
                           />
                         </div>
-                        <h3 className="font-semibold text-base leading-tight break-words">
+                        <h3 className="font-semibold text-base leading-tight break-words text-foreground">
                           {image.name}
                         </h3>
                       </div>
                       <div className="space-y-2">
                         <Badge
                           variant="secondary"
-                          className="text-xs w-fit justify-start"
+                          className="text-xs w-fit justify-start rounded-full bg-muted text-muted-foreground"
                         >
                           <span className="truncate">ID: {image.id}</span>
                         </Badge>

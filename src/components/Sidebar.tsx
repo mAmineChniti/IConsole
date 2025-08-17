@@ -18,6 +18,7 @@ import {
   Users as UsersIcon,
   Zap,
 } from "lucide-react";
+
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -164,10 +165,14 @@ export function Sidebar() {
 
       toast.success("Project switched successfully!");
     },
-    onError: (error: Error) => {
-      toast.error("Failed to switch project", {
-        description: error.message,
-      });
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -176,7 +181,6 @@ export function Sidebar() {
     localStorage.setItem("selectedProject", projectId);
     switchProjectMutation.mutate(projectId);
   };
-
   const logoutMutation = useMutation({
     mutationFn: () => AuthService.logout(),
     onSuccess: async () => {
@@ -186,14 +190,18 @@ export function Sidebar() {
       localStorage.removeItem("selectedProject");
       router.push("/login");
     },
-    onError: async (error: Error) => {
+    onError: async (err: unknown) => {
       await deleteCookie("user");
       await deleteCookie("token");
       setSelectedProject("");
       localStorage.removeItem("selectedProject");
-      toast.error("Logout failed", {
-        description: error.message,
-      });
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
       router.push("/login");
     },
   });
@@ -203,19 +211,25 @@ export function Sidebar() {
   };
 
   return (
-    <ShadcnSidebar className="w-64 overflow-hidden">
-      <SidebarHeader className="border-b p-3 sm:p-4">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+    <ShadcnSidebar className="w-64 overflow-hidden bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-full flex flex-col">
+      <SidebarHeader className="border-b border-sidebar-border p-3 sm:p-4 bg-sidebar">
+        <div className="flex items-center gap-2 min-w-0 justify-center">
+          <div className="relative">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+              <Shield
+                className="w-4 h-4 text-white"
+                aria-hidden="true"
+                focusable="false"
+              />
+            </div>
           </div>
-          <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent select-none truncate">
+          <span className="text-xl font-bold font-sans tracking-tight select-none truncate bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] bg-clip-text text-transparent">
             IConsole
           </span>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-2 overflow-y-auto">
+      <SidebarContent className="p-2 overflow-y-auto bg-sidebar">
         <SidebarGroup>
           <SidebarMenu className="space-y-2">
             <SidebarMenuItem>
@@ -232,20 +246,24 @@ export function Sidebar() {
               >
                 <SidebarMenuButton
                   asChild
-                  className="w-full h-10 px-3 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                  className={cn(
+                    "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                    selectedProject && "rounded-full",
+                  )}
                 >
                   <ComboboxTrigger
                     className={cn(
-                      "w-full flex items-center justify-start cursor-pointer rounded-md text-slate-700 dark:text-slate-300 border-0 bg-transparent shadow-none text-sm font-medium min-w-0",
+                      "w-full flex items-center justify-start cursor-pointer rounded-full text-sidebar-foreground border-0 bg-transparent shadow-none text-sm font-medium min-w-0 hover:rounded-full focus:rounded-full active:rounded-full transition-all",
                       switchProjectMutation.isPending &&
                         "opacity-50 cursor-not-allowed",
+                      selectedProject && "rounded-full",
                     )}
                   />
                 </SidebarMenuButton>
                 <ComboboxContent
                   popoverOptions={{
                     className:
-                      "w-[--radix-popover-trigger-width] p-0 border-slate-200 dark:border-slate-700 shadow-lg max-h-[300px]",
+                      "w-[--radix-popover-trigger-width] p-0 border-sidebar-border shadow-lg max-h-[300px] bg-card text-card-foreground rounded-md",
                   }}
                 >
                   <ComboboxInput
@@ -254,7 +272,7 @@ export function Sidebar() {
                   />
                   <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
                     {projectsLoading ? (
-                      <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
+                      <div className="px-3 py-2 text-sm text-muted-foreground">
                         Loading projects...
                       </div>
                     ) : projects?.projects && projects.projects.length > 0 ? (
@@ -263,7 +281,7 @@ export function Sidebar() {
                           key={project.project_id}
                           value={project.project_id}
                           keywords={[project.project_name]}
-                          className="px-3 py-2 text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-700 dark:text-slate-300 rounded-sm mx-1 transition-colors truncate"
+                          className="px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground text-card-foreground rounded-md mx-1 transition-colors truncate"
                         >
                           <span className="truncate">
                             {project.project_name}
@@ -284,15 +302,18 @@ export function Sidebar() {
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
-                    className="w-full h-10 px-3 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                    className={cn(
+                      "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                      isActive && "rounded-full",
+                    )}
                   >
                     <Link
                       href={item.href}
                       className={cn(
-                        "w-full flex items-center justify-start cursor-pointer rounded-md min-w-0",
+                        "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
                         isActive
-                          ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
-                          : "text-slate-700 dark:text-slate-300",
+                          ? "bg-accent text-accent-foreground font-bold rounded-full"
+                          : "text-sidebar-foreground",
                       )}
                     >
                       <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
@@ -308,12 +329,18 @@ export function Sidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                className="w-full h-10 px-3 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                className={cn(
+                  "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                  computeOpen && "rounded-full",
+                )}
               >
                 <Button
                   variant="ghost"
                   onClick={() => setComputeOpen(!computeOpen)}
-                  className="w-full flex items-center justify-start cursor-pointer rounded-md text-slate-700 dark:text-slate-300 min-w-0"
+                  className={cn(
+                    "w-full flex items-center justify-start cursor-pointer text-sidebar-foreground min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                    computeOpen && "rounded-full",
+                  )}
                 >
                   <Server className="h-4 w-4 mr-3 flex-shrink-0" />
                   <span className="text-sm font-medium flex-1 truncate text-left">
@@ -336,15 +363,18 @@ export function Sidebar() {
                       <SidebarMenuItem key={subItem.href}>
                         <SidebarMenuButton
                           asChild
-                          className="w-full h-10 px-3 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                          className={cn(
+                            "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                            isSubActive && "rounded-full",
+                          )}
                         >
                           <Link
                             href={subItem.href}
                             className={cn(
-                              "w-full flex items-center justify-start cursor-pointer rounded-md min-w-0",
+                              "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
                               isSubActive
-                                ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
-                                : "text-slate-700 dark:text-slate-300",
+                                ? "bg-accent text-accent-foreground font-bold rounded-full"
+                                : "text-sidebar-foreground",
                             )}
                           >
                             <subItem.icon className="h-4 w-4 mr-3 flex-shrink-0" />
@@ -366,15 +396,18 @@ export function Sidebar() {
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
-                    className="w-full h-10 px-3 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                    className={cn(
+                      "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                      isActive && "rounded-full",
+                    )}
                   >
                     <Link
                       href={item.href}
                       className={cn(
-                        "w-full flex items-center justify-start cursor-pointer rounded-md min-w-0",
+                        "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
                         isActive
-                          ? "bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white"
-                          : "text-slate-700 dark:text-slate-300",
+                          ? "bg-accent text-accent-foreground font-bold rounded-full"
+                          : "text-sidebar-foreground",
                       )}
                     >
                       <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
@@ -390,41 +423,38 @@ export function Sidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-3 sm:p-4 space-y-2">
+      <SidebarFooter className="p-3 sm:p-4 space-y-2 bg-sidebar border-t border-sidebar-border">
         <SidebarMenuButton
           asChild
-          className="w-full h-10 px-3 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+          className="w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer hover:rounded-full focus:rounded-full active:rounded-full transition-all"
         >
           <Button
             variant="ghost"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="w-full flex items-center justify-start text-slate-700 dark:text-slate-300 min-w-0 rounded-md"
+            className="w-full flex items-center justify-start text-sidebar-foreground min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all"
           >
             {!mounted ? (
-              <Sun className="h-4 w-4 mr-3 flex-shrink-0" />
+              <span className="h-4 w-4 mr-3 flex-shrink-0"></span>
             ) : theme === "dark" ? (
               <Sun className="h-4 w-4 mr-3 flex-shrink-0" />
             ) : (
               <Moon className="h-4 w-4 mr-3 flex-shrink-0" />
             )}
             <span className="text-sm font-medium truncate">
-              {!mounted
-                ? "Toggle Theme"
-                : theme === "dark"
-                  ? "Light Mode"
-                  : "Dark Mode"}
+              {!mounted ? "" : theme === "dark" ? "Light Mode" : "Dark Mode"}
             </span>
           </Button>
         </SidebarMenuButton>
 
         <SidebarMenuButton
           asChild
-          className="w-full h-10 px-3 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
+          className="w-full h-10 px-3 cursor-pointer rounded-full transition-all text-destructive"
         >
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full flex items-center justify-start text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 min-w-0 rounded-md"
+            className="w-full flex items-center justify-start !text-destructive min-w-0 rounded-full transition-all"
+            style={{ color: "var(--color-destructive)" }}
           >
             <LogOut className="h-4 w-4 mr-3 flex-shrink-0" />
             <span className="text-sm font-medium truncate">Sign Out</span>

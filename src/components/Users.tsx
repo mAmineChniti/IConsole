@@ -2,18 +2,14 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Activity,
   AtSign,
   Building,
-  Clock,
-  Crown,
   Edit,
   Plus,
   RefreshCw,
   Trash2,
   User,
   UserCheck,
-  Users as UsersIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -27,7 +23,6 @@ import type {
 import { ErrorCard } from "@/components/ErrorCard";
 import { UserCreateForm } from "@/components/UserCreateForm";
 import { UserEditForm } from "@/components/UserEditForm";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -45,6 +40,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 type ViewMode = "list" | "create" | "edit";
 
@@ -54,6 +50,7 @@ export function UsersManager() {
   const [editingUserId, setEditingUserId] = useState<string | undefined>();
   const [showDelete, setShowDelete] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | undefined>();
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const {
     data: users,
@@ -76,7 +73,15 @@ export function UsersManager() {
       setUserToDelete(undefined);
       await queryClient.invalidateQueries({ queryKey: ["users", "list"] });
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
   });
 
   const handleEdit = (userId: string) => {
@@ -117,21 +122,6 @@ export function UsersManager() {
     return (
       <div className="space-y-8">
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 ring-1 ring-primary/10 flex items-center justify-center">
-                <UsersIcon className="h-8 w-8 text-primary opacity-60" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500/60 rounded-full border-2 border-background flex items-center justify-center">
-                <div className="w-2 h-2 bg-white/80 rounded-full" />
-              </div>
-            </div>
-            <div className="space-y-3 flex-1 min-w-0">
-              <Skeleton className="h-9 w-64" />
-              <Skeleton className="h-5 w-80 max-w-full" />
-            </div>
-          </div>
-          <Separator />
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
@@ -221,46 +211,36 @@ export function UsersManager() {
 
   if (error) {
     return (
-      <div className="space-y-8">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <UsersIcon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                User Management
-              </h1>
-              <p className="text-muted-foreground">
-                Manage user accounts, permissions, and project assignments
-              </p>
-            </div>
-          </div>
-          <Separator />
-        </div>
-        <ErrorCard
-          title="Failed to Load Users"
-          message={error?.message || "Unable to load users"}
-          onRetry={() => refetch()}
-          isRetrying={isFetching}
-        />
-      </div>
+      <ErrorCard
+        title="Failed to Load Users"
+        message={error?.message || "Unable to load users"}
+        onRetry={() => refetch()}
+        isRetrying={isFetching}
+      />
     );
   }
 
-  const list = users ?? [];
+  const filteredUsers = users ?? [];
+  const totalItems = filteredUsers.length;
+  const visibleData = filteredUsers.slice(0, visibleCount);
+  const hasMore = visibleCount < totalItems;
+
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 6);
+  };
 
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              <span className="font-semibold text-primary">
-                {list.length} user{list.length !== 1 ? "s" : ""} total
-              </span>
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+          <div className="text-sm text-muted-foreground leading-relaxed">
+            {totalItems} user{totalItems !== 1 ? "s" : ""} total
+            {totalItems > 0 && (
+              <>
+                {" • "}
+                Showing {Math.min(visibleCount, totalItems)} of {totalItems}
+              </>
+            )}
           </div>
           <div className="flex gap-3">
             <Tooltip>
@@ -270,31 +250,37 @@ export function UsersManager() {
                   size="sm"
                   onClick={() => refetch()}
                   disabled={isFetching}
-                  className="h-9 w-9 p-0 rounded-lg hover:bg-muted transition-all duration-200 hover:scale-105 cursor-pointer"
+                  className="h-9 w-9 p-0 rounded-full bg-card text-card-foreground border border-border/50 transition-all duration-200 cursor-pointer"
                 >
                   <RefreshCw
-                    className={`h-4 w-4 transition-transform duration-200 ${
-                      isFetching ? "animate-spin" : ""
-                    }`}
+                    className={cn(
+                      "h-4 w-4 transition-transform duration-200",
+                      isFetching && "animate-spin",
+                    )}
                   />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Refresh users list</TooltipContent>
             </Tooltip>
-            <Button
-              size="sm"
-              onClick={() => setViewMode("create")}
-              className="gap-2 px-4 rounded-lg font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105 cursor-pointer"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">New User</span>
-              <span className="sm:hidden">New</span>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  onClick={() => setViewMode("create")}
+                  className="gap-2 px-4 rounded-full font-semibold shadow-md bg-primary text-primary-foreground transition-all duration-300 cursor-pointer"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">New User</span>
+                  <span className="sm:hidden">New</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Add a new user</TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>
 
-      {list.length === 0 ? (
+      {filteredUsers.length === 0 ? (
         <Card className="border-dashed border-2 border-muted-foreground/20 bg-gradient-to-br from-muted/30 to-muted/10">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <div className="relative mb-6">
@@ -315,7 +301,7 @@ export function UsersManager() {
             </p>
             <Button
               onClick={() => setViewMode("create")}
-              className="gap-2 px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 transition-all duration-300"
+              className="gap-2 px-6 py-2.5 rounded-full font-semibold shadow-lg bg-primary text-primary-foreground transition-all duration-300 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
               Create First User
@@ -324,10 +310,10 @@ export function UsersManager() {
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {list.map((user) => (
+          {visibleData.map((user) => (
             <Card
               key={user.id}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 flex flex-col overflow-hidden"
+              className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 transition-opacity duration-300 pointer-events-none" />
 
@@ -335,28 +321,17 @@ export function UsersManager() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="relative">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ring-1 ring-primary/10 transition-all duration-300">
-                        <UserCheck className="h-6 w-6 text-primary" />
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center ring-1 ring-border/50 transition-all duration-300">
+                        <UserCheck className="h-6 w-6 text-muted-foreground" />
                       </div>
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card flex items-center justify-center">
-                        <Activity className="h-2 w-2 text-white" />
-                      </div>
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-green-500 animate-pulse border-2 border-card" />
                     </div>
                     <div className="space-y-1 flex-1 min-w-0">
                       <CardTitle className="text-lg font-bold truncate transition-colors duration-200">
                         {user.name}
                       </CardTitle>
-                      <div className="flex items-center gap-2">
-                        <div className="text-xs text-muted-foreground/80 font-mono bg-muted/40 px-2 py-0.5 rounded-md truncate">
-                          {user.id.slice(0, 8)}...
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className="text-xs px-2 py-0 h-5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700"
-                        >
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1" />
-                          Active
-                        </Badge>
+                      <div className="text-xs text-muted-foreground/80 w-fit font-mono bg-muted/40 px-2 py-0.5 rounded-full wrap-break-word">
+                        {user.id}
                       </div>
                     </div>
                   </div>
@@ -366,7 +341,7 @@ export function UsersManager() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary rounded-lg transition-all duration-200 hover:scale-105"
+                          className="h-8 w-8 p-0 rounded-full bg-card text-card-foreground border border-border/50 transition-all duration-200 cursor-pointer"
                           onClick={() => handleEdit(user.id)}
                         >
                           <Edit className="h-4 w-4" />
@@ -379,7 +354,7 @@ export function UsersManager() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all duration-200 hover:scale-105"
+                          className="h-8 w-8 p-0 rounded-full bg-destructive text-white dark:text-white dark:bg-destructive cursor-pointer hover:bg-destructive hover:text-white dark:hover:bg-destructive focus:bg-destructive focus:text-white"
                           onClick={() => {
                             setUserToDelete(user.id);
                             setShowDelete(true);
@@ -397,8 +372,8 @@ export function UsersManager() {
               <CardContent className="space-y-4 pt-0 relative">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                      <AtSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <AtSign className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-muted-foreground font-medium mb-0.5">
@@ -411,8 +386,8 @@ export function UsersManager() {
                   </div>
 
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <Building className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <Building className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-muted-foreground font-medium mb-0.5">
@@ -424,34 +399,36 @@ export function UsersManager() {
                     </div>
                   </div>
                 </div>
-
-                <div className="pt-2">
-                  <Separator className="mb-4" />
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                        <Crown className="h-3 w-3 text-amber-600 dark:text-amber-400" />
-                      </div>
-                      <span className="text-sm font-medium text-muted-foreground">
-                        Member
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/40 px-2 py-1 rounded-md">
-                      <Clock className="h-3 w-3" />
-                      <span>Active</span>
-                    </div>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
 
+      <div className="flex justify-center px-4 sm:px-0">
+        <Button
+          onClick={handleShowMore}
+          variant="outline"
+          disabled={!hasMore}
+          className={cn(
+            "rounded-full transition-all duration-200 px-4 sm:px-6 py-2 w-full sm:w-auto max-w-xs bg-background text-foreground border border-border/50",
+            hasMore
+              ? "hover:bg-accent hover:text-accent-foreground hover:scale-105"
+              : "opacity-50 cursor-not-allowed",
+          )}
+        >
+          <span className="truncate">
+            {hasMore
+              ? `Show More (${Math.min(6, totalItems - visibleCount)} more)`
+              : "All users loaded"}
+          </span>
+        </Button>
+      </div>
+
       <Dialog open={showDelete} onOpenChange={setShowDelete}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
+            <DialogTitle className="flex items-center gap-2 text-foreground">
               <Trash2 className="h-5 w-5" />
               Delete User
             </DialogTitle>
@@ -460,11 +437,12 @@ export function UsersManager() {
               user account and remove all associated data.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-3 flex-col sm:flex-row pt-4">
             <Button
               variant="outline"
               onClick={() => setShowDelete(false)}
               disabled={deleteMutation.isPending}
+              className="rounded-full px-6 py-2 w-full sm:w-auto order-2 sm:order-1 bg-muted text-foreground transition-all duration-200 cursor-pointer"
             >
               Cancel
             </Button>
@@ -474,8 +452,19 @@ export function UsersManager() {
                 userToDelete && deleteMutation.mutate(userToDelete)
               }
               disabled={deleteMutation.isPending || !userToDelete}
+              className="rounded-full px-6 py-2 w-full sm:w-auto order-1 sm:order-2 bg-destructive text-white transition-all duration-200 cursor-pointer flex items-center justify-center"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete User"}
+              {deleteMutation.isPending ? (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete User
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

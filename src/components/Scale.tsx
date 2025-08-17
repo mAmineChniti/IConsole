@@ -75,7 +75,15 @@ export function ScaleOperations() {
       setShowNodeDialog(false);
       nodeForm.reset();
     },
-    onError: (error) => toast.error(error.message),
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
   });
 
   const testEmailMutation = useMutation({
@@ -86,12 +94,20 @@ export function ScaleOperations() {
       setShowEmailDialog(false);
       emailForm.reset();
     },
-    onError: (error) => toast.error(error.message),
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
   });
 
   return (
     <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
-      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+      <Card className="bg-card text-card-foreground shadow-lg rounded-xl border border-border/50 overflow-hidden">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <ServerCog className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
@@ -106,7 +122,7 @@ export function ScaleOperations() {
           <Button
             variant="outline"
             onClick={() => setShowNodeDialog(true)}
-            className="cursor-pointer w-full sm:w-auto min-w-[120px]"
+            className="cursor-pointer w-full sm:w-auto min-w-[120px] rounded-full"
           >
             <PlusCircle className="h-4 w-4 mr-2 flex-shrink-0" />
             <span className="truncate">Add Node</span>
@@ -114,7 +130,7 @@ export function ScaleOperations() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+      <Card className="bg-card text-card-foreground shadow-lg rounded-xl border border-border/50 overflow-hidden">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Mail className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
@@ -129,7 +145,7 @@ export function ScaleOperations() {
           <Button
             variant="outline"
             onClick={() => setShowEmailDialog(true)}
-            className="cursor-pointer w-full sm:w-auto min-w-[140px]"
+            className="cursor-pointer w-full sm:w-auto min-w-[140px] rounded-full"
           >
             <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
             <span className="truncate">Send Test Email</span>
@@ -138,7 +154,7 @@ export function ScaleOperations() {
       </Card>
 
       <Dialog open={showNodeDialog} onOpenChange={setShowNodeDialog}>
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl bg-card text-card-foreground shadow-lg rounded-xl border border-border/50 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Add Node
@@ -164,7 +180,7 @@ export function ScaleOperations() {
                       <FormControl>
                         <Input
                           placeholder="192.168.1.10"
-                          className="h-10 w-full"
+                          className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                           {...field}
                         />
                       </FormControl>
@@ -183,7 +199,7 @@ export function ScaleOperations() {
                       <FormControl>
                         <Input
                           placeholder="node-compute-01"
-                          className="h-10 w-full"
+                          className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                           {...field}
                         />
                       </FormControl>
@@ -204,11 +220,11 @@ export function ScaleOperations() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full cursor-pointer h-10">
+                          <SelectTrigger className="w-full cursor-pointer !h-10 bg-background text-foreground border border-input rounded-full">
                             <SelectValue placeholder="Select node type" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-card text-card-foreground border border-border/50 rounded-xl shadow-lg">
                           <SelectItem value="control">
                             <span className="truncate">Control</span>
                           </SelectItem>
@@ -235,7 +251,7 @@ export function ScaleOperations() {
                       <FormControl>
                         <Input
                           placeholder="eth1"
-                          className="h-10 w-full"
+                          className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                           {...field}
                         />
                       </FormControl>
@@ -254,7 +270,7 @@ export function ScaleOperations() {
                       <FormControl>
                         <Input
                           placeholder="eth0"
-                          className="h-10 w-full"
+                          className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                           {...field}
                         />
                       </FormControl>
@@ -273,7 +289,7 @@ export function ScaleOperations() {
                       <FormControl>
                         <Input
                           placeholder="kollauser"
-                          className="h-10 w-full"
+                          className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                           {...field}
                         />
                       </FormControl>
@@ -292,7 +308,7 @@ export function ScaleOperations() {
                       <FormControl>
                         <Input
                           type="password"
-                          className="h-10 w-full"
+                          className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                           {...field}
                         />
                       </FormControl>
@@ -311,7 +327,7 @@ export function ScaleOperations() {
                       <FormControl>
                         <Input
                           placeholder="compute"
-                          className="h-10 w-full"
+                          className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                           {...field}
                         />
                       </FormControl>
@@ -325,16 +341,16 @@ export function ScaleOperations() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowNodeDialog(false)}
-                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
+                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1 rounded-full"
                 >
                   <span className="truncate">Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   disabled={addNodeMutation.isPending}
-                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[120px]"
+                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[120px] rounded-full text-primary-foreground"
                 >
-                  <span className="truncate">
+                  <span className="text-primary-foreground truncate">
                     {addNodeMutation.isPending ? "Submitting..." : "Submit"}
                   </span>
                 </Button>
@@ -345,7 +361,7 @@ export function ScaleOperations() {
       </Dialog>
 
       <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground shadow-lg rounded-xl border border-border/50 overflow-hidden">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Send Test Email
@@ -372,7 +388,7 @@ export function ScaleOperations() {
                       <Input
                         type="email"
                         placeholder="ops@example.com"
-                        className="h-10 w-full"
+                        className="h-10 w-full bg-background text-foreground border border-input rounded-full"
                         {...field}
                       />
                     </FormControl>
@@ -385,14 +401,14 @@ export function ScaleOperations() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowEmailDialog(false)}
-                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
+                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1 rounded-full"
                 >
                   <span className="truncate">Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   disabled={testEmailMutation.isPending}
-                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[100px]"
+                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[100px] rounded-full text-primary-foreground"
                 >
                   <span className="truncate">
                     {testEmailMutation.isPending ? "Sending..." : "Send"}
