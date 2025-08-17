@@ -36,7 +36,13 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { NetworkService } from "@/lib/requests";
+import { cn } from "@/lib/utils";
 import type {
   AllocationPool,
   NetworkCreateRequest,
@@ -51,9 +57,10 @@ import type {
   RouterCreateResponse,
 } from "@/types/ResponseInterfaces";
 
-export function NetworksManager() {
+export function Networks() {
   const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(6);
   const [showRouterDialog, setShowRouterDialog] = useState(false);
   const [selectedNetworkId, setSelectedNetworkId] = useState<
     string | undefined
@@ -82,11 +89,10 @@ export function NetworksManager() {
   });
 
   const [allocationPoolsText, setAllocationPoolsText] = useState("");
-  // keep text in sync with form state so it reflects resets/defaults
   useEffect(() => {
     const pools = networkForm.getValues("subnet.allocation_pools") ?? [];
     setAllocationPoolsText(JSON.stringify(pools));
-  }, [showCreate, networkForm]); // re-sync when dialog opens/closes; adjust as needed
+  }, [showCreate, networkForm]);
 
   const routerForm = useForm<RouterCreateRequest>({
     resolver: zodResolver(RouterCreateRequestSchema),
@@ -142,7 +148,15 @@ export function NetworksManager() {
       networkForm.reset();
       await queryClient.invalidateQueries({ queryKey: ["networks", "list"] });
     },
-    onError: (error) => toast.error(error.message),
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
   });
 
   const createRouterMutation = useMutation({
@@ -170,7 +184,15 @@ export function NetworksManager() {
       routerForm.reset();
       await queryClient.invalidateQueries({ queryKey: ["networks", "list"] });
     },
-    onError: (error) => toast.error(error.message),
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -179,8 +201,21 @@ export function NetworksManager() {
       toast.success("Delete requested (ensure sub-resources detached)");
       await queryClient.invalidateQueries({ queryKey: ["networks", "list"] });
     },
-    onError: (error) => toast.error(error.message),
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
   });
+
+  const totalItems = (networks ?? []).length;
+  const visibleData = (networks ?? []).slice(0, visibleCount);
+  const hasMore = visibleCount < totalItems;
+  const handleShowMore = () => setVisibleCount((prev) => prev + 6);
 
   if (isLoading) {
     return (
@@ -196,7 +231,7 @@ export function NetworksManager() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
+              className="bg-card border border-border shadow-sm overflow-hidden"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2">
@@ -231,42 +266,60 @@ export function NetworksManager() {
     );
   }
 
-  const list = networks ?? [];
-
   return (
     <div className="space-y-6 px-2 sm:px-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
         <div className="text-sm text-muted-foreground leading-relaxed">
-          {list.length} network{list.length !== 1 ? "s" : ""}
+          {totalItems} network{totalItems !== 1 ? "s" : ""}
+          {totalItems > 0 && (
+            <>
+              {" • "}
+              Showing {Math.min(visibleCount, totalItems)} of {totalItems}
+            </>
+          )}
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="cursor-pointer w-10 h-9 p-0 sm:w-auto sm:px-3"
-          >
-            {isFetching ? (
-              <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
-            ) : (
-              <RefreshCw className="h-4 w-4 flex-shrink-0" />
-            )}
-            <span className="sr-only sm:not-sr-only sm:ml-2">Refresh</span>
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => setShowCreate(true)}
-            className="cursor-pointer flex-1 sm:flex-none min-w-[120px]"
-          >
-            <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
-            <span className="truncate">New Network</span>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className={cn(
+                  "cursor-pointer w-10 h-9 p-0 sm:w-auto sm:px-3 rounded-full",
+                  isFetching && "opacity-70",
+                )}
+              >
+                {isFetching ? (
+                  <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 flex-shrink-0" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Refresh</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                onClick={() => setShowCreate(true)}
+                className={cn(
+                  "cursor-pointer flex-1 sm:flex-none min-w-[120px] rounded-full",
+                )}
+              >
+                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate">New Network</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Create a new network</TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
-      {list.length === 0 ? (
-        <Card className="border-dashed overflow-hidden">
+      {totalItems === 0 ? (
+        <Card className="border-dashed overflow-hidden bg-card border-border">
           <CardContent className="p-6 sm:p-8 text-center">
             <Network className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mb-4 flex-shrink-0" />
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -275,72 +328,113 @@ export function NetworksManager() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((n) => (
-            <Card
-              key={n.id}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden"
+        <>
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleData.map((n) => (
+              <Card
+                key={n.id}
+                className="bg-card border border-border/50 shadow-sm overflow-hidden"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start sm:items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1 flex items-center gap-2">
+                      <CardTitle className="text-base sm:text-lg font-semibold break-words leading-tight">
+                        {n.name || n.id}
+                      </CardTitle>
+                      <Badge
+                        variant={
+                          n.status === "ACTIVE" ? "default" : "destructive"
+                        }
+                        className={cn(
+                          "gap-1.5 text-xs px-2 py-1 rounded-full capitalize flex items-center",
+                          n.status === "ACTIVE"
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "w-1.5 h-1.5 rounded-full animate-pulse",
+                            n.status === "ACTIVE"
+                              ? "bg-green-500"
+                              : "bg-red-400 dark:bg-red-500",
+                          )}
+                        />
+                        {n.status === "ACTIVE"
+                          ? "Online"
+                          : n.status === "DOWN"
+                            ? "Offline"
+                            : n.status.toLowerCase()}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+                      <Badge
+                        variant={n.is_external ? "default" : "secondary"}
+                        className="text-xs px-2 py-1 rounded-full"
+                      >
+                        {n.is_external ? "Ext" : "Int"}
+                      </Badge>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className={cn(
+                          "h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0 rounded-full",
+                        )}
+                        onClick={() => {
+                          setSelectedNetworkId(n.id);
+                          setShowRouterDialog(true);
+                        }}
+                      >
+                        <Router className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className={cn(
+                          "h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0 rounded-full",
+                          deleteMutation.isPending && "opacity-70",
+                        )}
+                        onClick={() => deleteMutation.mutate(n.id)}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground w-fit font-mono break-all mt-2 bg-muted/40 px-2 py-1 rounded leading-relaxed">
+                    ID: {n.id}
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-3 pt-0">
+                  <div className="text-xs text-muted-foreground">
+                    Subnets: {n.subnets?.length ?? 0}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="flex justify-center mt-4">
+            <Button
+              onClick={handleShowMore}
+              variant="outline"
+              disabled={!hasMore}
+              className={cn(
+                "rounded-full cursor-pointer transition-all duration-200 px-6 py-2 bg-background text-foreground border-border",
+                hasMore
+                  ? "hover:bg-accent hover:text-accent-foreground hover:scale-105"
+                  : "opacity-50 cursor-not-allowed",
+              )}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start sm:items-center justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <CardTitle className="text-base sm:text-lg font-semibold break-words leading-tight">
-                      {n.name || n.id}
-                    </CardTitle>
-                  </div>
-                  <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-                    <Badge
-                      variant={n.is_external ? "default" : "secondary"}
-                      className={`text-xs ${
-                        n.is_external
-                          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
-                          : ""
-                      }`}
-                    >
-                      {n.is_external ? "Ext" : "Int"}
-                    </Badge>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0"
-                      onClick={() => {
-                        setSelectedNetworkId(n.id);
-                        setShowRouterDialog(true);
-                      }}
-                    >
-                      <Router className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0"
-                      onClick={() => deleteMutation.mutate(n.id)}
-                      disabled={deleteMutation.isPending}
-                    >
-                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded leading-relaxed">
-                  ID: {n.id}
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-0">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Status:</span>
-                  <span className="truncate">{n.status}</span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Subnets: {n.subnets.length}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              {hasMore
+                ? `Show More (${Math.min(6, totalItems - visibleCount)} more)`
+                : "All networks loaded"}
+            </Button>
+          </div>
+        </>
       )}
 
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl overflow-hidden max-h-[80vh] overflow-y-auto">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl overflow-hidden max-h-[80vh] overflow-y-auto bg-card text-card-foreground border border-border shadow-lg">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Create network
@@ -366,7 +460,11 @@ export function NetworksManager() {
                       <FormControl>
                         <Input
                           placeholder="network-name"
-                          className="h-10 w-full"
+                          className={cn(
+                            "h-10 w-full rounded-full bg-input text-foreground",
+                            networkForm.formState.errors.name &&
+                              "border-destructive",
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -385,7 +483,11 @@ export function NetworksManager() {
                       <FormControl>
                         <Input
                           placeholder="Network description"
-                          className="h-10 w-full"
+                          className={cn(
+                            "h-10 w-full rounded-full bg-input text-foreground",
+                            networkForm.formState.errors.description &&
+                              "border-destructive",
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -449,7 +551,11 @@ export function NetworksManager() {
                         <Input
                           type="number"
                           placeholder="1500"
-                          className="h-10 w-full"
+                          className={cn(
+                            "h-10 w-full rounded-full bg-input text-foreground",
+                            networkForm.formState.errors.mtu &&
+                              "border-destructive",
+                          )}
                           {...field}
                           onChange={(e) =>
                             field.onChange(Number(e.target.value))
@@ -475,7 +581,12 @@ export function NetworksManager() {
                         <FormControl>
                           <Input
                             placeholder="zone1,zone2"
-                            className="h-10 w-full"
+                            className={cn(
+                              "h-10 w-full rounded-full bg-input text-foreground",
+                              networkForm.formState.errors
+                                .availability_zone_hints &&
+                                "border-destructive",
+                            )}
                             value={value}
                             onChange={(e) => {
                               const arr = e.target.value
@@ -506,7 +617,11 @@ export function NetworksManager() {
                       <FormControl>
                         <Input
                           placeholder="subnet-name (auto-generated if empty)"
-                          className="h-10 w-full"
+                          className={cn(
+                            "h-10 w-full rounded-full bg-input text-foreground",
+                            networkForm.formState.errors.subnet?.name &&
+                              "border-destructive",
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -530,7 +645,7 @@ export function NetworksManager() {
                           }
                         >
                           <FormControl>
-                            <SelectTrigger className="h-10 w-full">
+                            <SelectTrigger className="h-10 w-full rounded-full cursor-pointer">
                               <SelectValue placeholder="Select IP Version" />
                             </SelectTrigger>
                           </FormControl>
@@ -577,7 +692,11 @@ export function NetworksManager() {
                       <FormControl>
                         <Input
                           placeholder="10.10.10.0/24"
-                          className="h-10 w-full"
+                          className={cn(
+                            "h-10 w-full rounded-full bg-input text-foreground",
+                            networkForm.formState.errors.subnet?.cidr &&
+                              "border-destructive",
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -596,7 +715,11 @@ export function NetworksManager() {
                       <FormControl>
                         <Input
                           placeholder="10.10.10.1"
-                          className="h-10 w-full"
+                          className={cn(
+                            "h-10 w-full rounded-full bg-input text-foreground",
+                            networkForm.formState.errors.subnet?.gateway_ip &&
+                              "border-destructive",
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -619,7 +742,11 @@ export function NetworksManager() {
                         <FormControl>
                           <Input
                             placeholder="1.1.1.1,8.8.8.8"
-                            className="h-10 w-full"
+                            className={cn(
+                              "h-10 w-full rounded-full bg-input text-foreground",
+                              networkForm.formState.errors.subnet
+                                ?.dns_nameservers && "border-destructive",
+                            )}
                             value={value}
                             onChange={(e) =>
                               field.onChange(
@@ -716,7 +843,11 @@ export function NetworksManager() {
                         <FormControl>
                           <Input
                             placeholder="10.0.0.0/24,192.168.0.0/24"
-                            className="h-10 w-full"
+                            className={cn(
+                              "h-10 w-full rounded-full bg-input text-foreground",
+                              networkForm.formState.errors.subnet
+                                ?.host_routes && "border-destructive",
+                            )}
                             value={value}
                             onChange={(e) =>
                               field.onChange(
@@ -738,7 +869,10 @@ export function NetworksManager() {
                 <Button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="w-full sm:w-auto min-w-[100px]"
+                  className={cn(
+                    "w-full sm:w-auto min-w-[100px] rounded-full bg-primary text-primary-foreground cursor-pointer",
+                    createMutation.isPending && "opacity-70",
+                  )}
                 >
                   <span className="truncate">
                     {createMutation.isPending ? "Creating..." : "Create"}
@@ -751,12 +885,12 @@ export function NetworksManager() {
       </Dialog>
 
       <Dialog open={showRouterDialog} onOpenChange={setShowRouterDialog}>
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border shadow-lg overflow-hidden">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Create Router
             </DialogTitle>
-            <DialogDescription className="text-sm leading-relaxed">
+            <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
               Attach a router to an external network (then interface).
             </DialogDescription>
           </DialogHeader>
@@ -778,7 +912,11 @@ export function NetworksManager() {
                     <FormControl>
                       <Input
                         placeholder="router-name"
-                        className="h-10 w-full"
+                        className={cn(
+                          "h-10 w-full rounded-full bg-input text-foreground",
+                          routerForm.formState.errors.router_name &&
+                            "border-destructive",
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -797,7 +935,11 @@ export function NetworksManager() {
                     <FormControl>
                       <Input
                         placeholder="external-network-id"
-                        className="h-10 w-full"
+                        className={cn(
+                          "h-10 w-full rounded-full bg-input text-foreground",
+                          routerForm.formState.errors.external_network_id &&
+                            "border-destructive",
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -810,14 +952,19 @@ export function NetworksManager() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowRouterDialog(false)}
-                  className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
+                  className={cn(
+                    "cursor-pointer w-full sm:w-auto order-2 sm:order-1 rounded-full bg-background text-foreground border border-border",
+                  )}
                 >
                   <span className="truncate">Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   disabled={createRouterMutation.isPending}
-                  className="cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[100px]"
+                  className={cn(
+                    "cursor-pointer w-full sm:w-auto order-1 sm:order-2 min-w-[100px] rounded-full bg-primary text-primary-foreground",
+                    createRouterMutation.isPending && "opacity-70",
+                  )}
                 >
                   <span className="truncate">
                     {createRouterMutation.isPending ? "Creating..." : "Create"}

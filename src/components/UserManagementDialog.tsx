@@ -92,8 +92,14 @@ export function UserManagementDialog({
       setSelectedUser("");
       setSelectedRoles([]);
     },
-    onError: (error) => {
-      toast.error(`Failed to assign user: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -110,8 +116,14 @@ export function UserManagementDialog({
       await queryClient.invalidateQueries({ queryKey: ["unassigned-users"] });
       toast.success("User removed successfully");
     },
-    onError: (error) => {
-      toast.error(`Failed to remove user: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -128,8 +140,14 @@ export function UserManagementDialog({
       toast.success("User roles updated successfully");
       setEditingUser(undefined);
     },
-    onError: (error) => {
-      toast.error(`Failed to update user roles: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -169,7 +187,7 @@ export function UserManagementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 mx-4 sm:mx-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border border-border shadow-lg rounded-xl mx-4 sm:mx-auto">
         <DialogHeader className="space-y-3">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Users className="h-5 w-5 flex-shrink-0" />
@@ -204,21 +222,21 @@ export function UserManagementDialog({
                 >
                   <ComboboxTrigger
                     aria-labelledby="select-user-label"
-                    className="w-full cursor-pointer h-11 rounded-xl border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                    className="w-full cursor-pointer h-11 rounded-full border border-border bg-input text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                   />
                   <ComboboxContent
                     popoverOptions={{
                       className:
-                        "w-[--radix-popover-trigger-width] p-0 border-slate-200 dark:border-slate-700 shadow-lg",
+                        "w-[--radix-popover-trigger-width] p-0 shadow-lg",
                     }}
                   >
                     <ComboboxInput
                       placeholder="Search users..."
-                      className="border-0 rounded-none px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
+                      className="border-0 rounded-none px-3 py-2 text-sm text-foreground focus:ring-0 focus:ring-offset-0 focus:outline-none"
                     />
                     <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
                       {loadingUnassigned ? (
-                        <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
+                        <div className="px-3 py-2 text-sm">
                           Loading users...
                         </div>
                       ) : unassignedUsers && unassignedUsers.length > 0 ? (
@@ -227,7 +245,7 @@ export function UserManagementDialog({
                             key={user.user_id}
                             value={user.user_id}
                             keywords={[user.user_name]}
-                            className="px-3 py-2 text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-700 dark:text-slate-300 rounded-sm mx-1 transition-colors"
+                            className="px-3 py-2 text-sm cursor-pointer bg-background text-foreground rounded-full mx-1"
                           >
                             {user.user_name}
                           </ComboboxItem>
@@ -244,7 +262,7 @@ export function UserManagementDialog({
                   <Users className="h-4 w-4" />
                   Select Roles
                 </Label>
-                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 transition-all duration-200">
+                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-3 border border-border rounded-md text-foreground transition-all duration-200">
                   {loadingRoles ? (
                     <div className="col-span-2 text-center text-sm text-muted-foreground">
                       Loading roles...
@@ -256,7 +274,7 @@ export function UserManagementDialog({
                         className="flex items-center space-x-2 cursor-pointer"
                       >
                         <Checkbox
-                          className="cursor-pointer"
+                          className="cursor-pointer bg-input text-foreground border-border"
                           checked={selectedRoles.includes(role.name)}
                           onCheckedChange={(checked) => {
                             if (checked === true) {
@@ -282,7 +300,7 @@ export function UserManagementDialog({
                 !selectedUser ||
                 selectedRoles.length === 0
               }
-              className="w-full cursor-pointer rounded-full group transition-all duration-200"
+              className="w-full cursor-pointer rounded-full bg-primary text-primary-foreground border-none"
             >
               {assignUserMutation.isPending ? (
                 <>
@@ -291,7 +309,7 @@ export function UserManagementDialog({
                 </>
               ) : (
                 <>
-                  <UserPlus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  <UserPlus className="mr-2 h-4 w-4" />
                   Assign User
                 </>
               )}
@@ -309,7 +327,7 @@ export function UserManagementDialog({
               {project.assignments.map((assignment) => (
                 <Card
                   key={assignment.user_id}
-                  className="p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 hover:shadow-md transition-all duration-200"
+                  className="p-4 bg-card text-card-foreground border border-border shadow-lg rounded-xl"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -327,7 +345,7 @@ export function UserManagementDialog({
                             <Badge
                               key={role.role_id}
                               variant="secondary"
-                              className="text-xs max-w-full truncate"
+                              className="text-xs max-w-full truncate rounded-full"
                             >
                               {role.role_name}
                             </Badge>
@@ -349,18 +367,18 @@ export function UserManagementDialog({
                             assignment.roles.map((role) => role.role_id),
                           );
                         }}
-                        className="cursor-pointer rounded-full group transition-all duration-200"
+                        className="cursor-pointer rounded-full bg-background text-foreground border border-border"
                       >
-                        <Settings className="h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
+                        <Settings className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleRemoveUser(assignment.user_id)}
                         disabled={removeUserMutation.isPending}
-                        className="cursor-pointer rounded-full group transition-all duration-200"
+                        className="cursor-pointer rounded-full bg-background text-foreground border border-border"
                       >
-                        <UserMinus className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                        <UserMinus className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -375,7 +393,7 @@ export function UserManagementDialog({
             open={!!editingUser}
             onOpenChange={() => setEditingUser(undefined)}
           >
-            <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 mx-4 sm:mx-auto max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-card text-card-foreground border border-border shadow-lg rounded-xl mx-4 sm:mx-auto max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader className="space-y-3">
                 <DialogTitle className="text-slate-900 dark:text-white flex items-center gap-2 text-lg">
                   <Settings className="h-5 w-5 flex-shrink-0" />
@@ -385,7 +403,7 @@ export function UserManagementDialog({
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 transition-all duration-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 border rounded-md text-foreground transition-all duration-200">
                   {roles?.map((role) => {
                     const isChecked = pendingRoleIds.includes(role.id);
                     return (
@@ -394,7 +412,7 @@ export function UserManagementDialog({
                         className="flex items-center space-x-2 cursor-pointer"
                       >
                         <Checkbox
-                          className="cursor-pointer"
+                          className="cursor-pointer text-foreground border-border"
                           checked={isChecked}
                           onCheckedChange={(checked) => {
                             if (checked === true) {
@@ -415,14 +433,14 @@ export function UserManagementDialog({
                   <Button
                     variant="outline"
                     onClick={() => setEditingUser(undefined)}
-                    className="cursor-pointer rounded-full w-full sm:w-auto order-2 sm:order-1"
+                    className="cursor-pointer rounded-full w-full sm:w-auto order-2 sm:order-1 bg-background text-foreground border border-border"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={() => handleUpdateRoles(pendingRoleIds)}
                     disabled={updateRolesMutation.isPending}
-                    className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
+                    className="cursor-pointer rounded-full w-full sm:w-auto order-1 sm:order-2 bg-primary text-primary-foreground border-none"
                   >
                     {updateRolesMutation.isPending ? (
                       <>
@@ -431,7 +449,7 @@ export function UserManagementDialog({
                       </>
                     ) : (
                       <>
-                        <Settings className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
+                        <Settings className="mr-2 h-4 w-4" />
                         <span className="truncate">Update Roles</span>
                       </>
                     )}

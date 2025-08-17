@@ -177,8 +177,14 @@ export function VM() {
       vmDetailsForm.reset();
       await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
     },
-    onError: (error) => {
-      toast.error(`Failed to create VM: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -209,8 +215,14 @@ export function VM() {
       setImportFile(undefined);
       await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
     },
-    onError: (error) => {
-      toast.error(`Failed to import VM: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -230,16 +242,17 @@ export function VM() {
   return (
     <div className="space-y-6">
       <div
-        className="flex items-center space-x-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 rounded-xl p-1 overflow-hidden"
+        className="flex items-center space-x-1 bg-card text-card-foreground border border-border/50 rounded-full p-1 overflow-hidden"
         role="tablist"
         aria-label="VM tabs"
       >
         <Button
           variant={activeTab === "create" ? "default" : "ghost"}
           className={cn(
-            "flex-1 h-10 cursor-pointer min-w-0",
-            activeTab === "create" &&
-              "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
+            "flex-1 h-10 min-w-0 rounded-full cursor-pointer",
+            activeTab === "create"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "",
           )}
           onClick={() => setActiveTab("create")}
           role="tab"
@@ -253,9 +266,10 @@ export function VM() {
         <Button
           variant={activeTab === "import" ? "default" : "ghost"}
           className={cn(
-            "flex-1 h-10 cursor-pointer min-w-0",
-            activeTab === "import" &&
-              "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
+            "flex-1 h-10 min-w-0 rounded-full cursor-pointer",
+            activeTab === "import"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "",
           )}
           onClick={() => setActiveTab("import")}
           role="tab"
@@ -276,7 +290,7 @@ export function VM() {
           aria-labelledby="create-tab"
           tabIndex={0}
         >
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl overflow-hidden">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center w-full overflow-x-auto">
                 {steps.map((step, index) => {
@@ -298,10 +312,10 @@ export function VM() {
                           className={cn(
                             "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all",
                             isActive
-                              ? "bg-blue-600 border-blue-600 text-white"
+                              ? "bg-primary border-primary text-primary-foreground"
                               : isCompleted
-                                ? "bg-green-600 border-green-600 text-white"
-                                : "bg-muted border-muted-foreground/30 text-muted-foreground",
+                                ? "bg-green-500 border-green-500 text-white"
+                                : "bg-muted border-border text-muted-foreground",
                           )}
                         >
                           {isCompleted ? (
@@ -314,9 +328,9 @@ export function VM() {
                           className={cn(
                             "mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-center max-w-[100px] leading-tight",
                             isActive
-                              ? "text-blue-600 dark:text-blue-400"
+                              ? "text-primary"
                               : isCompleted
-                                ? "text-green-600 dark:text-green-400"
+                                ? "text-green-500 dark:text-green-400"
                                 : "text-muted-foreground",
                           )}
                         >
@@ -340,7 +354,7 @@ export function VM() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 overflow-hidden">
+          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl overflow-hidden">
             <CardHeader className="space-y-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 {(() => {
@@ -348,8 +362,8 @@ export function VM() {
                   const StepIcon = step?.icon ?? Cpu;
                   return (
                     <>
-                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full flex-shrink-0">
-                        <StepIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+                      <div className="p-2 bg-primary/10 rounded-full flex-shrink-0">
+                        <StepIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       </div>
                       <span className="truncate">{step?.title}</span>
                     </>
@@ -413,14 +427,14 @@ export function VM() {
                     variant="outline"
                     onClick={goToPreviousStep}
                     disabled={currentStepIndex === 0}
-                    className="cursor-pointer w-full sm:w-auto order-2 sm:order-1"
+                    className="rounded-full cursor-pointer w-full sm:w-auto order-2 sm:order-1"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2 flex-shrink-0" />
                     <span className="truncate">Previous</span>
                   </Button>
                   <Button
                     onClick={goToNextStep}
-                    className="cursor-pointer w-full sm:w-auto order-1 sm:order-2"
+                    className="rounded-full cursor-pointer w-full sm:w-auto order-1 sm:order-2 bg-primary text-primary-foreground"
                   >
                     <span className="truncate">Next</span>
                     <ArrowRight className="h-4 w-4 ml-2 flex-shrink-0" />

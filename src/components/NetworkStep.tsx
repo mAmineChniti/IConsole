@@ -68,19 +68,23 @@ export function NetworkStep({
             name="network_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2 text-sm font-medium">
-                  <Network className="h-4 w-4 flex-shrink-0" />
+                <FormLabel className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Network className="h-4 w-4 flex-shrink-0 text-primary" />
                   <span className="truncate">Network</span>
                 </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="h-11 w-full cursor-pointer">
+                    <SelectTrigger className="h-11 w-full rounded-full bg-input text-foreground border border-border cursor-pointer">
                       <SelectValue placeholder="Select network" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="bg-card text-card-foreground border border-border rounded-xl shadow-lg">
                     {resources?.networks?.map((network) => (
-                      <SelectItem key={network.id} value={network.id}>
+                      <SelectItem
+                        key={network.id}
+                        value={network.id}
+                        className="rounded-full"
+                      >
                         <span className="truncate">{network.name}</span>
                       </SelectItem>
                     ))}
@@ -96,19 +100,23 @@ export function NetworkStep({
             name="key_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2 text-sm font-medium">
-                  <Shield className="h-4 w-4 flex-shrink-0" />
+                <FormLabel className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Shield className="h-4 w-4 flex-shrink-0 text-primary" />
                   <span className="truncate">Key Pair</span>
                 </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="h-11 w-full cursor-pointer">
+                    <SelectTrigger className="h-11 w-full rounded-full bg-input text-foreground border border-border cursor-pointer">
                       <SelectValue placeholder="Select key pair" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="bg-card text-card-foreground border border-border rounded-xl shadow-lg">
                     {resources?.keypairs?.map((keypair) => (
-                      <SelectItem key={keypair.name} value={keypair.name}>
+                      <SelectItem
+                        key={keypair.name}
+                        value={keypair.name}
+                        className="rounded-full"
+                      >
                         <span className="truncate">{keypair.name}</span>
                       </SelectItem>
                     ))}
@@ -125,19 +133,23 @@ export function NetworkStep({
           name="security_group"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-2 text-sm font-medium">
-                <Shield className="h-4 w-4 flex-shrink-0" />
+              <FormLabel className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Shield className="h-4 w-4 flex-shrink-0 text-primary" />
                 <span className="truncate">Security Group</span>
               </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="h-11 w-full cursor-pointer">
+                  <SelectTrigger className="h-11 w-full rounded-full bg-input text-foreground border border-border cursor-pointer">
                     <SelectValue placeholder="Select security group" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-card text-card-foreground border border-border rounded-xl shadow-lg">
                   {resources?.security_groups?.map((group) => (
-                    <SelectItem key={group.name} value={group.name}>
+                    <SelectItem
+                      key={group.name}
+                      value={group.name}
+                      className="rounded-full"
+                    >
                       <span className="truncate">{group.name}</span>
                     </SelectItem>
                   ))}

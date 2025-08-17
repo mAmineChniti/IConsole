@@ -39,7 +39,7 @@ import {
 
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { calculateAge } from "@/lib/utils";
+import { calculateAge, cn } from "@/lib/utils";
 
 function InstanceActions({
   instanceId,
@@ -57,8 +57,14 @@ function InstanceActions({
       await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
       toast.success("Instance started successfully");
     },
-    onError: (error) => {
-      toast.error(`Failed to start instance: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -69,8 +75,14 @@ function InstanceActions({
       await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
       toast.success("Instance stopped successfully");
     },
-    onError: (error) => {
-      toast.error(`Failed to stop instance: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -81,8 +93,14 @@ function InstanceActions({
       await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
       toast.success("Instance rebooted successfully");
     },
-    onError: (error) => {
-      toast.error(`Failed to reboot instance: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -93,8 +111,14 @@ function InstanceActions({
       await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
       toast.success("Instance deleted successfully");
     },
-    onError: (error) => {
-      toast.error(`Failed to delete instance: ${error.message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
@@ -103,7 +127,7 @@ function InstanceActions({
   const canReboot = status === "ACTIVE";
 
   return (
-    <div className="flex justify-center gap-2 pt-4 mt-4 border-t border-border/50">
+    <div className="flex flex-wrap justify-center gap-2 gap-y-2 pt-4 mt-4 border-t border-border w-full max-w-full overflow-x-auto sm:flex-nowrap">
       {canStart && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -115,10 +139,12 @@ function InstanceActions({
               disabled={startMutation.isPending}
               size="sm"
               variant="outline"
-              className="cursor-pointer rounded-full group transition-all duration-200"
+              className="group rounded-full transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer"
             >
-              <Power className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
-              Start
+              <Power className="h-4 w-4 mr-1 group-hover:text-accent-foreground transition-colors duration-200" />
+              <span className="group-hover:text-accent-foreground transition-colors duration-200">
+                Start
+              </span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>Start the instance</TooltipContent>
@@ -136,10 +162,12 @@ function InstanceActions({
               disabled={stopMutation.isPending}
               size="sm"
               variant="outline"
-              className="cursor-pointer rounded-full group transition-all duration-200"
+              className="group rounded-full transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer"
             >
-              <PowerOff className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
-              Stop
+              <PowerOff className="h-4 w-4 mr-1 group-hover:text-accent-foreground transition-colors duration-200" />
+              <span className="group-hover:text-accent-foreground transition-colors duration-200">
+                Stop
+              </span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>Stop the instance</TooltipContent>
@@ -157,10 +185,12 @@ function InstanceActions({
               disabled={rebootMutation.isPending}
               size="sm"
               variant="outline"
-              className="cursor-pointer rounded-full group transition-all duration-200"
+              className="group rounded-full transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer"
             >
-              <RotateCcw className="h-4 w-4 mr-1 group-hover:rotate-180 transition-transform duration-300" />
-              Reboot
+              <RotateCcw className="h-4 w-4 mr-1 group-hover:text-accent-foreground group-hover:rotate-180 transition-all duration-300" />
+              <span className="group-hover:text-accent-foreground transition-colors duration-200">
+                Reboot
+              </span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>Reboot the instance</TooltipContent>
@@ -176,11 +206,13 @@ function InstanceActions({
             }}
             disabled={deleteMutation.isPending}
             size="sm"
-            variant="outline"
-            className="cursor-pointer rounded-full group transition-all duration-200"
+            variant="destructive"
+            className="group rounded-full transition-all duration-200 bg-destructive text-destructive-foreground border-border cursor-pointer"
           >
-            <Trash2 className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
-            Delete
+            <Trash2 className="h-4 w-4 mr-1 text-white transition-colors duration-200" />
+            <span className="text-white transition-colors duration-200">
+              Delete
+            </span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>Delete the instance</TooltipContent>
@@ -255,7 +287,7 @@ export function Instances() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className="bg-card text-card-foreground border border-border shadow-lg rounded-xl"
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <div className="space-y-2">
@@ -308,7 +340,7 @@ export function Instances() {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-center gap-2 pt-4 mt-4 border-t border-border/50">
+                <div className="flex justify-center gap-2 pt-4 mt-4 border-t border-border">
                   <Skeleton className="h-8 w-8 rounded-full" />
                   <Skeleton className="h-8 w-8 rounded-full" />
                   <Skeleton className="h-8 w-8 rounded-full" />
@@ -342,7 +374,7 @@ export function Instances() {
   if (!data || data.length === 0) {
     return (
       <div className="space-y-6">
-        <Card className="border-muted bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+        <Card className="bg-card text-card-foreground border border-border shadow-lg rounded-xl">
           <CardContent className="p-8 text-center">
             <div className="flex flex-col items-center space-y-4">
               <div className="p-3 bg-muted rounded-full">
@@ -361,17 +393,21 @@ export function Instances() {
                 onClick={() => refetch()}
                 disabled={isFetching}
                 variant="outline"
-                className="mt-4 cursor-pointer hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+                className="mt-4 rounded-full group transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
               >
                 {isFetching ? (
                   <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Refreshing...
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin group-hover:text-accent-foreground" />
+                    <span className="group-hover:text-accent-foreground">
+                      Refreshing...
+                    </span>
                   </>
                 ) : (
                   <>
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Refresh
+                    <RefreshCw className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
+                    <span className="group-hover:text-accent-foreground">
+                      Refresh
+                    </span>
                   </>
                 )}
               </Button>
@@ -400,12 +436,12 @@ export function Instances() {
         {visibleData.map((instance) => (
           <Card
             key={instance.id}
-            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 cursor-pointer"
+            className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl cursor-pointer"
             onClick={() => setSelectedInstance(instance)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-foreground truncate">
+                <CardTitle className="text-lg font-semibold text-card-foreground truncate">
                   {instance.name}
                 </CardTitle>
                 <div className="flex items-center gap-2">
@@ -417,26 +453,28 @@ export function Instances() {
                           ? "destructive"
                           : "secondary"
                     }
-                    className={`gap-1.5 ${
+                    className={cn(
+                      "gap-1.5",
                       instance.status === "ACTIVE"
-                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700"
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                         : instance.status === "SHUTOFF"
-                          ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+                          ? "bg-muted text-muted-foreground border border-border"
                           : instance.status === "ERROR"
-                            ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700"
-                            : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700"
-                    }`}
+                            ? "bg-destructive text-destructive-foreground border border-destructive"
+                            : "bg-accent text-accent-foreground border border-accent",
+                    )}
                   >
                     <div
-                      className={`w-1.5 h-1.5 rounded-full ${
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full animate-pulse",
                         instance.status === "ACTIVE"
-                          ? "bg-green-500 animate-pulse"
+                          ? "bg-green-500"
                           : instance.status === "SHUTOFF"
-                            ? "bg-gray-500 animate-pulse"
+                            ? "bg-muted-foreground"
                             : instance.status === "ERROR"
-                              ? "bg-red-500 animate-pulse"
-                              : "bg-yellow-500 animate-pulse"
-                      }`}
+                              ? "bg-destructive"
+                              : "bg-accent",
+                      )}
                     />
                     {instance.status}
                   </Badge>
@@ -447,7 +485,7 @@ export function Instances() {
                   )}
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground font-mono truncate mt-2 bg-muted/20 px-2 py-1 rounded-md">
+              <p className="text-xs text-muted-foreground font-mono break-words w-fit mt-2 bg-muted px-2 py-1 rounded-md border border-border">
                 ID: {instance.id}
               </p>
             </CardHeader>
@@ -455,32 +493,32 @@ export function Instances() {
             <CardContent className="pt-0">
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1 p-2 rounded-lg bg-blue-50/50 dark:bg-blue-900/10">
+                  <div className="space-y-1 p-2 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-1.5">
-                      <div className="p-1 bg-blue-100 dark:bg-blue-900/30 rounded">
-                        <HardDrive className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                      <div className="p-1 bg-muted rounded">
+                        <HardDrive className="h-3 w-3 text-muted-foreground" />
                       </div>
                       <p className="text-xs font-medium text-muted-foreground">
                         Image
                       </p>
                     </div>
                     <div className="pl-5">
-                      <p className="text-sm font-medium text-foreground truncate">
+                      <p className="text-sm font-medium text-card-foreground truncate">
                         {instance.image.name}
                       </p>
                     </div>
                   </div>
-                  <div className="space-y-1 p-2 rounded-lg bg-purple-50/50 dark:bg-purple-900/10">
+                  <div className="space-y-1 p-2 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-1.5">
-                      <div className="p-1 bg-purple-100 dark:bg-purple-900/30 rounded">
-                        <MemoryStick className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                      <div className="p-1 bg-muted rounded">
+                        <MemoryStick className="h-3 w-3 text-muted-foreground" />
                       </div>
                       <p className="text-xs font-medium text-muted-foreground">
                         Flavor
                       </p>
                     </div>
                     <div className="pl-5">
-                      <p className="text-sm font-medium text-foreground">
+                      <p className="text-sm font-medium text-card-foreground">
                         {instance.flavor.name}
                       </p>
                     </div>
@@ -488,32 +526,32 @@ export function Instances() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1 p-2 rounded-lg bg-orange-50/50 dark:bg-orange-900/10">
+                  <div className="space-y-1 p-2 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-1.5">
-                      <div className="p-1 bg-orange-100 dark:bg-orange-900/30 rounded">
-                        <Timer className="h-3 w-3 text-orange-600 dark:text-orange-400" />
+                      <div className="p-1 bg-muted rounded">
+                        <Timer className="h-3 w-3 text-muted-foreground" />
                       </div>
                       <p className="text-xs font-medium text-muted-foreground">
                         Age
                       </p>
                     </div>
                     <div className="pl-5">
-                      <p className="text-sm font-medium text-foreground">
+                      <p className="text-sm font-medium text-card-foreground">
                         {calculateAge(instance.created_at)}
                       </p>
                     </div>
                   </div>
-                  <div className="space-y-1 p-2 rounded-lg bg-green-50/50 dark:bg-green-900/10">
+                  <div className="space-y-1 p-2 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-1.5">
-                      <div className="p-1 bg-green-100 dark:bg-green-900/30 rounded">
-                        <Network className="h-3 w-3 text-green-600 dark:text-green-400" />
+                      <div className="p-1 bg-muted rounded">
+                        <Network className="h-3 w-3 text-muted-foreground" />
                       </div>
                       <p className="text-xs font-medium text-muted-foreground">
                         Network
                       </p>
                     </div>
                     <div className="pl-5">
-                      <p className="text-sm font-medium text-foreground font-mono truncate">
+                      <p className="text-sm font-medium text-card-foreground font-mono truncate">
                         {instance.networks.length > 0 && instance.networks[0]
                           ? instance.networks[0].ip
                           : "No IP"}
@@ -537,7 +575,7 @@ export function Instances() {
           onClick={handleShowMore}
           variant="outline"
           disabled={!hasMore}
-          className={`transition-all duration-200 px-6 py-2 ${
+          className={`rounded-full transition-all duration-200 px-6 py-2 bg-background text-foreground border-border ${
             hasMore
               ? "hover:bg-accent hover:text-accent-foreground hover:scale-105"
               : "opacity-50 cursor-not-allowed"
@@ -553,7 +591,7 @@ export function Instances() {
         open={!!selectedInstance}
         onOpenChange={() => setSelectedInstance(undefined)}
       >
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 left-[calc(50%+8rem)] translate-x-[-50%]">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border border-border shadow-lg rounded-xl left-[calc(50%+8rem)] translate-x-[-50%]">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between pr-8">
               <span className="text-xl font-semibold">
@@ -567,26 +605,28 @@ export function Instances() {
                       ? "destructive"
                       : "secondary"
                 }
-                className={`gap-1.5 ${
+                className={cn(
+                  "gap-1.5",
                   selectedInstance?.status === "ACTIVE"
                     ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700"
                     : selectedInstance?.status === "SHUTOFF"
-                      ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+                      ? "bg-muted text-muted-foreground border border-border"
                       : selectedInstance?.status === "ERROR"
-                        ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700"
-                        : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700"
-                }`}
+                        ? "bg-destructive text-destructive-foreground border border-destructive"
+                        : "bg-accent text-accent-foreground border border-accent",
+                )}
               >
                 <div
-                  className={`w-1.5 h-1.5 rounded-full ${
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full animate-pulse",
                     selectedInstance?.status === "ACTIVE"
-                      ? "bg-green-500 animate-pulse"
+                      ? "bg-green-500"
                       : selectedInstance?.status === "SHUTOFF"
-                        ? "bg-gray-500"
+                        ? "bg-muted-foreground"
                         : selectedInstance?.status === "ERROR"
-                          ? "bg-red-500"
-                          : "bg-yellow-500"
-                  }`}
+                          ? "bg-destructive"
+                          : "bg-accent",
+                  )}
                 />
                 {selectedInstance?.status}
               </Badge>
@@ -601,15 +641,15 @@ export function Instances() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1 bg-blue-100 dark:bg-blue-900/30 rounded">
-                      <HardDrive className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <div className="p-1 bg-muted rounded">
+                      <HardDrive className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Image
                     </p>
                   </div>
                   <div className="pl-6">
-                    <p className="text-base font-medium text-foreground break-words">
+                    <p className="text-base font-medium text-card-foreground break-words">
                       {selectedInstance.image.name}
                     </p>
                     <p className="text-sm text-muted-foreground font-mono break-all">
@@ -619,15 +659,15 @@ export function Instances() {
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1 bg-indigo-100 dark:bg-indigo-900/30 rounded">
-                      <Server className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                    <div className="p-1 bg-muted rounded">
+                      <Server className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Project ID
                     </p>
                   </div>
                   <div className="pl-6">
-                    <p className="text-sm font-mono text-foreground break-all">
+                    <p className="text-sm font-mono text-card-foreground break-all">
                       {selectedInstance.project_id}
                     </p>
                   </div>
@@ -639,8 +679,8 @@ export function Instances() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1 bg-green-100 dark:bg-green-900/30 rounded">
-                      <Network className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <div className="p-1 bg-muted rounded">
+                      <Network className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Networks
@@ -649,7 +689,7 @@ export function Instances() {
                   <div className="pl-6 space-y-2">
                     {selectedInstance.networks.map((network, index) => (
                       <div key={index} className="text-sm">
-                        <p className="font-mono text-foreground break-all">
+                        <p className="font-mono text-card-foreground break-all">
                           {network.ip}
                         </p>
                         <p className="text-muted-foreground">
@@ -661,21 +701,21 @@ export function Instances() {
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1 bg-orange-100 dark:bg-orange-900/30 rounded">
-                      <Timer className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                    <div className="p-1 bg-muted rounded">
+                      <Timer className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Created
                     </p>
                   </div>
                   <div className="pl-6">
-                    <p className="text-base font-medium text-foreground">
+                    <p className="text-base font-medium text-card-foreground">
                       {calculateAge(selectedInstance.created_at)}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(
                         selectedInstance.created_at,
-                      ).toLocaleDateString()}{" "}
+                      ).toLocaleDateString()}
                       {new Date(
                         selectedInstance.created_at,
                       ).toLocaleTimeString()}
@@ -689,23 +729,23 @@ export function Instances() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1 bg-cyan-100 dark:bg-cyan-900/30 rounded">
-                      <MapPin className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                    <div className="p-1 bg-muted rounded">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Host
                     </p>
                   </div>
                   <div className="pl-6">
-                    <p className="text-base font-medium text-foreground break-words">
+                    <p className="text-base font-medium text-card-foreground break-words">
                       {selectedInstance.host}
                     </p>
                   </div>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1 bg-amber-100 dark:bg-amber-900/30 rounded">
-                      <Key className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    <div className="p-1 bg-muted rounded">
+                      <Key className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Security Groups
@@ -719,7 +759,7 @@ export function Instances() {
                             <Badge
                               key={index}
                               variant="secondary"
-                              className="bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-700"
+                              className="bg-muted text-muted-foreground border-border"
                             >
                               {group}
                             </Badge>
@@ -735,10 +775,10 @@ export function Instances() {
                 </div>
               </div>
 
-              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+              <div className="bg-muted rounded-lg p-4">
                 <div className="flex items-center gap-1.5 mb-3">
-                  <div className="p-1 bg-purple-100 dark:bg-purple-900/30 rounded">
-                    <MemoryStick className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  <div className="p-1 bg-muted rounded">
+                    <MemoryStick className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <p className="text-sm font-medium text-muted-foreground">
                     Flavor Details
@@ -750,19 +790,19 @@ export function Instances() {
                   </p>
                   <div className="grid grid-cols-3 gap-4 pt-2">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      <p className="text-2xl font-bold text-foreground">
                         {selectedInstance.flavor.vcpus}
                       </p>
                       <p className="text-sm text-muted-foreground">vCPUs</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      <p className="text-2xl font-bold text-foreground">
                         {selectedInstance.flavor.ram}
                       </p>
                       <p className="text-sm text-muted-foreground">RAM</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      <p className="text-2xl font-bold text-foreground">
                         {selectedInstance.flavor.disk}
                       </p>
                       <p className="text-sm text-muted-foreground">Disk</p>
@@ -773,10 +813,10 @@ export function Instances() {
 
               {selectedInstance.volumes &&
                 selectedInstance.volumes.length > 0 && (
-                  <div className="bg-slate-50 dark:bg-slate-900/20 rounded-lg p-4">
+                  <div className="bg-muted rounded-lg p-4">
                     <div className="flex items-center gap-1.5 mb-3">
-                      <div className="p-1 bg-slate-100 dark:bg-slate-900/30 rounded">
-                        <HardDrive className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                      <div className="p-1 bg-muted rounded">
+                        <HardDrive className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <p className="text-sm font-medium text-muted-foreground">
                         Attached Volumes
@@ -785,7 +825,7 @@ export function Instances() {
                     <div className="pl-6 space-y-3">
                       {selectedInstance.volumes.map((volume, index) => (
                         <div key={index} className="text-sm">
-                          <p className="font-medium text-foreground">
+                          <p className="font-medium text-card-foreground">
                             {volume.name}
                           </p>
                           <p className="text-muted-foreground font-mono">
@@ -801,10 +841,10 @@ export function Instances() {
                 )}
 
               {selectedInstance.floating_ips.length > 0 && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <div className="bg-muted rounded-lg p-4">
                   <div className="flex items-center gap-1.5 mb-3">
-                    <div className="p-1 bg-blue-100 dark:bg-blue-900/30 rounded">
-                      <Network className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <div className="p-1 bg-muted rounded">
+                      <Network className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Floating IPs
@@ -814,7 +854,7 @@ export function Instances() {
                     {selectedInstance.floating_ips.map((ip, index) => (
                       <p
                         key={index}
-                        className="text-base font-medium text-blue-600 dark:text-blue-400 font-mono break-all"
+                        className="text-base font-medium text-card-foreground font-mono break-all"
                       >
                         {ip}
                       </p>

@@ -26,15 +26,15 @@ export function DetailsStep({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-2 text-base font-medium">
-                <MonitorStop className="h-4 w-4 flex-shrink-0" />
+              <FormLabel className="flex items-center gap-2 text-base font-medium text-foreground">
+                <MonitorStop className="h-4 w-4 flex-shrink-0 text-primary" />
                 <span className="truncate">VM Name</span>
               </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   placeholder="Enter VM name"
-                  className="h-11 w-full"
+                  className="h-11 w-full rounded-full bg-input text-foreground border border-border"
                 />
               </FormControl>
               <FormDescription className="text-sm text-muted-foreground leading-relaxed">
@@ -51,14 +51,14 @@ export function DetailsStep({
             name="admin_username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">
+                <FormLabel className="text-sm font-medium text-foreground">
                   Admin Username
                 </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     placeholder="Enter admin username"
-                    className="h-11 w-full"
+                    className="h-11 w-full rounded-full bg-input text-foreground border border-border"
                   />
                 </FormControl>
                 <FormDescription className="text-sm text-muted-foreground leading-relaxed">
@@ -74,7 +74,7 @@ export function DetailsStep({
             name="admin_password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">
+                <FormLabel className="text-sm font-medium text-foreground">
                   Admin Password
                 </FormLabel>
                 <FormControl>
@@ -82,7 +82,7 @@ export function DetailsStep({
                     {...field}
                     type="password"
                     placeholder="Enter admin password"
-                    className="h-11 w-full"
+                    className="h-11 w-full rounded-full bg-input text-foreground border border-border"
                   />
                 </FormControl>
                 <FormDescription className="text-sm text-muted-foreground leading-relaxed">

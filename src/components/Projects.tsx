@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Building,
@@ -61,9 +62,9 @@ function ProjectActions({
             variant="outline"
             size="sm"
             onClick={() => onEdit(project)}
-            className="h-8 w-8 p-0 cursor-pointer rounded-full group transition-all duration-200 flex-shrink-0"
+            className="h-8 w-8 p-0 rounded-full flex-shrink-0 bg-card text-card-foreground border border-border/50 cursor-pointer hover:bg-card hover:text-card-foreground focus:bg-card focus:text-card-foreground"
           >
-            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover:scale-110 transition-transform duration-200" />
+            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Edit project</TooltipContent>
@@ -74,9 +75,9 @@ function ProjectActions({
             variant="outline"
             size="sm"
             onClick={() => onDelete(project.id)}
-            className="h-8 w-8 p-0 cursor-pointer rounded-full group transition-all duration-200 flex-shrink-0"
+            className="h-8 w-8 p-0 rounded-full flex-shrink-0 bg-destructive text-white dark:text-white dark:bg-destructive cursor-pointer hover:bg-destructive hover:text-white dark:hover:bg-destructive focus:bg-destructive focus:text-white"
           >
-            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover:scale-110 transition-transform duration-200" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Delete project</TooltipContent>
@@ -90,10 +91,10 @@ export function Projects() {
     ProjectDetailsResponse | undefined
   >();
   const [visibleCount, setVisibleCount] = useState(6);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [editingProject, setEditingProject] = useState<
+  const [dialogProject, setDialogProject] = useState<
     ProjectDetailsResponse | undefined
-  >();
+  >(undefined);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<
@@ -136,14 +137,21 @@ export function Projects() {
       setShowDeleteDialog(false);
       setProjectToDelete(undefined);
     },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : String(error);
-      toast.error(`Failed to delete project: ${message}`);
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
     },
   });
 
-  const handleEdit = (project: ProjectDetailsResponse) =>
-    setEditingProject(project);
+  const handleEdit = (project: ProjectDetailsResponse) => {
+    setDialogProject(project);
+    setDialogOpen(true);
+  };
 
   const handleDelete = (projectId: string) => {
     const project = projectData.find((p) => p.id === projectId);
@@ -203,14 +211,16 @@ export function Projects() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50"
+              className={cn(
+                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl",
+              )}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-32" />
                   <Skeleton className="h-3 w-24" />
                 </div>
-                <Skeleton className="h-6 w-16 rounded" />
+                <Skeleton className="h-6 w-16 rounded-full" />
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="space-y-2">
@@ -220,7 +230,7 @@ export function Projects() {
                 <Separator />
                 <div className="flex justify-between items-center">
                   <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-8 w-24" />
+                  <Skeleton className="h-8 w-24 rounded-full" />
                 </div>
               </CardContent>
             </Card>
@@ -247,16 +257,23 @@ export function Projects() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
           <p className="text-sm text-muted-foreground">No projects found</p>
           <Button
-            variant="outline"
-            onClick={() => setShowCreateDialog(true)}
-            className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto"
+            variant="default"
+            onClick={() => {
+              setDialogProject(undefined);
+              setDialogOpen(true);
+            }}
+            className="rounded-full w-full sm:w-auto px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
           >
-            <Plus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+            <Plus className="mr-2 h-4 w-4" />
             Create Project
           </Button>
         </div>
 
-        <Card className="border-muted bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+        <Card
+          className={cn(
+            "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl",
+          )}
+        >
           <CardContent className="p-8 text-center">
             <div className="flex flex-col items-center space-y-4">
               <div className="p-3 bg-muted rounded-full">
@@ -272,16 +289,27 @@ export function Projects() {
                 </p>
               </div>
               <Button
-                variant="outline"
-                onClick={() => setShowCreateDialog(true)}
-                className="mt-4 cursor-pointer rounded-full group transition-all duration-200"
+                variant="default"
+                onClick={() => {
+                  setDialogProject(undefined);
+                  setDialogOpen(true);
+                }}
+                className="mt-4 rounded-full px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
               >
-                <Plus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                <Plus className="mr-2 h-4 w-4" />
                 Create Your First Project
               </Button>
             </div>
           </CardContent>
         </Card>
+        <ProjectFormDialog
+          project={dialogProject}
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (!open) setDialogProject(undefined);
+          }}
+        />
       </div>
     );
   }
@@ -301,10 +329,14 @@ export function Projects() {
           </span>
         </div>
         <Button
-          onClick={() => setShowCreateDialog(true)}
-          className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto"
+          variant="default"
+          onClick={() => {
+            setDialogProject(undefined);
+            setDialogOpen(true);
+          }}
+          className="rounded-full w-full sm:w-auto px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
         >
-          <Plus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+          <Plus className="mr-2 h-4 w-4" />
           Create Project
         </Button>
       </div>
@@ -313,7 +345,9 @@ export function Projects() {
         {visibleData.map((project) => (
           <Card
             key={project.id}
-            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 flex flex-col overflow-hidden"
+            className={cn(
+              "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden",
+            )}
           >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-2">
@@ -325,12 +359,21 @@ export function Projects() {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <Badge
                     variant={project.enabled ? "default" : "secondary"}
-                    className={`text-xs ${
+                    className={cn(
+                      "text-xs px-2 py-0.5 gap-1.5 flex items-center",
                       project.enabled
-                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
-                    }`}
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                        : "bg-muted text-muted-foreground",
+                    )}
                   >
+                    <span
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full animate-pulse inline-block",
+                        project.enabled
+                          ? "bg-green-500"
+                          : "bg-muted-foreground/40",
+                      )}
+                    />
                     {project.enabled ? "Enabled" : "Disabled"}
                   </Badge>
                 </div>
@@ -340,7 +383,7 @@ export function Projects() {
                   {project.description}
                 </p>
               )}
-              <p className="text-xs text-muted-foreground font-mono truncate mt-2 bg-muted/20 px-2 py-1 rounded-md">
+              <p className="text-xs w-fit text-muted-foreground font-mono truncate mt-2 bg-muted/20 px-2 py-1 rounded-md">
                 ID: {project.id}
               </p>
             </CardHeader>
@@ -349,7 +392,9 @@ export function Projects() {
               <div className="space-y-3 flex-grow">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-black dark:bg-black dark:text-white shadow-sm">
+                      <Users className="h-4 w-4 text-card-foreground" />
+                    </span>
                     <span className="text-sm font-medium">
                       {project.assignments?.length ?? 0} user
                       {project.assignments?.length !== 1 ? "s" : ""}
@@ -359,12 +404,12 @@ export function Projects() {
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleProjectExpansion(project.id)}
-                    className="cursor-pointer rounded-full group transition-all duration-200"
+                    className="rounded-full px-2 py-1 bg-muted cursor-pointer"
                   >
                     {expandedProjects.has(project.id) ? (
-                      <ChevronUp className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                      <ChevronUp className="h-4 w-4" />
                     ) : (
-                      <ChevronDown className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                      <ChevronDown className="h-4 w-4" />
                     )}
                   </Button>
                 </div>
@@ -378,11 +423,11 @@ export function Projects() {
                           (assignment: UserAssignment) => (
                             <div
                               key={assignment.user_id}
-                              className="flex items-center justify-between gap-2 p-2 bg-muted/20 rounded-md"
+                              className="flex items-center justify-between gap-2 p-2 bg-muted/20 rounded-full"
                             >
                               <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <Avatar className="h-6 w-6 flex-shrink-0">
-                                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white text-xs font-medium">
+                                  <AvatarFallback className="bg-white text-black dark:bg-black dark:text-white text-xs font-medium">
                                     {(
                                       assignment.user_name?.charAt(0) ?? "?"
                                     ).toUpperCase()}
@@ -399,13 +444,16 @@ export function Projects() {
                                     <Badge
                                       key={role.role_id}
                                       variant="outline"
-                                      className="text-xs max-w-full truncate"
+                                      className="text-xs max-w-full truncate rounded-full"
                                     >
                                       {role.role_name}
                                     </Badge>
                                   ))}
                                 {assignment.roles.length > 2 && (
-                                  <Badge variant="outline" className="text-xs">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs rounded-full"
+                                  >
                                     +{assignment.roles.length - 2}
                                   </Badge>
                                 )}
@@ -425,15 +473,14 @@ export function Projects() {
 
               <div className="mt-auto pt-3">
                 <Separator />
-
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => handleManageUsers(project)}
-                    className="flex-1 cursor-pointer rounded-full group transition-all duration-200"
+                    className="flex-1 rounded-full px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
                   >
-                    <UserPlus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                    <UserPlus className="mr-2 h-4 w-4" />
                     <span className="truncate">Manage Users</span>
                   </Button>
                   <div className="flex justify-center sm:justify-end">
@@ -452,14 +499,13 @@ export function Projects() {
 
       <div className="flex justify-center px-4">
         <Button
-          onClick={handleShowMore}
           variant="outline"
+          onClick={handleShowMore}
           disabled={!hasMore || isRefetching}
-          className={`transition-all duration-200 px-4 sm:px-6 py-2 w-full sm:w-auto max-w-sm ${
-            hasMore
-              ? "hover:bg-accent hover:text-accent-foreground hover:scale-105"
-              : "opacity-50 cursor-not-allowed"
-          }`}
+          className={cn(
+            "rounded-full px-6 py-2 w-full sm:w-auto max-w-sm cursor-pointer",
+            hasMore ? "" : "opacity-50 cursor-not-allowed",
+          )}
         >
           <span className="truncate">
             {hasMore
@@ -469,18 +515,16 @@ export function Projects() {
         </Button>
       </div>
 
-      <ProjectFormDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
-      />
-
-      <ProjectFormDialog
-        project={editingProject}
-        open={!!editingProject}
-        onOpenChange={(open) => {
-          if (!open) setEditingProject(undefined);
-        }}
-      />
+      {dialogOpen && (
+        <ProjectFormDialog
+          project={dialogProject}
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (!open) setDialogProject(undefined);
+          }}
+        />
+      )}
 
       {selectedProject && (
         <UserManagementDialog
@@ -494,13 +538,17 @@ export function Projects() {
       )}
 
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-border/50 max-w-lg mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          className={cn(
+            "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl max-w-lg mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto",
+          )}
+        >
           <DialogHeader className="space-y-3">
-            <DialogTitle className="text-slate-900 dark:text-white flex items-center gap-2 text-lg">
-              <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <DialogTitle className="flex items-center gap-2 text-lg text-foreground">
+              <Trash2 className="h-5 w-5 text-foreground flex-shrink-0" />
               <span className="truncate">Delete Project</span>
             </DialogTitle>
-            <DialogDescription className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
               Are you sure you want to delete this project? This action cannot
               be undone.
             </DialogDescription>
@@ -508,21 +556,21 @@ export function Projects() {
 
           {projectToDelete && (
             <div className="py-4">
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 sm:p-4">
+              <div className="bg-destructive/10 border border-destructive rounded-xl p-3 sm:p-4">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-red-100 dark:bg-red-900/40 rounded-full flex-shrink-0">
-                    <Building className="h-4 w-4 text-red-600 dark:text-red-400" />
+                  <div className="p-2 bg-destructive/20 rounded-full flex-shrink-0">
+                    <Building className="h-4 w-4 text-destructive" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-red-900 dark:text-red-100 truncate">
+                    <h4 className="font-semibold text-destructive truncate">
                       {projectToDelete.name}
                     </h4>
                     {projectToDelete.description && (
-                      <p className="text-sm text-red-700 dark:text-red-300 mt-1 line-clamp-2">
+                      <p className="text-sm text-destructive mt-1 line-clamp-2">
                         {projectToDelete.description}
                       </p>
                     )}
-                    <p className="text-xs text-red-600 dark:text-red-400 mt-2 font-mono truncate bg-red-100/50 dark:bg-red-900/20 px-2 py-1 rounded">
+                    <p className="text-xs text-destructive w-fit mt-2 font-mono truncate bg-destructive/10 px-2 py-1 rounded">
                       ID: {projectToDelete.id}
                     </p>
                   </div>
@@ -535,7 +583,7 @@ export function Projects() {
             <Button
               variant="outline"
               onClick={cancelDelete}
-              className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto order-2 sm:order-1"
+              className="rounded-full px-6 py-2 w-full sm:w-auto order-2 sm:order-1 bg-muted text-foreground cursor-pointer"
             >
               Cancel
             </Button>
@@ -543,16 +591,16 @@ export function Projects() {
               variant="destructive"
               onClick={confirmDelete}
               disabled={deleteMutation.isPending}
-              className="cursor-pointer rounded-full group transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
+              className="rounded-full px-6 py-2 w-full sm:w-auto order-1 sm:order-2 bg-destructive text-white cursor-pointer"
             >
               {deleteMutation.isPending ? (
                 <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-destructive-foreground border-t-transparent" />
                   <span className="truncate">Deleting...</span>
                 </>
               ) : (
                 <>
-                  <Trash2 className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  <Trash2 className="mr-2 h-4 w-4" />
                   <span className="truncate">Delete Project</span>
                 </>
               )}

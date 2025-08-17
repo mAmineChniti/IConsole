@@ -20,6 +20,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxTrigger,
+} from "@/components/ui/combobox";
+import {
   Form,
   FormControl,
   FormDescription,
@@ -30,14 +38,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -149,7 +149,15 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
       await queryClient.invalidateQueries({ queryKey: ["users", "list"] });
       onSuccess();
     },
-    onError: (error) => toast.error(error.message),
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
   });
 
   const onSubmit = (values: UserUpdateRequest) => {
@@ -168,7 +176,6 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
         <div className="space-y-4">
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-96" />
-          <Separator />
           <Card>
             <CardHeader>
               <Skeleton className="h-6 w-32" />
@@ -203,13 +210,13 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-6xl min-h-[80vh] mx-auto space-y-8 py-8">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground bg-card border border-border/50 transition-all duration-200 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Users
@@ -218,7 +225,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
 
       <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
+          <div className="p-2 bg-primary/10 rounded-full">
             <User className="h-6 w-6 text-primary" />
           </div>
           <div>
@@ -230,22 +237,23 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
             </p>
           </div>
         </div>
-        <div className="text-xs text-muted-foreground font-mono bg-muted/20 px-3 py-2 rounded-md inline-block">
+        <div className="text-xs text-muted-foreground font-mono bg-muted/20 px-3 py-2 rounded-full inline-block">
           ID: {userDetails.id}
         </div>
       </div>
-
-      <Separator />
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+      <div className="grid gap-6 lg:grid-cols-2 items-start">
+        <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
           <CardHeader>
             <CardTitle className="text-lg">Basic Information</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 flex flex-col">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} id="user-edit-form">
-                <div className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                id="user-edit-form"
+                className="flex-1 flex flex-col"
+              >
+                <div className="space-y-4 flex-1">
                   <FormField
                     control={form.control}
                     name="name"
@@ -253,7 +261,10 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-10" />
+                          <Input
+                            {...field}
+                            className="h-10 rounded-full bg-muted/40 border border-border/50 text-foreground"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -273,7 +284,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                             onChange={(e) =>
                               field.onChange(e.target.value || undefined)
                             }
-                            className="h-10"
+                            className="h-10 rounded-full bg-muted/40 border border-border/50 text-foreground"
                           />
                         </FormControl>
                         <FormMessage />
@@ -295,7 +306,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                             onChange={(e) =>
                               field.onChange(e.target.value || undefined)
                             }
-                            className="h-10"
+                            className="h-10 rounded-full bg-muted/40 border border-border/50 text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -311,15 +322,15 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
               Project Assignments
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="flex-1 flex flex-col">
+            <div className="space-y-4 flex-1 flex flex-col max-h-[480px] overflow-y-auto">
               <div>
                 <Label className="text-sm font-medium leading-none">
                   Current Assignments
@@ -329,11 +340,11 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                 </p>
               </div>
 
-              <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="space-y-3 flex-1 overflow-y-auto max-h-[420px]">
                 {projectFields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="p-4 border rounded-lg space-y-3 bg-muted/20"
+                    className="p-4 border border-border/50 rounded-xl space-y-3 bg-muted/20"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium truncate">
@@ -349,7 +360,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                               removeProject(index);
                               setProjectsModified(true);
                             }}
-                            className="h-6 w-6 p-0 text-destructive hover:text-destructive flex-shrink-0"
+                            className="h-7 w-7 p-0 rounded-full text-destructive hover:text-destructive flex-shrink-0 bg-card border border-border/50 cursor-pointer"
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -365,9 +376,14 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                       >
                         Project
                       </Label>
-                      <Select
+                      <Combobox
+                        data={(availableProjects?.projects ?? []).map((p) => ({
+                          label: p.project_name,
+                          value: p.project_id,
+                        }))}
+                        type="project"
                         value={field.project_id}
-                        onValueChange={(value) => {
+                        onValueChange={(value: string) => {
                           if (
                             value &&
                             projectFields.some(
@@ -386,39 +402,48 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                           setProjectsModified(true);
                         }}
                       >
-                        <SelectTrigger
+                        <ComboboxTrigger
                           id={`project-select-${index}`}
                           aria-labelledby={`project-label-${index}`}
-                          className="w-full mt-1 text-sm h-9"
+                          className="w-full mt-1 text-sm !h-9 rounded-full bg-muted/40 border border-border/50 cursor-pointer"
                           disabled={
                             isProjectsLoading ||
                             (availableProjects?.projects?.length ?? 0) === 0
                           }
+                        />
+                        <ComboboxContent
+                          popoverOptions={{
+                            className:
+                              "w-[--radix-popover-trigger-width] p-0 border-border shadow-lg",
+                          }}
                         >
-                          <SelectValue placeholder="Select a project" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {isProjectsLoading ? (
-                            <SelectItem value="__loading" disabled>
-                              Loading projects…
-                            </SelectItem>
-                          ) : (availableProjects?.projects?.length ?? 0) ===
-                            0 ? (
-                            <SelectItem value="__no-projects" disabled>
-                              No projects available
-                            </SelectItem>
-                          ) : (
-                            availableProjects?.projects?.map((p) => (
-                              <SelectItem
-                                key={p.project_id}
-                                value={p.project_id}
-                              >
-                                {p.project_name}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                          <ComboboxInput
+                            placeholder="Search projects..."
+                            className="border-0 rounded-none px-3 py-2 text-sm text-foreground focus:ring-0 focus:ring-offset-0 focus:outline-none"
+                          />
+                          <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
+                            {isProjectsLoading ? (
+                              <ComboboxItem disabled value="__loading">
+                                Loading projects…
+                              </ComboboxItem>
+                            ) : (availableProjects?.projects?.length ?? 0) ===
+                              0 ? (
+                              <ComboboxItem disabled value="__no-projects">
+                                No projects available
+                              </ComboboxItem>
+                            ) : (
+                              (availableProjects?.projects ?? []).map((p) => (
+                                <ComboboxItem
+                                  key={p.project_id}
+                                  value={p.project_id}
+                                >
+                                  {p.project_name}
+                                </ComboboxItem>
+                              ))
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                     </div>
 
                     <div>
@@ -446,7 +471,11 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                                     updateProject(index, updatedField);
                                     setProjectsModified(true);
                                   }}
-                                  className="cursor-pointer select-none text-xs hover:opacity-80 transition-opacity"
+                                  className={
+                                    isSelected
+                                      ? "cursor-pointer select-none text-xs rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 gap-1.5 flex items-center"
+                                      : "cursor-pointer select-none text-xs rounded-full border border-border/50 px-2 py-0.5 hover:bg-muted/40 transition-opacity"
+                                  }
                                 >
                                   {role.name}
                                 </Badge>
@@ -470,7 +499,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                 ))}
 
                 {projectFields.length === 0 && (
-                  <div className="text-center py-6 text-muted-foreground text-sm border-2 border-dashed border-muted-foreground/20 rounded-lg">
+                  <div className="text-center py-6 text-muted-foreground text-sm border-2 border-dashed border-muted-foreground/20 rounded-xl">
                     No project assignments
                   </div>
                 )}
@@ -488,7 +517,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                   appendProject({ project_id: "", roles: [] });
                   setProjectsModified(true);
                 }}
-                className="w-full"
+                className="w-full rounded-full px-6 py-2 bg-muted text-foreground border border-border/50 transition-all duration-200 cursor-pointer"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Project Assignment
@@ -498,15 +527,20 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
         </Card>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onBack}>
+      <div className="flex justify-end gap-3 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="rounded-full px-6 py-2 bg-muted text-foreground border border-border/50 transition-all duration-200 cursor-pointer"
+        >
           Cancel
         </Button>
         <Button
           type="submit"
           form="user-edit-form"
           disabled={updateMutation.isPending}
-          className="min-w-[120px]"
+          className="rounded-full min-w-[120px] bg-primary text-primary-foreground transition-all duration-200 cursor-pointer"
         >
           {updateMutation.isPending ? (
             <>
