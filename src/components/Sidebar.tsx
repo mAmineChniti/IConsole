@@ -1,30 +1,5 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteCookie, setCookie } from "cookies-next";
-import {
-  ArrowRight,
-  Boxes,
-  ChevronDown,
-  Globe,
-  Image as ImageIcon,
-  LayoutDashboard,
-  LogOut,
-  Moon,
-  Plus,
-  Server,
-  Shield,
-  Sun,
-  Users as UsersIcon,
-  Zap,
-} from "lucide-react";
-
-import { useTheme } from "next-themes";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import {
   Combobox,
@@ -47,32 +22,56 @@ import {
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
 import { AuthService } from "@/lib/requests";
+import { cn } from "@/lib/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteCookie, setCookie } from "cookies-next";
+import {
+  ArrowRight,
+  ChevronDown,
+  Cpu,
+  Expand,
+  Folder,
+  Globe,
+  HardDrive,
+  Home,
+  LogOut,
+  Monitor,
+  Moon,
+  Plus,
+  Shield,
+  Sun,
+  UserCircle2,
+} from "lucide-react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-const sidebarItems = [
+const firstSidebarItems = [
   {
     title: "Overview",
-    icon: LayoutDashboard,
+    icon: Home,
     href: "/dashboard/overview",
   },
   {
-    title: "Projects",
-    icon: Boxes,
-    href: "/dashboard/projects",
-  },
-  {
-    title: "Images",
-    icon: ImageIcon,
-    href: "/dashboard/images",
-  },
-  {
     title: "Users",
-    icon: UsersIcon,
+    icon: UserCircle2,
     href: "/dashboard/users",
+  },
+  {
+    title: "Projects",
+    icon: Folder,
+    href: "/dashboard/projects",
   },
 ] as const;
 
-const networkingItems = [
+const secondSidebarItems = [
+  {
+    title: "Images",
+    icon: HardDrive,
+    href: "/dashboard/images",
+  },
   {
     title: "Networks",
     icon: Globe,
@@ -83,7 +82,7 @@ const networkingItems = [
 const computeSubItems = [
   {
     title: "Instances",
-    icon: Server,
+    icon: Monitor,
     href: "/dashboard/instances",
   },
   {
@@ -98,7 +97,7 @@ const computeSubItems = [
   },
   {
     title: "Scaling",
-    icon: Zap,
+    icon: Expand,
     href: "/dashboard/scale",
   },
 ] as const;
@@ -302,7 +301,7 @@ export function Sidebar() {
               </Combobox>
             </SidebarMenuItem>
 
-            {sidebarItems.map((item) => {
+            {firstSidebarItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <SidebarMenuItem key={item.href}>
@@ -348,7 +347,7 @@ export function Sidebar() {
                     computeOpen && "rounded-full",
                   )}
                 >
-                  <Server className="h-4 w-4 mr-3 flex-shrink-0" />
+                  <Cpu className="h-4 w-4 mr-3 flex-shrink-0" />
                   <span className="text-sm font-medium flex-1 truncate text-left">
                     Compute
                   </span>
@@ -395,15 +394,14 @@ export function Sidebar() {
                 </SidebarMenuSub>
               )}
             </SidebarMenuItem>
-
-            {networkingItems.map((item) => {
+            {secondSidebarItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                      "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
                       isActive && "rounded-full",
                     )}
                   >

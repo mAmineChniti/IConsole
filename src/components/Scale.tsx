@@ -1,22 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Mail, PlusCircle, ServerCog } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import { ScaleService } from "@/lib/requests";
-import type {
-  ScaleNodeRequest,
-  SendTestEmailRequest,
-} from "@/types/RequestInterfaces";
-import {
-  ScaleNodeRequestSchema,
-  SendTestEmailRequestSchema,
-} from "@/types/RequestSchemas";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -42,6 +25,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ScaleService } from "@/lib/requests";
+import type {
+  ScaleNodeRequest,
+  SendTestEmailRequest,
+} from "@/types/RequestInterfaces";
+import {
+  ScaleNodeRequestSchema,
+  SendTestEmailRequestSchema,
+} from "@/types/RequestSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Mail, PlusCircle, ServerCog } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export function ScaleOperations() {
   const [showNodeDialog, setShowNodeDialog] = useState(false);

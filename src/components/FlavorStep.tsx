@@ -1,8 +1,5 @@
 "use client";
 
-import { Cpu, HardDrive, MemoryStick } from "lucide-react";
-import { type useForm } from "react-hook-form";
-
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -10,6 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { FlavorFormData } from "@/types/RequestInterfaces";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
+import { Cpu, HardDrive, MemoryStick } from "lucide-react";
+import { type useForm } from "react-hook-form";
 
 export function FlavorStep({
   form,

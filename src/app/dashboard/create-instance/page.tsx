@@ -1,8 +1,7 @@
-import { type Metadata } from "next";
-
 import { Sidebar } from "@/components/Sidebar";
-import { VM } from "@/components/VM";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { VM } from "@/components/VM";
+import { type Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "IConsole | Create Instance",

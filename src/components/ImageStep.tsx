@@ -1,4 +1,5 @@
 "use client";
+
 import { GetDistroIcon } from "@/components/GetDistroIcon";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
