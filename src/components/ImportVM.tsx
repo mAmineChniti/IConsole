@@ -1,5 +1,6 @@
+"use client";
 import { Download, Loader2, Package, Upload } from "lucide-react";
-import { type useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 
@@ -30,26 +31,97 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InfraService } from "@/lib/requests";
 import type { ImportVMFormData } from "@/types/RequestInterfaces";
+import { importVMSchema } from "@/types/RequestSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
+import { ErrorCard } from "./ErrorCard";
 
-export function ImportVMTab({
-  form,
-  resources,
-  isLoading,
-  onImportVM,
-  isCreating,
-  importFile,
-  setImportFile,
-}: {
-  form: ReturnType<typeof useForm<ImportVMFormData>>;
-  resources: ResourcesResponse | undefined;
-  isLoading: boolean;
-  onImportVM: (data: ImportVMFormData) => void;
-  isCreating: boolean;
-  importFile: File | undefined;
-  setImportFile: (file: File | undefined) => void;
-}) {
+export function ImportVM() {
+  const [importFile, setImportFile] = useState<File | undefined>(undefined);
+  const queryClient = useQueryClient();
+
+  const importForm = useForm<ImportVMFormData>({
+    resolver: zodResolver(importVMSchema),
+    defaultValues: {
+      vm_name: "",
+      description: "",
+      min_disk: 20,
+      min_ram: 2048,
+      is_public: false,
+      flavor_id: "",
+      network_id: "",
+      key_name: "",
+      security_group: "",
+      admin_password: "",
+    },
+  });
+
+  const {
+    data: resources,
+    isLoading: resourcesLoading,
+    isError: resourcesIsError,
+    error: resourcesError,
+    refetch: refetchResources,
+  } = useQuery<ResourcesResponse, Error>({
+    queryKey: ["vm-resources"],
+    queryFn: () => InfraService.listResources(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const importVMMutation = useMutation({
+    mutationFn: async (data: ImportVMFormData) => {
+      if (!importFile) {
+        throw new Error("Please select a VMDK file to import");
+      }
+      const formData = new FormData();
+      formData.append("vmdk_file", importFile);
+      formData.append("vm_name", data.vm_name);
+      formData.append("description", data.description ?? "");
+      formData.append("min_disk", data.min_disk?.toString() ?? "20");
+      formData.append("min_ram", data.min_ram?.toString() ?? "2048");
+      formData.append("is_public", data.is_public.toString());
+      formData.append("flavor_id", data.flavor_id);
+      formData.append("network_id", data.network_id);
+      formData.append("key_name", data.key_name);
+      formData.append("security_group", data.security_group);
+      formData.append("admin_password", data.admin_password);
+      return InfraService.importVMwareVM(formData);
+    },
+    onSuccess: async (response) => {
+      toast.success("VM imported successfully!", {
+        description: `VM \"${response.server.name}\" has been imported and deployed`,
+      });
+      importForm.reset();
+      setImportFile(undefined);
+      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
+    },
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "An unexpected error occurred";
+      toast.error(message);
+    },
+  });
+
+  if (resourcesIsError) {
+    return (
+      <ErrorCard
+        title="Failed to Load Resources"
+        message={
+          resourcesError.message ||
+          "Unable to fetch VM resources. Please check your connection and try again."
+        }
+        onRetry={() => refetchResources()}
+      />
+    );
+  }
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -63,7 +135,7 @@ export function ImportVMTab({
     }
   };
 
-  if (isLoading)
+  if (resourcesLoading)
     return (
       <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl">
         <CardHeader>
@@ -170,8 +242,13 @@ export function ImportVMTab({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onImportVM)} className="space-y-6">
+        <Form {...importForm}>
+          <form
+            onSubmit={importForm.handleSubmit((data) => {
+              importVMMutation.mutate(data);
+            })}
+            className="space-y-6"
+          >
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">VMDK File</label>
@@ -212,7 +289,7 @@ export function ImportVMTab({
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="vm_name"
                 render={({ field }) => (
                   <FormItem>
@@ -230,7 +307,7 @@ export function ImportVMTab({
               />
 
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
@@ -250,7 +327,7 @@ export function ImportVMTab({
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="min_disk"
                 render={({ field }) => (
                   <FormItem>
@@ -269,7 +346,7 @@ export function ImportVMTab({
               />
 
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="min_ram"
                 render={({ field }) => (
                   <FormItem>
@@ -290,7 +367,7 @@ export function ImportVMTab({
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="flavor_id"
                 render={({ field }) => (
                   <FormItem>
@@ -315,7 +392,7 @@ export function ImportVMTab({
               />
 
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="network_id"
                 render={({ field }) => (
                   <FormItem>
@@ -342,7 +419,7 @@ export function ImportVMTab({
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="key_name"
                 render={({ field }) => (
                   <FormItem>
@@ -367,7 +444,7 @@ export function ImportVMTab({
               />
 
               <FormField
-                control={form.control}
+                control={importForm.control}
                 name="security_group"
                 render={({ field }) => (
                   <FormItem>
@@ -393,7 +470,7 @@ export function ImportVMTab({
             </div>
 
             <FormField
-              control={form.control}
+              control={importForm.control}
               name="admin_password"
               render={({ field }) => (
                 <FormItem>
@@ -419,10 +496,10 @@ export function ImportVMTab({
             <div className="flex justify-center sm:justify-end">
               <Button
                 type="submit"
-                disabled={isCreating || !importFile}
+                disabled={importVMMutation.isPending || !importFile}
                 className="rounded-full bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer w-full sm:w-auto"
               >
-                {isCreating ? (
+                {importVMMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
                     <span className="truncate">Importing VM...</span>

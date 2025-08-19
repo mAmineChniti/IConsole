@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteCookie, setCookie } from "cookies-next";
 import {
+  ArrowRight,
   Boxes,
   ChevronDown,
   Globe,
@@ -89,6 +90,11 @@ const computeSubItems = [
     title: "Create Instance",
     icon: Plus,
     href: "/dashboard/create-instance",
+  },
+  {
+    title: "Migrate VM",
+    icon: ArrowRight,
+    href: "/dashboard/migrate-vm",
   },
   {
     title: "Scaling",

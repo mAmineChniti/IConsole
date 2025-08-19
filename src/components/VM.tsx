@@ -8,20 +8,20 @@ import {
   CheckCircle,
   Cpu,
   HardDrive,
+  Mic,
   Network,
   Plus,
   Settings,
-  Upload,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { DescribeVMTab } from "@/components/DescribeVMTab";
 import { DetailsStep } from "@/components/DetailsStep";
 import { ErrorCard } from "@/components/ErrorCard";
 import { FlavorStep } from "@/components/FlavorStep";
 import { ImageStep } from "@/components/ImageStep";
-import { ImportVMTab } from "@/components/ImportVMTab";
 import { NetworkStep } from "@/components/NetworkStep";
 import { SummaryStep } from "@/components/SummaryStep";
 import { Button } from "@/components/ui/button";
@@ -32,14 +32,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import { Separator } from "@/components/ui/separator";
 import { InfraService } from "@/lib/requests";
-import { cn } from "@/lib/utils";
 import type {
   CombinedVMData,
   FlavorFormData,
   ImageFormData,
-  ImportVMFormData,
   NetworkFormData,
   VMCreateRequest,
   VMDetailsFormData,
@@ -47,19 +46,36 @@ import type {
 import {
   flavorSchema,
   imageSchema,
-  importVMSchema,
   networkSchema,
   vmDetailsSchema,
 } from "@/types/RequestSchemas";
 
+import { cn } from "@/lib/utils";
 type WizardStep = "flavor" | "image" | "network" | "details" | "summary";
-
 export function VM() {
-  const [activeTab, setActiveTab] = useState<"create" | "import">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "describe" | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = window.localStorage.getItem("vm-active-tab");
+      if (saved === "create" || saved === "describe") {
+        setActiveTab(saved);
+      } else {
+        setActiveTab("create");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && activeTab) {
+      window.localStorage.setItem("vm-active-tab", activeTab);
+    }
+  }, [activeTab]);
   const [currentStep, setCurrentStep] = useState<WizardStep>("flavor");
   const [combinedData, setCombinedData] = useState<Partial<CombinedVMData>>({});
   const queryClient = useQueryClient();
-  const [importFile, setImportFile] = useState<File | undefined>(undefined);
 
   const {
     data: resources,
@@ -90,22 +106,6 @@ export function VM() {
   const vmDetailsForm = useForm<VMDetailsFormData>({
     resolver: zodResolver(vmDetailsSchema),
     defaultValues: { name: "", admin_username: "", admin_password: "" },
-  });
-
-  const importForm = useForm<ImportVMFormData>({
-    resolver: zodResolver(importVMSchema),
-    defaultValues: {
-      vm_name: "",
-      description: "",
-      min_disk: 20,
-      min_ram: 2048,
-      is_public: false,
-      flavor_id: "",
-      network_id: "",
-      key_name: "",
-      security_group: "",
-      admin_password: "",
-    },
   });
 
   const steps: { key: WizardStep; title: string; icon: typeof Cpu }[] = [
@@ -188,31 +188,14 @@ export function VM() {
     },
   });
 
-  const importVMMutation = useMutation({
-    mutationFn: async (data: ImportVMFormData) => {
-      if (!importFile) {
-        throw new Error("Please select a VMDK file to import");
-      }
-      const formData = new FormData();
-      formData.append("vmdk_file", importFile);
-      formData.append("vm_name", data.vm_name);
-      formData.append("description", data.description ?? "");
-      formData.append("min_disk", data.min_disk?.toString() ?? "20");
-      formData.append("min_ram", data.min_ram?.toString() ?? "2048");
-      formData.append("is_public", data.is_public.toString());
-      formData.append("flavor_id", data.flavor_id);
-      formData.append("network_id", data.network_id);
-      formData.append("key_name", data.key_name);
-      formData.append("security_group", data.security_group);
-      formData.append("admin_password", data.admin_password);
-      return InfraService.importVMwareVM(formData);
+  const describeVMMutation = useMutation({
+    mutationFn: async (description: string) => {
+      return InfraService.createFromDescription({ description });
     },
     onSuccess: async (response) => {
-      toast.success("VM imported successfully!", {
-        description: `VM \"${response.server.name}\" has been imported and deployed`,
+      toast.success("VM created from description!", {
+        description: `VM \"${response.server_name}\" is being deployed`,
       });
-      importForm.reset();
-      setImportFile(undefined);
       await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
     },
     onError: (err: unknown) => {
@@ -239,6 +222,8 @@ export function VM() {
     );
   }
 
+  if (activeTab === undefined) return undefined;
+
   return (
     <div className="space-y-6">
       <div
@@ -264,21 +249,21 @@ export function VM() {
           <span className="truncate">Create VM</span>
         </Button>
         <Button
-          variant={activeTab === "import" ? "default" : "ghost"}
+          variant={activeTab === "describe" ? "default" : "ghost"}
           className={cn(
             "flex-1 h-10 min-w-0 rounded-full cursor-pointer",
-            activeTab === "import"
+            activeTab === "describe"
               ? "bg-primary text-primary-foreground shadow-sm"
               : "",
           )}
-          onClick={() => setActiveTab("import")}
+          onClick={() => setActiveTab("describe")}
           role="tab"
-          aria-selected={activeTab === "import"}
-          aria-controls="import-tab-panel"
-          id="import-tab"
+          aria-selected={activeTab === "describe"}
+          aria-controls="describe-tab-panel"
+          id="describe-tab"
         >
-          <Upload className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
-          <span className="truncate">Import VM</span>
+          <Mic className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
+          <span className="truncate">Describe VM</span>
         </Button>
       </div>
 
@@ -447,18 +432,13 @@ export function VM() {
       ) : (
         <div
           role="tabpanel"
-          id="import-tab-panel"
-          aria-labelledby="import-tab"
+          id="describe-tab-panel"
+          aria-labelledby="describe-tab"
           tabIndex={0}
         >
-          <ImportVMTab
-            form={importForm}
-            resources={resources}
-            isLoading={resourcesLoading}
-            onImportVM={(data) => importVMMutation.mutate(data)}
-            isCreating={importVMMutation.isPending}
-            importFile={importFile}
-            setImportFile={setImportFile}
+          <DescribeVMTab
+            onCreateVM={(desc) => describeVMMutation.mutate(desc)}
+            isCreating={describeVMMutation.isPending}
           />
         </div>
       )}

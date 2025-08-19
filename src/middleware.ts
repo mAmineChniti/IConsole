@@ -13,6 +13,7 @@ export function middleware(request: NextRequest) {
     "/dashboard/create-instance",
     "/dashboard/images",
     "/dashboard/projects",
+    "/dashboard/migrate-vm",
   ];
 
   if (pathname === "/") {
