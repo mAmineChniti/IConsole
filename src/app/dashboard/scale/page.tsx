@@ -1,8 +1,7 @@
-import { type Metadata } from "next";
-
 import { ScaleOperations } from "@/components/Scale";
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { type Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "IConsole | Scale",

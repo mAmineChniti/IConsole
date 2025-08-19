@@ -1,5 +1,37 @@
 "use client";
 
+import { DescribeVMTab } from "@/components/DescribeVMTab";
+import { DetailsStep } from "@/components/DetailsStep";
+import { ErrorCard } from "@/components/ErrorCard";
+import { FlavorStep } from "@/components/FlavorStep";
+import { ImageStep } from "@/components/ImageStep";
+import { NetworkStep } from "@/components/NetworkStep";
+import { SummaryStep } from "@/components/SummaryStep";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { InfraService } from "@/lib/requests";
+import { cn } from "@/lib/utils";
+import type {
+  CombinedVMData,
+  FlavorFormData,
+  ImageFormData,
+  NetworkFormData,
+  VMCreateRequest,
+  VMDetailsFormData,
+} from "@/types/RequestInterfaces";
+import {
+  flavorSchema,
+  imageSchema,
+  networkSchema,
+  vmDetailsSchema,
+} from "@/types/RequestSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -17,40 +49,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { DescribeVMTab } from "@/components/DescribeVMTab";
-import { DetailsStep } from "@/components/DetailsStep";
-import { ErrorCard } from "@/components/ErrorCard";
-import { FlavorStep } from "@/components/FlavorStep";
-import { ImageStep } from "@/components/ImageStep";
-import { NetworkStep } from "@/components/NetworkStep";
-import { SummaryStep } from "@/components/SummaryStep";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-import { Separator } from "@/components/ui/separator";
-import { InfraService } from "@/lib/requests";
-import type {
-  CombinedVMData,
-  FlavorFormData,
-  ImageFormData,
-  NetworkFormData,
-  VMCreateRequest,
-  VMDetailsFormData,
-} from "@/types/RequestInterfaces";
-import {
-  flavorSchema,
-  imageSchema,
-  networkSchema,
-  vmDetailsSchema,
-} from "@/types/RequestSchemas";
-
-import { cn } from "@/lib/utils";
 type WizardStep = "flavor" | "image" | "network" | "details" | "summary";
 export function VM() {
   const [activeTab, setActiveTab] = useState<"create" | "describe" | undefined>(

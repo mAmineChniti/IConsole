@@ -1,6 +1,3 @@
-import { MonitorStop } from "lucide-react";
-import { type UseFormReturn } from "react-hook-form";
-
 import {
   Form,
   FormControl,
@@ -12,6 +9,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import type { VMDetailsFormData } from "@/types/RequestInterfaces";
+import { MonitorStop } from "lucide-react";
+import { type UseFormReturn } from "react-hook-form";
 
 export function DetailsStep({
   form,

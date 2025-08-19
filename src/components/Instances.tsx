@@ -1,5 +1,25 @@
 "use client";
 
+import { ErrorCard } from "@/components/ErrorCard";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { InfraService } from "@/lib/requests";
+import { calculateAge, cn } from "@/lib/utils";
+import type { InstanceDetailsResponse } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   HardDrive,
@@ -17,29 +37,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-
-import { InfraService } from "@/lib/requests";
-import type { InstanceDetailsResponse } from "@/types/ResponseInterfaces";
-
-import { ErrorCard } from "@/components/ErrorCard";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { calculateAge, cn } from "@/lib/utils";
 
 function InstanceActions({
   instanceId,

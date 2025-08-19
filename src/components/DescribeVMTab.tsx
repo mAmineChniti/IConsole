@@ -10,12 +10,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Languages, Loader2, Mic, MicOff, Send, Trash2 } from "lucide-react";
-
 import type { CreateFromDescriptionRequest } from "@/types/RequestInterfaces";
 import { CreateFromDescriptionRequestSchema } from "@/types/RequestSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { pipeline, read_audio } from "@huggingface/transformers";
+import { Languages, Loader2, Mic, MicOff, Send, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import SpeechRecognition, {

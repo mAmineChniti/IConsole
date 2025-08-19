@@ -1,21 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Save, Shield, User, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import { AuthService, UserService } from "@/lib/requests";
-import type { UserUpdateRequest } from "@/types/RequestInterfaces";
-import { UserUpdateRequestSchema } from "@/types/RequestSchemas";
-import type {
-  ProjectsResponse,
-  RolesResponse,
-  UserDetailsResponse,
-} from "@/types/ResponseInterfaces";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +28,20 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { AuthService, UserService } from "@/lib/requests";
+import type { UserUpdateRequest } from "@/types/RequestInterfaces";
+import { UserUpdateRequestSchema } from "@/types/RequestSchemas";
+import type {
+  ProjectsResponse,
+  RolesResponse,
+  UserDetailsResponse,
+} from "@/types/ResponseInterfaces";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Plus, Save, Shield, User, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface UserEditFormProps {
   userId: string;
