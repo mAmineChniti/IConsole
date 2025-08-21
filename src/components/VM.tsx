@@ -155,7 +155,9 @@ export function VM({ onBack }: { onBack?: () => void }) {
       imageForm.reset();
       networkForm.reset();
       vmDetailsForm.reset();
-      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["instances", "details"],
+      });
       await queryClient.invalidateQueries({ queryKey: ["vm-resources"] });
     },
     onError: (err: unknown) => {
@@ -177,7 +179,9 @@ export function VM({ onBack }: { onBack?: () => void }) {
       toast.success("VM created from description!", {
         description: `VM \"${response.server_name}\" is being deployed`,
       });
-      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["instances", "details"],
+      });
       await queryClient.invalidateQueries({ queryKey: ["vm-resources"] });
     },
     onError: (err: unknown) => {

@@ -25,8 +25,9 @@ export function InstanceActions({
   const startMutation = useMutation({
     mutationFn: (id: string) => InfraService.startInstance(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
-      await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["instances", "details"],
+      });
       toast.success("Instance started successfully");
     },
     onError: (err: unknown) => {
@@ -43,8 +44,9 @@ export function InstanceActions({
   const stopMutation = useMutation({
     mutationFn: (id: string) => InfraService.stopInstance(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
-      await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["instances", "details"],
+      });
       toast.success("Instance stopped successfully");
     },
     onError: (err: unknown) => {
@@ -61,8 +63,9 @@ export function InstanceActions({
   const rebootMutation = useMutation({
     mutationFn: (id: string) => InfraService.rebootInstance(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
-      await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["instances", "details"],
+      });
       toast.success("Instance rebooted successfully");
     },
     onError: (err: unknown) => {
@@ -79,8 +82,9 @@ export function InstanceActions({
   const deleteMutation = useMutation({
     mutationFn: (id: string) => InfraService.deleteInstance(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
-      await queryClient.invalidateQueries({ queryKey: ["instances-details"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["instances", "details"],
+      });
       toast.success("Instance deleted successfully");
     },
     onError: (err: unknown) => {
