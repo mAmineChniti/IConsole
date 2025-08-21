@@ -110,7 +110,9 @@ export function ImportVM() {
       });
       importForm.reset();
       setImportFile(undefined);
-      await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["instances", "details"],
+      });
     },
     onError: (err: unknown) => {
       const message =
