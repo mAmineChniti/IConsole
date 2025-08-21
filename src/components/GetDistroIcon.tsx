@@ -24,20 +24,18 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
 
   if (imageErrorIndex >= candidates.length) {
     return (
-      <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8">
+      <div className={cn("relative flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8")}>
+        {" "}
         <Server
-          className={cn(
-            "h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0",
-            "text-muted-foreground",
-          )}
+          className={cn("w-full h-full flex-shrink-0", "text-muted-foreground")}
           aria-hidden="true"
-        />
+        />{" "}
       </div>
     );
   }
 
   const candidate = candidates[imageErrorIndex]!;
-  const sizeClasses = cn("w-6 h-6", "sm:w-8 sm:h-8");
+  const sizeClasses = cn("w-6 h-6 sm:w-8 sm:h-8");
 
   if (candidate === "windows") {
     const src =
@@ -46,11 +44,10 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
     return (
       <div className={cn("relative flex-shrink-0", sizeClasses)}>
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center w-full h-full">
             <Server
               className={cn(
-                "h-4 w-4",
-                "sm:h-6 sm:w-6",
+                "w-full h-full flex-shrink-0",
                 "text-muted-foreground",
               )}
               aria-hidden="true"
@@ -63,7 +60,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
           alt="Windows"
           width={32}
           height={32}
-          className={cn(sizeClasses, "object-contain")}
+          className={cn(sizeClasses, "object-contain w-full h-full")}
           onError={() => {
             setImageErrorIndex((i) => i + 1);
             setLoading(true);
@@ -82,9 +79,9 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
   return (
     <div className={cn("relative flex-shrink-0", sizeClasses)}>
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center w-full h-full">
           <Server
-            className={cn("h-4 w-4", "sm:h-6 sm:w-6", "text-muted-foreground")}
+            className={cn("w-full h-full flex-shrink-0 text-muted-foreground")}
             aria-hidden="true"
           />
         </div>
@@ -95,7 +92,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
         alt={`${logoWord.charAt(0).toUpperCase() + logoWord.slice(1)} Logo`}
         width={32}
         height={32}
-        className={cn(sizeClasses, "object-contain")}
+        className={cn(sizeClasses, "object-contain w-full h-full")}
         onError={() => {
           setImageErrorIndex((i) => i + 1);
           setLoading(true);

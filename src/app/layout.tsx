@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import { Providers } from "@/components/providers";
+import { TokenExpiration } from "@/components/TokenExpiration";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       className={`${geist.variable} h-full`}
       suppressHydrationWarning
     >
+      <TokenExpiration />
       <body className="h-full bg-background text-foreground antialiased">
         <Providers>{children}</Providers>
       </body>

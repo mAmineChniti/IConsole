@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -120,88 +119,70 @@ export function UsersManager() {
     return (
       <div className="space-y-8">
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
-                <Skeleton className="h-4 w-20" />
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+            <div className="text-sm text-muted-foreground leading-relaxed">
+              <Skeleton className="h-4 w-40 inline-block align-middle" />
             </div>
             <div className="flex gap-3">
-              <Skeleton className="h-9 w-9 rounded-lg" />
-              <Skeleton className="h-9 w-32 rounded-lg" />
+              <Skeleton className="h-9 w-9 p-0 rounded-full" />
+              <Skeleton className="h-9 w-32 rounded-full" />
             </div>
           </div>
         </div>
-
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm ring-1 ring-border/50"
+              className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 transition-opacity duration-300 pointer-events-none" />
               <CardHeader className="pb-4 relative">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="relative">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center ring-1 ring-border/50 transition-all duration-300">
                         <Skeleton className="h-6 w-6 rounded-md" />
                       </div>
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500/40 rounded-full border-2 border-card" />
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-green-500 animate-pulse border-2 border-card" />
                     </div>
-                    <div className="space-y-2 flex-1 min-w-0">
-                      <Skeleton className="h-6 w-40" />
-                      <div className="flex items-center gap-2">
-                        <Skeleton className="h-5 w-16" />
-                        <Skeleton className="h-5 w-14" />
-                      </div>
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <Skeleton className="h-6 w-32" />
+                      <Skeleton className="h-4 w-24 rounded-full" />
                     </div>
                   </div>
-                  <div className="flex gap-1 ml-3 opacity-100">
-                    <Skeleton className="h-8 w-8 rounded-lg" />
-                    <Skeleton className="h-8 w-8 rounded-lg" />
+                  <div className="flex gap-1 ml-3 z-10">
+                    <Skeleton className="h-8 w-8 p-0 rounded-full" />
+                    <Skeleton className="h-8 w-8 p-0 rounded-full" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 pt-0 relative">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                       <Skeleton className="h-4 w-4 rounded" />
                     </div>
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <Skeleton className="h-3 w-14" />
-                      <Skeleton className="h-4 w-40" />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
-                      <Skeleton className="h-4 w-4 rounded" />
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <Skeleton className="h-3 w-16" />
+                    <div className="flex-1 min-w-0">
+                      <Skeleton className="h-3 w-10 mb-1" />
                       <Skeleton className="h-4 w-32" />
                     </div>
                   </div>
-                </div>
-                <div className="pt-2">
-                  <Separator className="mb-4" />
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-                        <Skeleton className="h-3 w-3 rounded-full" />
-                      </div>
-                      <Skeleton className="h-4 w-16" />
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <Skeleton className="h-4 w-4 rounded" />
                     </div>
-                    <div className="flex items-center gap-2 bg-muted/40 px-2 py-1 rounded-md">
-                      <Skeleton className="h-3 w-3 rounded-full" />
-                      <Skeleton className="h-3 w-10" />
+                    <div className="flex-1 min-w-0">
+                      <Skeleton className="h-3 w-10 mb-1" />
+                      <Skeleton className="h-4 w-24" />
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           ))}
+        </div>
+        <div className="flex justify-center px-4 sm:px-0">
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -311,7 +292,7 @@ export function UsersManager() {
           {visibleData.map((user) => (
             <Card
               key={user.id}
-              className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden"
+              className="relative bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 transition-opacity duration-300 pointer-events-none" />
 

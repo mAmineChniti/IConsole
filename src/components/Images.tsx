@@ -114,15 +114,13 @@ export function Images() {
   if (loading) {
     return (
       <div className="space-y-6 px-2 sm:px-0">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-32" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+          <Skeleton className="h-4 w-40" />
         </div>
-
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <Skeleton className="h-10 w-full max-w-md" />
-          <Skeleton className="h-10 w-full sm:w-32" />
+          <Skeleton className="h-10 w-full max-w-md rounded-full" />
+          <Skeleton className="h-10 w-full sm:w-auto min-w-[140px] rounded-full" />
         </div>
-
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <Card
@@ -132,18 +130,18 @@ export function Images() {
               )}
             >
               <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full flex-shrink-0" />
-                  <Skeleton className="h-5 sm:h-6 w-3/4" />
+                <div className="flex items-start gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                  </div>
                 </div>
-                <Skeleton className="h-4 w-1/2 mt-2" />
               </CardHeader>
             </Card>
           ))}
         </div>
-
-        <div className="flex justify-center">
-          <Skeleton className="h-10 w-32" />
+        <div className="flex justify-center px-4 sm:px-0">
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -192,7 +190,7 @@ export function Images() {
           <DialogTrigger asChild>
             <Button
               variant="outline"
-              className="gap-2 cursor-pointer w-full sm:w-auto min-w-[140px] rounded-full"
+              className="gap-2 cursor-pointer h-10 w-full sm:w-auto min-w-[140px] rounded-full"
             >
               <Plus className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">Import Image</span>
@@ -330,9 +328,6 @@ export function Images() {
                     <CardTitle className="text-base sm:text-lg font-semibold text-foreground break-words leading-tight">
                       {image.name}
                     </CardTitle>
-                    <p className="text-xs text-muted-foreground w-fit font-mono break-all mt-2 bg-muted/20 px-2 py-1 rounded-md leading-relaxed">
-                      ID: {image.id}
-                    </p>
                   </div>
                 </div>
               </CardHeader>

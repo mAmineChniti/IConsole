@@ -12,7 +12,6 @@ import type {
   RouterAddInterfaceRequest,
   RouterCreateRequest,
   ScaleNodeRequest,
-  SendTestEmailRequest,
   SwitchProjectRequest,
   UpdateUserRolesRequest,
   UserCreateRequest,
@@ -46,7 +45,6 @@ import type {
   RouterCreateResponse,
   ScaleHealthResponse,
   ScaleNodeResponse,
-  SendTestEmailResponse,
   UnassignedUsersResponse,
   UpdateUserRolesResponse,
   UserCreateResponse,
@@ -107,7 +105,6 @@ const API_CONFIG = {
   SCALE: {
     HEALTH: "/scale/",
     NODE: "/scale/node",
-    SEND_TEST_EMAIL: "/scale/send_test_email",
   },
 } as const;
 
@@ -474,8 +471,21 @@ export const NetworkService = {
     return result.data!;
   },
 };
-
 export const InfraService = {
+  async listDetails(): Promise<InstanceDetailsResponse[]> {
+    const instanceList = await this.listInstances();
+    // InstanceListResponse is an array of InstanceListItem
+    if (!Array.isArray(instanceList) || instanceList.length === 0) return [];
+    const settled = await Promise.allSettled(
+      instanceList.map((i) => this.getInstanceDetails(i.id)),
+    );
+    return settled
+      .filter(
+        (r): r is PromiseFulfilledResult<InstanceDetailsResponse> =>
+          r.status === "fulfilled",
+      )
+      .map((r) => r.value);
+  },
   async listInstances(): Promise<InstanceListResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
@@ -694,16 +704,6 @@ export const ScaleService = {
   async addNode(data: ScaleNodeRequest): Promise<ScaleNodeResponse> {
     const result = await client.post<ScaleNodeResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.SCALE.NODE,
-      { type: "json", data },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-  async sendTestEmail(
-    data: SendTestEmailRequest,
-  ): Promise<SendTestEmailResponse> {
-    const result = await client.post<SendTestEmailResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.SCALE.SEND_TEST_EMAIL,
       { type: "json", data },
     );
     if (result.error) throw new Error(result.error.message);

@@ -164,28 +164,92 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-6xl min-h-[80vh] mx-auto space-y-8 py-8">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground bg-card border border-border/50 transition-all duration-200 cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Users
           </Button>
         </div>
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
-          <Card>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <Skeleton className="h-6 w-6 rounded-full" />
+            </div>
+            <div>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <Skeleton className="h-6 w-40 mt-2 rounded-full" />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2 items-start">
+          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
             <CardHeader>
               <Skeleton className="h-6 w-32" />
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
+            <CardContent className="flex-1 flex flex-col">
+              <div className="space-y-4 flex-1">
+                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
             </CardContent>
           </Card>
+          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded-full" />
+                <Skeleton className="h-6 w-32" />
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col">
+              <div className="space-y-4 flex-1 flex flex-col max-h-[480px] overflow-y-auto">
+                <div>
+                  <Skeleton className="h-4 w-32 mb-2" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+                <div className="space-y-3 flex-1 overflow-y-auto max-h-[420px]">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="p-4 border border-border/50 rounded-xl space-y-3 bg-muted/20"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-7 w-7 rounded-full" />
+                      </div>
+                      <div>
+                        <Skeleton className="h-3 w-20 mb-2" />
+                        <Skeleton className="h-9 w-full rounded-full" />
+                      </div>
+                      <div>
+                        <Skeleton className="h-3 w-16 mb-2" />
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {Array.from({ length: 3 }).map((_, j) => (
+                            <Skeleton
+                              key={j}
+                              className="h-6 w-16 rounded-full"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Skeleton className="h-10 w-full rounded-full mt-4" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="flex justify-end gap-3 pt-4">
+          <Skeleton className="h-10 w-32 rounded-full" />
+          <Skeleton className="h-10 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -234,9 +298,6 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
               Update user information and manage project assignments
             </p>
           </div>
-        </div>
-        <div className="text-xs text-muted-foreground font-mono bg-muted/20 px-3 py-2 rounded-full inline-block">
-          ID: {userDetails.id}
         </div>
       </div>
       <div className="grid gap-6 lg:grid-cols-2 items-start">
@@ -509,7 +570,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                 size="sm"
                 onClick={() => {
                   if (projectFields.some((p) => !p.project_id)) {
-                    toast.message("Complete current assignment first");
+                    toast.info("Complete current assignment first");
                     return;
                   }
                   appendProject({ project_id: "", roles: [] });
