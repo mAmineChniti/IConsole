@@ -54,21 +54,40 @@ export default function Login() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => AuthService.login(data),
     onSuccess: async (response) => {
-      await setCookie("token", response.token, {
-        maxAge: 60 * 60 * 24 * 7,
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
+      const now = Date.now();
+      const expiresAtMs =
+        response.expires_at_ts > 1e12
+          ? response.expires_at_ts
+          : response.expires_at_ts * 1000;
+      const maxAge = Math.max(Math.floor((expiresAtMs - now) / 1000), 0);
+
+      await setCookie(
+        "token",
+        JSON.stringify({
+          token: response.token,
+          expires_at: response.expires_at,
+          expires_at_ts: response.expires_at_ts,
+        }),
+        {
+          path: "/",
+          maxAge,
+          httpOnly: false,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        },
+      );
 
       await setCookie(
         "user",
         JSON.stringify({
+          user_id: response.user_id,
+          username: response.username,
           projects: response.projects,
           loginTime: new Date().toISOString(),
         }),
         {
-          maxAge: 60 * 60 * 24 * 7,
+          path: "/",
+          maxAge,
           httpOnly: false,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",

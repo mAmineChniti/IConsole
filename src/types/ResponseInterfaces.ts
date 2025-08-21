@@ -3,7 +3,11 @@ type ServiceState = "up" | "down";
 
 export interface LoginResponse {
   token: string;
+  user_id: string;
+  username: string;
   projects: ProjectInfo[];
+  expires_at: string;
+  expires_at_ts: number;
   message: string;
 }
 

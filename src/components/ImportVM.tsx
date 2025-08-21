@@ -33,7 +33,21 @@ import { importVMSchema } from "@/types/RequestSchemas";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, Loader2, Package, Upload } from "lucide-react";
+import {
+  Download,
+  FileText,
+  HardDrive,
+  IceCream,
+  KeyRound,
+  Loader2,
+  MemoryStick,
+  Network,
+  Package,
+  Server,
+  ShieldCheck,
+  Upload,
+  UserCog,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -139,27 +153,27 @@ export function ImportVM() {
       <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+            <div className="p-2 bg-muted rounded-full">
               <Skeleton className="h-5 w-5" />
             </div>
-            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-6 w-44" />
           </CardTitle>
           <CardDescription>
-            <Skeleton className="h-4 w-80" />
+            <Skeleton className="h-4 w-64" />
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Skeleton className="h-4 w-20 mb-2" />
-                <div className="flex items-center justify-center w-full">
-                  <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Skeleton className="w-8 h-8 mb-2" />
-                      <Skeleton className="h-4 w-40 mb-2" />
-                      <Skeleton className="h-3 w-24" />
+            <div>
+              <Skeleton className="h-4 w-24 mb-2" />
+              <div className="flex items-center justify-center w-full">
+                <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <div className="p-2 bg-muted rounded-full mb-2">
+                      <Skeleton className="w-8 h-8" />
                     </div>
+                    <Skeleton className="h-4 w-40 mb-2" />
+                    <Skeleton className="h-3 w-24" />
                   </div>
                 </div>
               </div>
@@ -169,58 +183,102 @@ export function ImportVM() {
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-2">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-10 w-full" />
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
               <div className="space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            </div>
-
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-28" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-28" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            </div>
-
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-12" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-10 w-full" />
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
             </div>
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-2">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-10 w-full" />
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
               <div className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-full" />
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
+              </div>
+            </div>
+
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-28" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
+              </div>
+            </div>
+
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-28" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="p-1 bg-muted rounded-full">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-36" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-3 w-64" />
+              <div className="flex items-center gap-2 mb-1">
+                <div className="p-1 bg-muted rounded-full">
+                  <Skeleton className="h-4 w-4" />
+                </div>
+                <Skeleton className="h-4 w-36" />
+              </div>
+              <Skeleton className="h-10 w-full rounded-full" />
             </div>
 
             <Separator />
 
             <div className="flex justify-center sm:justify-end">
-              <Skeleton className="h-10 w-full sm:w-48" />
+              <Skeleton className="h-10 w-full sm:w-48 rounded-full" />
             </div>
           </div>
         </CardContent>
@@ -292,7 +350,12 @@ export function ImportVM() {
                 name="vm_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>VM Name</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <Server className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                      VM Name
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -310,7 +373,12 @@ export function ImportVM() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                      Description (Optional)
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -330,12 +398,29 @@ export function ImportVM() {
                 name="min_disk"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum Disk (GB)</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <HardDrive className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                      Minimum Disk (GB)
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        min={0}
+                        step={1}
+                        inputMode="numeric"
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (v === "") return field.onChange(undefined);
+                          const n = Number(v);
+                          field.onChange(
+                            Number.isFinite(n)
+                              ? Math.max(0, Math.floor(n))
+                              : undefined,
+                          );
+                        }}
                         className="rounded-full bg-input text-foreground"
                       />
                     </FormControl>
@@ -349,12 +434,29 @@ export function ImportVM() {
                 name="min_ram"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum RAM (MB)</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <MemoryStick className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                      Minimum RAM (MB)
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        min={0}
+                        step={1}
+                        inputMode="numeric"
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (v === "") return field.onChange(undefined);
+                          const n = Number(v);
+                          field.onChange(
+                            Number.isFinite(n)
+                              ? Math.max(0, Math.floor(n))
+                              : undefined,
+                          );
+                        }}
                         className="rounded-full bg-input text-foreground"
                       />
                     </FormControl>
@@ -370,7 +472,12 @@ export function ImportVM() {
                 name="flavor_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Flavor</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <IceCream className="h-4 w-4 text-muted-foreground rotate-45" />
+                      </span>
+                      Flavor
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full rounded-full cursor-pointer">
@@ -395,7 +502,12 @@ export function ImportVM() {
                 name="network_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Network</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <Network className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                      Network
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full rounded-full cursor-pointer">
@@ -422,7 +534,12 @@ export function ImportVM() {
                 name="key_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Key Pair</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <KeyRound className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                      Key Pair
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full rounded-full cursor-pointer">
@@ -447,7 +564,12 @@ export function ImportVM() {
                 name="security_group"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Security Group</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                        <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                      Security Group
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full rounded-full cursor-pointer">
@@ -473,7 +595,12 @@ export function ImportVM() {
               name="admin_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Admin Password</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    <span className="p-1 bg-muted rounded-full flex items-center justify-center">
+                      <UserCog className="h-4 w-4 text-muted-foreground" />
+                    </span>
+                    Admin Password
+                  </FormLabel>
                   <FormControl>
                     <Input
                       {...field}

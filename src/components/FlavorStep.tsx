@@ -32,25 +32,50 @@ export function FlavorStep({
               key={i}
               className="bg-card text-card-foreground border border-border/50 shadow-lg"
             >
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                    <Skeleton className="h-5 w-5" />
-                  </div>
-                  <div className="space-y-1">
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-3 w-12" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, j) => (
-                    <div key={j} className="flex items-center gap-2">
-                      <div className="flex h-6 w-6 items-center justify-center bg-muted">
-                        <Skeleton className="h-3 w-3" />
-                      </div>
-                      <Skeleton className="h-3 w-16" />
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                      <Skeleton className="h-4 w-4" />
                     </div>
-                  ))}
+                    <div>
+                      <Skeleton className="h-4 w-20 mb-1" />
+                      <Skeleton className="h-3 w-12" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-5 w-14 rounded-full" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
+                      <Skeleton className="h-3 w-3" />
+                    </div>
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
+                      <Skeleton className="h-3 w-3" />
+                    </div>
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
+                      <Skeleton className="h-3 w-3" />
+                    </div>
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
+                      <Skeleton className="h-3 w-3" />
+                    </div>
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
+                      <Skeleton className="h-3 w-3" />
+                    </div>
+                    <Skeleton className="h-3 w-16" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -68,7 +93,7 @@ export function FlavorStep({
           render={({ field }) => (
             <FormItem>
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {resources?.flavors.length === 0 ? (
+                {(resources?.flavors?.length ?? 0) === 0 ? (
                   <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
                     <div className="rounded-full bg-muted/50 p-3 mb-4">
                       <Cpu className="h-6 w-6 text-muted-foreground" />
@@ -82,7 +107,7 @@ export function FlavorStep({
                     </p>
                   </div>
                 ) : (
-                  resources?.flavors.map((flavor) => (
+                  (resources?.flavors ?? []).map((flavor) => (
                     <Card
                       key={flavor.id}
                       className={cn(

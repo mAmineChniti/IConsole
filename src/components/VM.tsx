@@ -45,32 +45,14 @@ import {
   Plus,
   Settings,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 type WizardStep = "flavor" | "image" | "network" | "details" | "summary";
-export function VM() {
-  const [activeTab, setActiveTab] = useState<"create" | "describe" | undefined>(
-    undefined,
-  );
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = window.localStorage.getItem("vm-active-tab");
-      if (saved === "create" || saved === "describe") {
-        setActiveTab(saved);
-      } else {
-        setActiveTab("create");
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && activeTab) {
-      window.localStorage.setItem("vm-active-tab", activeTab);
-    }
-  }, [activeTab]);
+export function VM({ onBack }: { onBack?: () => void }) {
+  const [activeTab, setActiveTab] = useState<"create" | "describe">("create");
   const [currentStep, setCurrentStep] = useState<WizardStep>("flavor");
   const [combinedData, setCombinedData] = useState<Partial<CombinedVMData>>({});
   const queryClient = useQueryClient();
@@ -174,6 +156,7 @@ export function VM() {
       networkForm.reset();
       vmDetailsForm.reset();
       await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
+      await queryClient.invalidateQueries({ queryKey: ["vm-resources"] });
     },
     onError: (err: unknown) => {
       const message =
@@ -195,6 +178,7 @@ export function VM() {
         description: `VM \"${response.server_name}\" is being deployed`,
       });
       await queryClient.invalidateQueries({ queryKey: ["instances-list"] });
+      await queryClient.invalidateQueries({ queryKey: ["vm-resources"] });
     },
     onError: (err: unknown) => {
       const message =
@@ -224,6 +208,19 @@ export function VM() {
 
   return (
     <div className="space-y-6">
+      {onBack && (
+        <div className="flex items-center gap-4 mb-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground bg-card border border-border/50 transition-all duration-200 cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Instances
+          </Button>
+        </div>
+      )}
       <div
         className="flex items-center space-x-1 bg-card text-card-foreground border border-border/50 rounded-full p-1 overflow-hidden"
         role="tablist"

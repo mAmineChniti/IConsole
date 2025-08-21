@@ -36,6 +36,7 @@ import {
   ChevronUp,
   Edit,
   Plus,
+  RefreshCw,
   Trash2,
   UserPlus,
   Users,
@@ -200,39 +201,81 @@ export function Projects() {
   if (isLoadingInitial) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-10 w-32" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <div className="flex gap-3">
+            <Skeleton className="h-9 w-9 rounded-full" />
+            <Skeleton className="h-9 w-32 rounded-full" />
+          </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-start">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
               className={cn(
-                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl",
+                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden",
               )}
             >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-24" />
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <Skeleton className="h-6 w-32 mb-2" />
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </div>
                 </div>
-                <Skeleton className="h-6 w-16 rounded-full" />
+                <Skeleton className="h-4 w-40 mt-2" />
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
+
+              <CardContent className="pt-0 flex-grow flex flex-col">
+                <div className="space-y-3 flex-grow">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-black dark:bg-black dark:text-white shadow-sm">
+                        <Skeleton className="h-4 w-4" />
+                      </span>
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  </div>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {Array.from({ length: 2 }).map((_, j) => (
+                      <div
+                        key={j}
+                        className="flex items-center justify-between gap-2 p-2 bg-muted/20 rounded-full"
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <Skeleton className="h-6 w-6 rounded-full" />
+                          <Skeleton className="h-4 w-24" />
+                        </div>
+                        <div className="flex flex-wrap gap-1 max-w-[40%]">
+                          <Skeleton className="h-5 w-12 rounded-full" />
+                          <Skeleton className="h-5 w-12 rounded-full" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <Separator />
-                <div className="flex justify-between items-center">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-8 w-24 rounded-full" />
+                <div className="mt-auto pt-3">
+                  <Separator />
+                  <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
+                    <Skeleton className="h-10 w-32 rounded-full" />
+                    <div className="flex justify-center sm:justify-end gap-2">
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ))}
+        </div>
+        <div className="flex justify-center px-4 sm:px-0">
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -326,17 +369,48 @@ export function Projects() {
             )}
           </span>
         </div>
-        <Button
-          variant="default"
-          onClick={() => {
-            setDialogProject(undefined);
-            setDialogOpen(true);
-          }}
-          className="rounded-full w-full sm:w-auto px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create Project
-        </Button>
+        <div className="flex gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isRefetching}
+                className={cn(
+                  "cursor-pointer w-10 h-9 p-0 sm:w-auto sm:px-3 rounded-full",
+                  isRefetching && "opacity-70",
+                )}
+                aria-label="Refresh projects"
+              >
+                {isRefetching ? (
+                  <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 flex-shrink-0" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Refresh</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setDialogProject(undefined);
+                  setDialogOpen(true);
+                }}
+                className={cn(
+                  "cursor-pointer flex-1 sm:flex-none min-w-[120px] rounded-full",
+                )}
+              >
+                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate">Create Project</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Create Project</TooltipContent>
+          </Tooltip>
+        </div>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-start">
@@ -381,9 +455,6 @@ export function Projects() {
                   {project.description}
                 </p>
               )}
-              <p className="text-xs w-fit text-muted-foreground font-mono truncate mt-2 bg-muted/20 px-2 py-1 rounded-md">
-                ID: {project.id}
-              </p>
             </CardHeader>
 
             <CardContent className="pt-0 flex-grow flex flex-col">

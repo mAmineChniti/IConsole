@@ -1,4 +1,4 @@
-import { ScaleOperations } from "@/components/Scale";
+import { Scaling } from "@/components/Scaling";
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { type Metadata } from "next";
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Operational tooling to add nodes and send test alerts",
 };
 
-export default function ScalePage() {
+export default function ScalingPage() {
   return (
     <SidebarProvider>
       <Sidebar />
@@ -19,10 +19,10 @@ export default function ScalePage() {
               Scaling & Operations
             </h1>
             <p className="text-muted-foreground">
-              Add compute/control/storage nodes and verify alerting
+              Add compute/control/storage nodes
             </p>
           </div>
-          <ScaleOperations />
+          <Scaling />
         </div>
       </SidebarInset>
     </SidebarProvider>

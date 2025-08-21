@@ -1,7 +1,6 @@
 "use client";
 
 import { GetDistroIcon } from "@/components/GetDistroIcon";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,9 +36,10 @@ export function ImageStep({
                   <div className="p-2 bg-accent rounded-full">
                     <Skeleton className="h-5 w-5" />
                   </div>
-                  <Skeleton className="h-5 w-24" />
                 </div>
-                <Skeleton className="h-6 w-20" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-32 rounded-full" />
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -79,14 +79,6 @@ export function ImageStep({
                         <h3 className="font-semibold text-base leading-tight break-words text-foreground">
                           {image.name}
                         </h3>
-                      </div>
-                      <div className="space-y-2">
-                        <Badge
-                          variant="secondary"
-                          className="text-xs w-fit justify-start rounded-full bg-muted text-muted-foreground"
-                        >
-                          <span className="truncate">ID: {image.id}</span>
-                        </Badge>
                       </div>
                     </CardContent>
                   </Card>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Combobox,
@@ -24,7 +25,7 @@ import {
 import { AuthService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import {
   ArrowRight,
   ChevronDown,
@@ -37,7 +38,6 @@ import {
   LogOut,
   Monitor,
   Moon,
-  Plus,
   Shield,
   Sun,
   UserCircle2,
@@ -86,11 +86,6 @@ const computeSubItems = [
     href: "/dashboard/instances",
   },
   {
-    title: "Create Instance",
-    icon: Plus,
-    href: "/dashboard/create-instance",
-  },
-  {
     title: "Migrate VM",
     icon: ArrowRight,
     href: "/dashboard/migrate-vm",
@@ -108,6 +103,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
+  const [userName, setUserName] = useState<string>("");
+
   const initialComputeOpen = computeSubItems.some(
     (item) => pathname === item.href,
   );
@@ -117,6 +114,20 @@ export function Sidebar() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const userCookie = getCookie("user");
+      if (userCookie) {
+        const userObj = JSON.parse(userCookie as string) as {
+          username?: string;
+        };
+        if (typeof userObj.username === "string") setUserName(userObj.username);
+      }
+    } catch {
+      // ignore
+    }
   }, []);
 
   useEffect(() => {
@@ -147,20 +158,46 @@ export function Sidebar() {
     mutationFn: (projectId: string) =>
       AuthService.switchProject({ project_id: projectId }),
     onSuccess: async (response, projectId) => {
-      await setCookie("token", response.token, {
-        maxAge: 60 * 60 * 24 * 7,
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
+      const now = Date.now();
+      const expiresAtMs =
+        response.expires_at_ts > 1e12
+          ? response.expires_at_ts
+          : response.expires_at_ts * 1000;
+      const maxAge = Math.max(Math.floor((expiresAtMs - now) / 1000), 0);
 
+      await setCookie(
+        "token",
+        JSON.stringify({
+          token: response.token,
+          expires_at: response.expires_at,
+          expires_at_ts: response.expires_at_ts,
+        }),
+        {
+          path: "/",
+          maxAge,
+          httpOnly: false,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        },
+      );
+
+      let prevUser: Record<string, unknown> = {};
+      try {
+        const prevUserRaw = getCookie("user");
+        if (prevUserRaw)
+          prevUser = JSON.parse(prevUserRaw as string) as Record<
+            string,
+            unknown
+          >;
+      } catch {}
       const userData = {
+        ...prevUser,
         projects: response.projects,
         loginTime: new Date().toISOString(),
       };
-
       await setCookie("user", JSON.stringify(userData), {
-        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+        maxAge,
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -189,15 +226,31 @@ export function Sidebar() {
   const logoutMutation = useMutation({
     mutationFn: () => AuthService.logout(),
     onSuccess: async () => {
-      await deleteCookie("user");
-      await deleteCookie("token");
+      await deleteCookie("user", {
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
+      await deleteCookie("token", {
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
       setSelectedProject("");
       localStorage.removeItem("selectedProject");
       router.push("/login");
     },
     onError: async (err: unknown) => {
-      await deleteCookie("user");
-      await deleteCookie("token");
+      await deleteCookie("user", {
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
+      await deleteCookie("token", {
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
       setSelectedProject("");
       localStorage.removeItem("selectedProject");
       const message =
@@ -428,6 +481,23 @@ export function Sidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-3 sm:p-4 space-y-2 bg-sidebar border-t border-sidebar-border">
+        {userName && (
+          <div className="w-full h-10 flex items-center gap-3 mb-2 px-3 rounded-full bg-accent text-accent-foreground transition-all">
+            <Avatar className="h-6 w-6 shadow-sm">
+              <AvatarFallback className="bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] text-white text-base font-bold tracking-wide">
+                {userName
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-semibold truncate max-w-[140px]">
+              {userName}
+            </span>
+          </div>
+        )}
         <SidebarMenuButton
           asChild
           className="w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer hover:rounded-full focus:rounded-full active:rounded-full transition-all"

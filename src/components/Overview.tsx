@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { InfraService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -35,7 +40,12 @@ export function Overview() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+        <div className="flex justify-end">
+          <div className="flex gap-2">
+            <Skeleton className="w-10 h-9 rounded-full" />
+          </div>
+        </div>
+        <div className="grid gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card
               key={i}
@@ -44,11 +54,11 @@ export function Overview() {
               <CardContent>
                 <div className="flex items-center gap-3 mb-3">
                   <Skeleton className="h-12 w-12 rounded-full" />
-                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-6 w-32" />
                 </div>
                 <div className="text-center">
-                  <Skeleton className="h-8 w-16 mb-1 mx-auto" />
-                  <Skeleton className="h-3 w-28 mx-auto" />
+                  <Skeleton className="h-8 w-24 mb-1 mx-auto" />
+                  <Skeleton className="h-4 w-32 mx-auto" />
                 </div>
               </CardContent>
             </Card>
@@ -59,36 +69,40 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground shadow-lg rounded-xl border border-border/50"
+              className="w-full bg-card text-card-foreground shadow-lg rounded-xl border border-border/50"
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
                   <Skeleton className="h-5 w-32" />
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-8 w-16" />
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <div className="space-y-3">
-                    {Array.from({ length: 2 }).map((_, j) => (
-                      <div key={j} className="flex items-center gap-2">
-                        <Skeleton className="h-3 w-3 rounded-full" />
-                        <Skeleton className="h-3 w-16" />
-                      </div>
-                    ))}
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
                   </div>
                   <div className="space-y-3">
-                    {Array.from({ length: 2 }).map((_, j) => (
-                      <div key={j} className="flex items-center gap-2">
-                        <Skeleton className="h-3 w-3 rounded-full" />
-                        <Skeleton className="h-3 w-16" />
-                      </div>
-                    ))}
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -100,11 +114,11 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground shadow-lg rounded-xl border border-border/50"
+              className="w-full bg-card text-card-foreground shadow-lg rounded-xl border border-border/50"
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
                   <Skeleton className="h-5 w-32" />
                 </CardTitle>
               </CardHeader>
@@ -112,17 +126,23 @@ export function Overview() {
                 <div className="relative w-40 h-40">
                   <Skeleton className="w-full h-full rounded-full" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <Skeleton className="h-6 w-12 mb-1" />
-                    <Skeleton className="h-3 w-8" />
+                    <Skeleton className="h-8 w-20 mb-1" />
+                    <Skeleton className="h-4 w-12" />
                   </div>
                 </div>
                 <div className="ml-10 space-y-3">
-                  {Array.from({ length: 3 }).map((_, j) => (
-                    <div key={j} className="flex items-center justify-between">
-                      <Skeleton className="h-3 w-12" />
-                      <Skeleton className="h-3 w-8" />
-                    </div>
-                  ))}
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -133,12 +153,12 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground shadow-lg rounded-xl border border-border/50"
+              className="w-full bg-card text-card-foreground shadow-lg rounded-xl border border-border/50"
             >
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Skeleton className="h-9 w-9 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
                     <Skeleton className="h-5 w-32" />
                   </div>
                   <Skeleton className="h-4 w-16" />
@@ -234,6 +254,32 @@ export function Overview() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <div className="flex gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className={cn(
+                  "cursor-pointer w-10 h-9 p-0 sm:w-auto sm:px-3 rounded-full",
+                  isFetching && "opacity-70",
+                )}
+                aria-label="Refresh overview"
+              >
+                {isFetching ? (
+                  <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 flex-shrink-0" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Refresh</TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
       <div className="grid gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
         <Card className="bg-card text-card-foreground shadow-lg rounded-xl border border-border/50">
           <CardContent>

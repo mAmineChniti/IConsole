@@ -162,13 +162,13 @@ export function Networks() {
     mutationFn: async (data: RouterCreateRequest) => {
       return NetworkService.createRouter(data);
     },
-    onSuccess: async (_router: RouterCreateResponse) => {
+    onSuccess: async (router: RouterCreateResponse) => {
       if (selectedNetworkId) {
         const net = networks?.find((n) => n.id === selectedNetworkId);
         const firstSubnetId = net?.subnets?.[0];
         if (firstSubnetId) {
           try {
-            await NetworkService.addRouterInterface(selectedNetworkId, {
+            await NetworkService.addRouterInterface(router.id, {
               subnet_id: firstSubnetId,
             });
           } catch {
@@ -220,35 +220,39 @@ export function Networks() {
     return (
       <div className="space-y-6 px-2 sm:px-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-40" />
           <div className="flex gap-2">
-            <Skeleton className="h-9 w-9 flex-shrink-0" />
-            <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-9 rounded-full flex-shrink-0" />
+            <Skeleton className="h-9 w-28 rounded-full" />
           </div>
         </div>
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card border border-border shadow-sm overflow-hidden"
+              className="bg-card border border-border/50 shadow-sm rounded-xl overflow-hidden"
             >
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between gap-2">
-                  <Skeleton className="h-5 sm:h-6 w-32 flex-1" />
-                  <div className="flex gap-2 flex-shrink-0">
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-8 w-8" />
+                <div className="flex items-start sm:items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1 flex items-center gap-2">
+                    <Skeleton className="h-5 sm:h-6 w-32 rounded" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                  <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+                    <Skeleton className="h-6 w-10 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
                   </div>
                 </div>
-                <Skeleton className="h-4 sm:h-6 w-full mt-2" />
               </CardHeader>
-              <CardContent className="space-y-3 pt-0">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-3 w-20" />
+              <CardContent className="pt-0">
+                <Skeleton className="h-4 w-24 rounded" />
               </CardContent>
             </Card>
           ))}
+        </div>
+        <div className="flex justify-center px-4 sm:px-0">
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -340,32 +344,32 @@ export function Networks() {
                       <CardTitle className="text-base sm:text-lg font-semibold break-words leading-tight">
                         {n.name || n.id}
                       </CardTitle>
-                      <Badge
-                        variant={
-                          n.status === "ACTIVE" ? "default" : "destructive"
-                        }
-                        className={cn(
-                          "gap-1.5 text-xs px-2 py-1 rounded-full capitalize flex items-center",
-                          n.status === "ACTIVE"
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                            : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "w-1.5 h-1.5 rounded-full animate-pulse",
-                            n.status === "ACTIVE"
-                              ? "bg-green-500"
-                              : "bg-red-400 dark:bg-red-500",
-                          )}
-                        />
-                        {n.status === "ACTIVE"
-                          ? "Online"
-                          : n.status === "DOWN"
-                            ? "Offline"
-                            : n.status.toLowerCase()}
-                      </Badge>
                     </div>
+                    <Badge
+                      variant={
+                        n.status === "ACTIVE" ? "default" : "destructive"
+                      }
+                      className={cn(
+                        "gap-1.5",
+                        n.status === "ACTIVE"
+                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                          : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-1.5 h-1.5 rounded-full animate-pulse",
+                          n.status === "ACTIVE"
+                            ? "bg-green-500"
+                            : "bg-red-400 dark:bg-red-500",
+                        )}
+                      />
+                      {n.status === "ACTIVE"
+                        ? "Online"
+                        : n.status === "DOWN"
+                          ? "Offline"
+                          : (n.status?.toLowerCase() ?? "unknown")}
+                    </Badge>
                     <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                       <Badge
                         variant={n.is_external ? "default" : "secondary"}
@@ -400,9 +404,6 @@ export function Networks() {
                       </Button>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground w-fit font-mono break-all mt-2 bg-muted/40 px-2 py-1 rounded leading-relaxed">
-                    ID: {n.id}
-                  </p>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-0">
                   <div className="text-xs text-muted-foreground">
