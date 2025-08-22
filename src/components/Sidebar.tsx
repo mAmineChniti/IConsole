@@ -97,6 +97,24 @@ const computeSubItems = [
   },
 ] as const;
 
+const volumesSubItems = [
+  {
+    title: "Volumes",
+    icon: HardDrive,
+    href: "/dashboard/volumes",
+  },
+  {
+    title: "Snapshots",
+    icon: Monitor,
+    href: "/dashboard/snapshots",
+  },
+  {
+    title: "Volume Types",
+    icon: HardDrive,
+    href: "/dashboard/volume-types",
+  },
+] as const;
+
 export function Sidebar() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
@@ -110,6 +128,10 @@ export function Sidebar() {
   );
   const [computeOpen, setComputeOpen] = useState(initialComputeOpen);
 
+  const initialVolumeOpen = volumesSubItems.some(
+    (item) => pathname === item.href,
+  );
+  const [volumeOpen, setVolumeOpen] = useState(initialVolumeOpen);
   const [selectedProject, setSelectedProject] = useState<string>("");
 
   useEffect(() => {
@@ -269,11 +291,11 @@ export function Sidebar() {
   };
 
   return (
-    <ShadcnSidebar className="w-64 overflow-hidden bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-full flex flex-col">
-      <SidebarHeader className="border-b border-sidebar-border p-3 sm:p-4 bg-sidebar">
-        <div className="flex items-center gap-2 min-w-0 justify-center">
+    <ShadcnSidebar className="flex overflow-hidden flex-col w-64 h-full border-r bg-sidebar text-sidebar-foreground border-sidebar-border">
+      <SidebarHeader className="p-3 border-b sm:p-4 border-sidebar-border bg-sidebar">
+        <div className="flex gap-2 justify-center items-center min-w-0">
           <div className="relative">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+            <div className="flex justify-center items-center w-7 h-7 bg-gradient-to-br rounded-full shadow-lg from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
               <Shield
                 className="w-4 h-4 text-white"
                 aria-hidden="true"
@@ -281,13 +303,13 @@ export function Sidebar() {
               />
             </div>
           </div>
-          <span className="text-xl font-bold font-sans tracking-tight select-none truncate bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] bg-clip-text text-transparent">
+          <span className="font-sans text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br select-none truncate from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
             IConsole
           </span>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-2 overflow-y-auto bg-sidebar">
+      <SidebarContent className="overflow-y-auto p-2 bg-sidebar">
         <SidebarGroup>
           <SidebarMenu className="space-y-2">
             <SidebarMenuItem>
@@ -326,11 +348,11 @@ export function Sidebar() {
                 >
                   <ComboboxInput
                     placeholder="Search projects..."
-                    className="border-0 rounded-none px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
+                    className="py-2 px-3 text-sm rounded-none border-0 focus:ring-0 focus:ring-offset-0 focus:outline-none"
                   />
-                  <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
+                  <ComboboxList className="overflow-y-auto p-1 max-h-[200px]">
                     {projectsLoading ? (
-                      <div className="px-3 py-2 text-sm text-muted-foreground">
+                      <div className="py-2 px-3 text-sm text-muted-foreground">
                         Loading projects...
                       </div>
                     ) : projects?.projects && projects.projects.length > 0 ? (
@@ -339,7 +361,7 @@ export function Sidebar() {
                           key={project.project_id}
                           value={project.project_id}
                           keywords={[project.project_name]}
-                          className="px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground text-card-foreground rounded-md mx-1 transition-colors truncate"
+                          className="py-2 px-3 mx-1 text-sm rounded-md transition-colors cursor-pointer text-card-foreground truncate hover:bg-accent hover:text-accent-foreground"
                         >
                           <span className="truncate">
                             {project.project_name}
@@ -374,7 +396,7 @@ export function Sidebar() {
                           : "text-sidebar-foreground",
                       )}
                     >
-                      <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                      <item.icon className="flex-shrink-0 mr-3 w-4 h-4" />
                       <span className="text-sm font-medium truncate">
                         {item.title}
                       </span>
@@ -400,8 +422,8 @@ export function Sidebar() {
                     computeOpen && "rounded-full",
                   )}
                 >
-                  <Cpu className="h-4 w-4 mr-3 flex-shrink-0" />
-                  <span className="text-sm font-medium flex-1 truncate text-left">
+                  <Cpu className="flex-shrink-0 mr-3 w-4 h-4" />
+                  <span className="flex-1 text-sm font-medium text-left truncate">
                     Compute
                   </span>
                   <ChevronDown
@@ -414,7 +436,7 @@ export function Sidebar() {
               </SidebarMenuButton>
 
               {computeOpen && (
-                <SidebarMenuSub className="ml-4 mt-1 space-y-1 border-l-0 pl-0">
+                <SidebarMenuSub className="pl-0 mt-1 ml-4 space-y-1 border-l-0">
                   {computeSubItems.map((subItem) => {
                     const isSubActive = pathname === subItem.href;
                     return (
@@ -435,7 +457,7 @@ export function Sidebar() {
                                 : "text-sidebar-foreground",
                             )}
                           >
-                            <subItem.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                            <subItem.icon className="flex-shrink-0 mr-3 w-4 h-4" />
                             <span className="text-sm font-medium truncate">
                               {subItem.title}
                             </span>
@@ -467,7 +489,7 @@ export function Sidebar() {
                           : "text-sidebar-foreground",
                       )}
                     >
-                      <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                      <item.icon className="flex-shrink-0 mr-3 w-4 h-4" />
                       <span className="text-sm font-medium truncate">
                         {item.title}
                       </span>
@@ -476,15 +498,78 @@ export function Sidebar() {
                 </SidebarMenuItem>
               );
             })}
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className={cn(
+                  "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                  volumeOpen && "rounded-full",
+                )}
+              >
+                <Button
+                  variant="ghost"
+                  onClick={() => setVolumeOpen(!volumeOpen)}
+                  className={cn(
+                    "w-full flex items-center justify-start cursor-pointer text-sidebar-foreground min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                    volumeOpen && "rounded-full",
+                  )}
+                >
+                  <HardDrive className="flex-shrink-0 mr-3 w-4 h-4" />
+                  <span className="flex-1 text-sm font-medium text-left truncate">
+                    Volumes
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 transition-transform flex-shrink-0",
+                      volumeOpen && "rotate-180",
+                    )}
+                  />
+                </Button>
+              </SidebarMenuButton>
+
+              {volumeOpen && (
+                <SidebarMenuSub className="pl-0 mt-1 ml-4 space-y-1 border-l-0">
+                  {volumesSubItems.map((subItem) => {
+                    const isSubActive = pathname === subItem.href;
+                    return (
+                      <SidebarMenuItem key={subItem.href}>
+                        <SidebarMenuButton
+                          asChild
+                          className={cn(
+                            "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                            isSubActive && "rounded-full",
+                          )}
+                        >
+                          <Link
+                            href={subItem.href}
+                            className={cn(
+                              "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                              isSubActive
+                                ? "bg-accent text-accent-foreground font-bold rounded-full"
+                                : "text-sidebar-foreground",
+                            )}
+                          >
+                            <subItem.icon className="flex-shrink-0 mr-3 w-4 h-4" />
+                            <span className="text-sm font-medium truncate">
+                              {subItem.title}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenuSub>
+              )}
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-3 sm:p-4 space-y-2 bg-sidebar border-t border-sidebar-border">
+      <SidebarFooter className="p-3 space-y-2 border-t sm:p-4 bg-sidebar border-sidebar-border">
         {userName && (
-          <div className="w-full h-10 flex items-center gap-3 mb-2 px-3 rounded-full bg-accent text-accent-foreground transition-all">
-            <Avatar className="h-6 w-6 shadow-sm">
-              <AvatarFallback className="bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] text-white text-base font-bold tracking-wide">
+          <div className="flex gap-3 items-center px-3 mb-2 w-full h-10 rounded-full transition-all bg-accent text-accent-foreground">
+            <Avatar className="w-6 h-6 shadow-sm">
+              <AvatarFallback className="text-base font-bold tracking-wide text-white bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
                 {userName
                   .split(" ")
                   .map((n) => n[0])
@@ -500,19 +585,19 @@ export function Sidebar() {
         )}
         <SidebarMenuButton
           asChild
-          className="w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer hover:rounded-full focus:rounded-full active:rounded-full transition-all"
+          className="px-3 w-full h-10 rounded-md transition-all cursor-pointer hover:rounded-full focus:rounded-full active:rounded-full hover:bg-accent hover:text-accent-foreground"
         >
           <Button
             variant="ghost"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="w-full flex items-center justify-start text-sidebar-foreground min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all"
+            className="flex justify-start items-center w-full min-w-0 rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full text-sidebar-foreground"
           >
             {!mounted ? (
-              <span className="h-4 w-4 mr-3 flex-shrink-0"></span>
+              <span className="flex-shrink-0 mr-3 w-4 h-4"></span>
             ) : theme === "dark" ? (
-              <Sun className="h-4 w-4 mr-3 flex-shrink-0" />
+              <Sun className="flex-shrink-0 mr-3 w-4 h-4" />
             ) : (
-              <Moon className="h-4 w-4 mr-3 flex-shrink-0" />
+              <Moon className="flex-shrink-0 mr-3 w-4 h-4" />
             )}
             <span className="text-sm font-medium truncate">
               {!mounted ? "" : theme === "dark" ? "Light Mode" : "Dark Mode"}
@@ -522,7 +607,7 @@ export function Sidebar() {
 
         <SidebarMenuButton
           asChild
-          className="w-full h-10 px-3 cursor-pointer rounded-full transition-all text-destructive"
+          className="px-3 w-full h-10 rounded-full transition-all cursor-pointer text-destructive"
         >
           <Button
             variant="ghost"
@@ -530,7 +615,7 @@ export function Sidebar() {
             className="w-full flex items-center justify-start !text-destructive min-w-0 rounded-full transition-all"
             style={{ color: "var(--color-destructive)" }}
           >
-            <LogOut className="h-4 w-4 mr-3 flex-shrink-0" />
+            <LogOut className="flex-shrink-0 mr-3 w-4 h-4" />
             <span className="text-sm font-medium truncate">Sign Out</span>
           </Button>
         </SidebarMenuButton>

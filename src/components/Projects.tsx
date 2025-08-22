@@ -54,16 +54,16 @@ function ProjectActions({
   onDelete: (projectId: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 sm:gap-2">
+    <div className="flex gap-1 items-center sm:gap-2">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant="outline"
             size="sm"
             onClick={() => onEdit(project)}
-            className="h-8 w-8 p-0 rounded-full flex-shrink-0 bg-card text-card-foreground border border-border/50 cursor-pointer hover:bg-card hover:text-card-foreground focus:bg-card focus:text-card-foreground"
+            className="flex-shrink-0 p-0 w-8 h-8 rounded-full border cursor-pointer bg-card text-card-foreground border-border/50 hover:bg-card hover:text-card-foreground focus:bg-card focus:text-card-foreground"
           >
-            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Edit project</TooltipContent>
@@ -74,9 +74,9 @@ function ProjectActions({
             variant="outline"
             size="sm"
             onClick={() => onDelete(project.id)}
-            className="h-8 w-8 p-0 rounded-full flex-shrink-0 bg-destructive text-white dark:text-white dark:bg-destructive cursor-pointer hover:bg-destructive hover:text-white dark:hover:bg-destructive focus:bg-destructive focus:text-white"
+            className="flex-shrink-0 p-0 w-8 h-8 text-white rounded-full cursor-pointer dark:text-white hover:text-white focus:text-white bg-destructive dark:bg-destructive dark:hover:bg-destructive hover:bg-destructive focus:bg-destructive"
           >
-            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Delete project</TooltipContent>
@@ -201,17 +201,17 @@ export function Projects() {
   if (isLoadingInitial) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <Skeleton className="h-4 w-40" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
+          <div className="flex gap-2 items-center text-sm text-muted-foreground">
+            <Skeleton className="w-40 h-4" />
           </div>
           <div className="flex gap-3">
-            <Skeleton className="h-9 w-9 rounded-full" />
-            <Skeleton className="h-9 w-32 rounded-full" />
+            <Skeleton className="w-9 h-9 rounded-full" />
+            <Skeleton className="w-32 h-9 rounded-full" />
           </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-start">
+        <div className="grid gap-6 items-start sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
@@ -220,53 +220,53 @@ export function Projects() {
               )}
             >
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex gap-2 justify-between items-start">
                   <div className="flex-1 min-w-0">
-                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="mb-2 w-32 h-6" />
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <Skeleton className="h-6 w-20 rounded-full" />
+                  <div className="flex flex-shrink-0 gap-2 items-center">
+                    <Skeleton className="w-20 h-6 rounded-full" />
                   </div>
                 </div>
-                <Skeleton className="h-4 w-40 mt-2" />
+                <Skeleton className="mt-2 w-40 h-4" />
               </CardHeader>
 
-              <CardContent className="pt-0 flex-grow flex flex-col">
-                <div className="space-y-3 flex-grow">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-black dark:bg-black dark:text-white shadow-sm">
-                        <Skeleton className="h-4 w-4" />
+              <CardContent className="flex flex-col flex-grow pt-0">
+                <div className="flex-grow space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-1.5 items-center">
+                      <span className="inline-flex justify-center items-center w-7 h-7 text-black bg-white rounded-full shadow-sm dark:text-white dark:bg-black">
+                        <Skeleton className="w-4 h-4" />
                       </span>
-                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="w-20 h-4" />
                     </div>
-                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="w-8 h-8 rounded-full" />
                   </div>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <div className="overflow-y-auto space-y-2 max-h-32">
                     {Array.from({ length: 2 }).map((_, j) => (
                       <div
                         key={j}
-                        className="flex items-center justify-between gap-2 p-2 bg-muted/20 rounded-full"
+                        className="flex gap-2 justify-between items-center p-2 rounded-full bg-muted/20"
                       >
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <Skeleton className="h-6 w-6 rounded-full" />
-                          <Skeleton className="h-4 w-24" />
+                        <div className="flex flex-1 gap-2 items-center min-w-0">
+                          <Skeleton className="w-6 h-6 rounded-full" />
+                          <Skeleton className="w-24 h-4" />
                         </div>
                         <div className="flex flex-wrap gap-1 max-w-[40%]">
-                          <Skeleton className="h-5 w-12 rounded-full" />
-                          <Skeleton className="h-5 w-12 rounded-full" />
+                          <Skeleton className="w-12 h-5 rounded-full" />
+                          <Skeleton className="w-12 h-5 rounded-full" />
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="mt-auto pt-3">
+                <div className="pt-3 mt-auto">
                   <Separator />
-                  <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
-                    <Skeleton className="h-10 w-32 rounded-full" />
-                    <div className="flex justify-center sm:justify-end gap-2">
-                      <Skeleton className="h-8 w-8 rounded-full" />
-                      <Skeleton className="h-8 w-8 rounded-full" />
+                  <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center">
+                    <Skeleton className="w-32 h-10 rounded-full" />
+                    <div className="flex gap-2 justify-center sm:justify-end">
+                      <Skeleton className="w-8 h-8 rounded-full" />
+                      <Skeleton className="w-8 h-8 rounded-full" />
                     </div>
                   </div>
                 </div>
@@ -275,7 +275,7 @@ export function Projects() {
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="h-9 w-40 rounded-full" />
+          <Skeleton className="w-40 h-9 rounded-full" />
         </div>
       </div>
     );
@@ -295,7 +295,7 @@ export function Projects() {
   if (isEmpty) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
           <p className="text-sm text-muted-foreground">No projects found</p>
           <Button
             variant="default"
@@ -303,9 +303,9 @@ export function Projects() {
               setDialogProject(undefined);
               setDialogOpen(true);
             }}
-            className="rounded-full w-full sm:w-auto px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
+            className="py-2 px-6 w-full rounded-full cursor-pointer sm:w-auto bg-primary text-primary-foreground"
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="mr-2 w-4 h-4" />
             Create Project
           </Button>
         </div>
@@ -317,14 +317,14 @@ export function Projects() {
         >
           <CardContent className="p-8 text-center">
             <div className="flex flex-col items-center space-y-4">
-              <div className="p-3 bg-muted rounded-full">
-                <Building className="h-8 w-8 text-muted-foreground" />
+              <div className="p-3 rounded-full bg-muted">
+                <Building className="w-8 h-8 text-muted-foreground" />
               </div>
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-foreground">
                   No Projects Found
                 </h3>
-                <p className="text-sm text-muted-foreground max-w-md">
+                <p className="max-w-md text-sm text-muted-foreground">
                   You don&apos;t have any projects yet. Create your first
                   project to get started.
                 </p>
@@ -335,9 +335,9 @@ export function Projects() {
                   setDialogProject(undefined);
                   setDialogOpen(true);
                 }}
-                className="mt-4 rounded-full px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
+                className="py-2 px-6 mt-4 rounded-full cursor-pointer bg-primary text-primary-foreground"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 w-4 h-4" />
                 Create Your First Project
               </Button>
             </div>
@@ -357,8 +357,8 @@ export function Projects() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-        <div className="text-sm text-muted-foreground flex items-center gap-2">
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
+        <div className="flex gap-2 items-center text-sm text-muted-foreground">
           <span>
             {totalItems} project{totalItems !== 1 ? "s" : ""} total
             {totalItems > 0 && (
@@ -384,9 +384,9 @@ export function Projects() {
                 aria-label="Refresh projects"
               >
                 {isRefetching ? (
-                  <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
+                  <RefreshCw className="flex-shrink-0 w-4 h-4 animate-spin" />
                 ) : (
-                  <RefreshCw className="h-4 w-4 flex-shrink-0" />
+                  <RefreshCw className="flex-shrink-0 w-4 h-4" />
                 )}
               </Button>
             </TooltipTrigger>
@@ -404,7 +404,7 @@ export function Projects() {
                   "cursor-pointer flex-1 sm:flex-none min-w-[120px] rounded-full",
                 )}
               >
-                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+                <Plus className="flex-shrink-0 mr-2 w-4 h-4" />
                 <span className="truncate">Create Project</span>
               </Button>
             </TooltipTrigger>
@@ -413,7 +413,7 @@ export function Projects() {
         </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-start">
+      <div className="grid gap-6 items-start sm:grid-cols-2 lg:grid-cols-3">
         {visibleData.map((project) => (
           <Card
             key={project.id}
@@ -422,13 +422,13 @@ export function Projects() {
             )}
           >
             <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex gap-2 justify-between items-start">
                 <div className="flex-1 min-w-0">
                   <CardTitle className="text-lg font-semibold text-foreground truncate">
                     {project.name}
                   </CardTitle>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex flex-shrink-0 gap-2 items-center">
                   <Badge
                     variant={project.enabled ? "default" : "secondary"}
                     className={cn(
@@ -451,18 +451,18 @@ export function Projects() {
                 </div>
               </div>
               {project.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
                   {project.description}
                 </p>
               )}
             </CardHeader>
 
-            <CardContent className="pt-0 flex-grow flex flex-col">
-              <div className="space-y-3 flex-grow">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-black dark:bg-black dark:text-white shadow-sm">
-                      <Users className="h-4 w-4 text-card-foreground" />
+            <CardContent className="flex flex-col flex-grow pt-0">
+              <div className="flex-grow space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-1.5 items-center">
+                    <span className="inline-flex justify-center items-center w-7 h-7 text-black bg-white rounded-full shadow-sm dark:text-white dark:bg-black">
+                      <Users className="w-4 h-4 text-card-foreground" />
                     </span>
                     <span className="text-sm font-medium">
                       {project.assignments?.length ?? 0} user
@@ -473,12 +473,12 @@ export function Projects() {
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleProjectExpansion(project.id)}
-                    className="rounded-full px-2 py-1 bg-muted cursor-pointer"
+                    className="py-1 px-2 rounded-full cursor-pointer bg-muted"
                   >
                     {expandedProjects.has(project.id) ? (
-                      <ChevronUp className="h-4 w-4" />
+                      <ChevronUp className="w-4 h-4" />
                     ) : (
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="w-4 h-4" />
                     )}
                   </Button>
                 </div>
@@ -486,17 +486,17 @@ export function Projects() {
                 {expandedProjects.has(project.id) && (
                   <>
                     <Separator />
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                    <div className="overflow-y-auto space-y-2 max-h-32">
                       {project.assignments && project.assignments.length > 0 ? (
                         project.assignments.map(
                           (assignment: UserAssignment) => (
                             <div
                               key={assignment.user_id}
-                              className="flex items-center justify-between gap-2 p-2 bg-muted/20 rounded-full"
+                              className="flex gap-2 justify-between items-center p-2 rounded-full bg-muted/20"
                             >
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <Avatar className="h-6 w-6 flex-shrink-0">
-                                  <AvatarFallback className="bg-white text-black dark:bg-black dark:text-white text-xs font-medium">
+                              <div className="flex flex-1 gap-2 items-center min-w-0">
+                                <Avatar className="flex-shrink-0 w-6 h-6">
+                                  <AvatarFallback className="text-xs font-medium text-black bg-white dark:text-white dark:bg-black">
                                     {(
                                       assignment.user_name?.charAt(0) ?? "?"
                                     ).toUpperCase()}
@@ -507,23 +507,23 @@ export function Projects() {
                                 </span>
                               </div>
                               <div className="flex flex-wrap gap-1 max-w-[40%]">
-                                {assignment.roles
+                                {(assignment.roles ?? [])
                                   .slice(0, 2)
                                   .map((role: UserRole) => (
                                     <Badge
                                       key={role.role_id}
                                       variant="outline"
-                                      className="text-xs max-w-full truncate rounded-full"
+                                      className="max-w-full text-xs rounded-full truncate"
                                     >
                                       {role.role_name}
                                     </Badge>
                                   ))}
-                                {assignment.roles.length > 2 && (
+                                {(assignment.roles ?? []).length > 2 && (
                                   <Badge
                                     variant="outline"
                                     className="text-xs rounded-full"
                                   >
-                                    +{assignment.roles.length - 2}
+                                    +{(assignment.roles ?? []).length - 2}
                                   </Badge>
                                 )}
                               </div>
@@ -531,7 +531,7 @@ export function Projects() {
                           ),
                         )
                       ) : (
-                        <p className="text-sm text-muted-foreground text-center">
+                        <p className="text-sm text-center text-muted-foreground">
                           No users assigned
                         </p>
                       )}
@@ -540,16 +540,16 @@ export function Projects() {
                 )}
               </div>
 
-              <div className="mt-auto pt-3">
+              <div className="pt-3 mt-auto">
                 <Separator />
-                <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center">
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => handleManageUsers(project)}
-                    className="flex-1 rounded-full px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
+                    className="flex-1 py-2 px-6 rounded-full cursor-pointer bg-primary text-primary-foreground"
                   >
-                    <UserPlus className="mr-2 h-4 w-4" />
+                    <UserPlus className="mr-2 w-4 h-4" />
                     <span className="truncate">Manage Users</span>
                   </Button>
                   <div className="flex justify-center sm:justify-end">
@@ -613,11 +613,11 @@ export function Projects() {
           )}
         >
           <DialogHeader className="space-y-3">
-            <DialogTitle className="flex items-center gap-2 text-lg text-foreground">
-              <Trash2 className="h-5 w-5 text-foreground flex-shrink-0" />
+            <DialogTitle className="flex gap-2 items-center text-lg text-foreground">
+              <Trash2 className="flex-shrink-0 w-5 h-5 text-foreground" />
               <span className="truncate">Delete Project</span>
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
+            <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
               Are you sure you want to delete this project? This action cannot
               be undone.
             </DialogDescription>
@@ -625,21 +625,21 @@ export function Projects() {
 
           {projectToDelete && (
             <div className="py-4">
-              <div className="bg-destructive/10 border border-destructive rounded-xl p-3 sm:p-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-destructive/20 rounded-full flex-shrink-0">
-                    <Building className="h-4 w-4 text-destructive" />
+              <div className="p-3 rounded-xl border sm:p-4 bg-destructive/10 border-destructive">
+                <div className="flex gap-3 items-start">
+                  <div className="flex-shrink-0 p-2 rounded-full bg-destructive/20">
+                    <Building className="w-4 h-4 text-destructive" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-destructive truncate">
                       {projectToDelete.name}
                     </h4>
                     {projectToDelete.description && (
-                      <p className="text-sm text-destructive mt-1 line-clamp-2">
+                      <p className="mt-1 text-sm text-destructive line-clamp-2">
                         {projectToDelete.description}
                       </p>
                     )}
-                    <p className="text-xs text-destructive w-fit mt-2 font-mono truncate bg-destructive/10 px-2 py-1 rounded">
+                    <p className="py-1 px-2 mt-2 font-mono text-xs rounded text-destructive w-fit truncate bg-destructive/10">
                       ID: {projectToDelete.id}
                     </p>
                   </div>
@@ -648,11 +648,11 @@ export function Projects() {
             </div>
           )}
 
-          <DialogFooter className="gap-3 flex-col sm:flex-row pt-4">
+          <DialogFooter className="flex-col gap-3 pt-4 sm:flex-row">
             <Button
               variant="outline"
               onClick={cancelDelete}
-              className="rounded-full px-6 py-2 w-full sm:w-auto order-2 sm:order-1 bg-muted text-foreground cursor-pointer"
+              className="order-2 py-2 px-6 w-full rounded-full cursor-pointer sm:order-1 sm:w-auto bg-muted text-foreground"
             >
               Cancel
             </Button>
@@ -660,16 +660,16 @@ export function Projects() {
               variant="destructive"
               onClick={confirmDelete}
               disabled={deleteMutation.isPending}
-              className="rounded-full px-6 py-2 w-full sm:w-auto order-1 sm:order-2 bg-destructive text-white cursor-pointer"
+              className="order-1 py-2 px-6 w-full text-white rounded-full cursor-pointer sm:order-2 sm:w-auto bg-destructive"
             >
               {deleteMutation.isPending ? (
                 <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-destructive-foreground border-t-transparent" />
+                  <div className="mr-2 w-4 h-4 rounded-full border-2 animate-spin border-destructive-foreground border-t-transparent" />
                   <span className="truncate">Deleting...</span>
                 </>
               ) : (
                 <>
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 className="mr-2 w-4 h-4" />
                   <span className="truncate">Delete Project</span>
                 </>
               )}

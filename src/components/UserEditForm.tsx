@@ -103,7 +103,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           password: undefined,
           projects: details.projects.map((p) => ({
             project_id: p.project_id,
-            roles: p.roles,
+            roles: p.roles ?? [],
           })),
         });
       } catch {
@@ -164,77 +164,77 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
 
   if (isLoading) {
     return (
-      <div className="max-w-6xl min-h-[80vh] mx-auto space-y-8 py-8">
-        <div className="flex items-center gap-4">
+      <div className="py-8 mx-auto space-y-8 max-w-6xl min-h-[80vh]">
+        <div className="flex gap-4 items-center">
           <Button
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground bg-card border border-border/50 transition-all duration-200 cursor-pointer"
+            className="flex gap-2 items-center rounded-full border transition-all duration-200 cursor-pointer text-muted-foreground bg-card border-border/50 hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="w-4 h-4" />
             Back to Users
           </Button>
         </div>
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-full">
-              <Skeleton className="h-6 w-6 rounded-full" />
+          <div className="flex gap-3 items-center">
+            <div className="p-2 rounded-full bg-primary/10">
+              <Skeleton className="w-6 h-6 rounded-full" />
             </div>
             <div>
-              <Skeleton className="h-8 w-48 mb-2" />
-              <Skeleton className="h-4 w-64" />
+              <Skeleton className="mb-2 w-48 h-8" />
+              <Skeleton className="w-64 h-4" />
             </div>
           </div>
-          <Skeleton className="h-6 w-40 mt-2 rounded-full" />
+          <Skeleton className="mt-2 w-40 h-6 rounded-full" />
         </div>
-        <div className="grid gap-6 lg:grid-cols-2 items-start">
-          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
+        <div className="grid gap-6 items-start lg:grid-cols-2">
+          <Card className="flex flex-col rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
             <CardHeader>
-              <Skeleton className="h-6 w-32" />
+              <Skeleton className="w-32 h-6" />
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="space-y-4 flex-1">
-                <Skeleton className="h-10 w-full rounded-full" />
-                <Skeleton className="h-10 w-full rounded-full" />
-                <Skeleton className="h-10 w-full rounded-full" />
+            <CardContent className="flex flex-col flex-1">
+              <div className="flex-1 space-y-4">
+                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
+          <Card className="flex flex-col rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-5 w-5 rounded-full" />
-                <Skeleton className="h-6 w-32" />
+              <div className="flex gap-2 items-center">
+                <Skeleton className="w-5 h-5 rounded-full" />
+                <Skeleton className="w-32 h-6" />
               </div>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="space-y-4 flex-1 flex flex-col max-h-[480px] overflow-y-auto">
+            <CardContent className="flex flex-col flex-1">
+              <div className="flex overflow-y-auto flex-col flex-1 space-y-4 max-h-[480px]">
                 <div>
-                  <Skeleton className="h-4 w-32 mb-2" />
-                  <Skeleton className="h-3 w-48" />
+                  <Skeleton className="mb-2 w-32 h-4" />
+                  <Skeleton className="w-48 h-3" />
                 </div>
-                <div className="space-y-3 flex-1 overflow-y-auto max-h-[420px]">
+                <div className="overflow-y-auto flex-1 space-y-3 max-h-[420px]">
                   {Array.from({ length: 2 }).map((_, i) => (
                     <div
                       key={i}
-                      className="p-4 border border-border/50 rounded-xl space-y-3 bg-muted/20"
+                      className="p-4 space-y-3 rounded-xl border border-border/50 bg-muted/20"
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <Skeleton className="h-5 w-32" />
-                        <Skeleton className="h-7 w-7 rounded-full" />
+                      <div className="flex gap-2 justify-between items-center">
+                        <Skeleton className="w-32 h-5" />
+                        <Skeleton className="w-7 h-7 rounded-full" />
                       </div>
                       <div>
-                        <Skeleton className="h-3 w-20 mb-2" />
-                        <Skeleton className="h-9 w-full rounded-full" />
+                        <Skeleton className="mb-2 w-20 h-3" />
+                        <Skeleton className="w-full h-9 rounded-full" />
                       </div>
                       <div>
-                        <Skeleton className="h-3 w-16 mb-2" />
+                        <Skeleton className="mb-2 w-16 h-3" />
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           {Array.from({ length: 3 }).map((_, j) => (
                             <Skeleton
                               key={j}
-                              className="h-6 w-16 rounded-full"
+                              className="w-16 h-6 rounded-full"
                             />
                           ))}
                         </div>
@@ -242,14 +242,14 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                     </div>
                   ))}
                 </div>
-                <Skeleton className="h-10 w-full rounded-full mt-4" />
+                <Skeleton className="mt-4 w-full h-10 rounded-full" />
               </div>
             </CardContent>
           </Card>
         </div>
-        <div className="flex justify-end gap-3 pt-4">
-          <Skeleton className="h-10 w-32 rounded-full" />
-          <Skeleton className="h-10 w-40 rounded-full" />
+        <div className="flex gap-3 justify-end pt-4">
+          <Skeleton className="w-32 h-10 rounded-full" />
+          <Skeleton className="w-40 h-10 rounded-full" />
         </div>
       </div>
     );
@@ -257,14 +257,14 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
 
   if (!userDetails) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
+      <div className="mx-auto space-y-6 max-w-2xl">
+        <div className="flex gap-4 items-center">
           <Button variant="ghost" size="sm" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 w-4 h-4" />
             Back
           </Button>
         </div>
-        <div className="text-center py-8">
+        <div className="py-8 text-center">
           <p className="text-muted-foreground">User not found</p>
         </div>
       </div>
@@ -272,23 +272,23 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
   }
 
   return (
-    <div className="max-w-6xl min-h-[80vh] mx-auto space-y-8 py-8">
-      <div className="flex items-center gap-4">
+    <div className="py-8 mx-auto space-y-8 max-w-6xl min-h-[80vh]">
+      <div className="flex gap-4 items-center">
         <Button
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground bg-card border border-border/50 transition-all duration-200 cursor-pointer"
+          className="flex gap-2 items-center rounded-full border transition-all duration-200 cursor-pointer text-muted-foreground bg-card border-border/50 hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="w-4 h-4" />
           Back to Users
         </Button>
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-full">
-            <User className="h-6 w-6 text-primary" />
+        <div className="flex gap-3 items-center">
+          <div className="p-2 rounded-full bg-primary/10">
+            <User className="w-6 h-6 text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
@@ -300,19 +300,19 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           </div>
         </div>
       </div>
-      <div className="grid gap-6 lg:grid-cols-2 items-start">
-        <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
+      <div className="grid gap-6 items-start lg:grid-cols-2">
+        <Card className="flex flex-col rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
           <CardHeader>
             <CardTitle className="text-lg">Basic Information</CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
+          <CardContent className="flex flex-col flex-1">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 id="user-edit-form"
-                className="flex-1 flex flex-col"
+                className="flex flex-col flex-1"
               >
-                <div className="space-y-4 flex-1">
+                <div className="flex-1 space-y-4">
                   <FormField
                     control={form.control}
                     name="name"
@@ -322,7 +322,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                         <FormControl>
                           <Input
                             {...field}
-                            className="h-10 rounded-full bg-muted/40 border border-border/50 text-foreground"
+                            className="h-10 rounded-full border bg-muted/40 border-border/50 text-foreground"
                           />
                         </FormControl>
                         <FormMessage />
@@ -343,7 +343,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                             onChange={(e) =>
                               field.onChange(e.target.value || undefined)
                             }
-                            className="h-10 rounded-full bg-muted/40 border border-border/50 text-foreground"
+                            className="h-10 rounded-full border bg-muted/40 border-border/50 text-foreground"
                           />
                         </FormControl>
                         <FormMessage />
@@ -365,7 +365,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                             onChange={(e) =>
                               field.onChange(e.target.value || undefined)
                             }
-                            className="h-10 rounded-full bg-muted/40 border border-border/50 text-foreground"
+                            className="h-10 rounded-full border bg-muted/40 border-border/50 text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -381,15 +381,15 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col">
+        <Card className="flex flex-col rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
+            <CardTitle className="flex gap-2 items-center text-lg">
+              <Shield className="w-5 h-5 text-primary" />
               Project Assignments
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
-            <div className="space-y-4 flex-1 flex flex-col max-h-[480px] overflow-y-auto">
+          <CardContent className="flex flex-col flex-1">
+            <div className="flex overflow-y-auto flex-col flex-1 space-y-4 max-h-[480px]">
               <div>
                 <Label className="text-sm font-medium leading-none">
                   Current Assignments
@@ -399,13 +399,13 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                 </p>
               </div>
 
-              <div className="space-y-3 flex-1 overflow-y-auto max-h-[420px]">
+              <div className="overflow-y-auto flex-1 space-y-3 max-h-[420px]">
                 {projectFields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="p-4 border border-border/50 rounded-xl space-y-3 bg-muted/20"
+                    className="p-4 space-y-3 rounded-xl border border-border/50 bg-muted/20"
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex gap-2 justify-between items-center">
                       <span className="text-sm font-medium truncate">
                         Assignment #{index + 1}
                       </span>
@@ -419,9 +419,9 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                               removeProject(index);
                               setProjectsModified(true);
                             }}
-                            className="h-7 w-7 p-0 rounded-full text-destructive hover:text-destructive flex-shrink-0 bg-card border border-border/50 cursor-pointer"
+                            className="flex-shrink-0 p-0 w-7 h-7 rounded-full border cursor-pointer text-destructive bg-card border-border/50 hover:text-destructive"
                           >
-                            <X className="h-4 w-4" />
+                            <X className="w-4 h-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Remove assignment</TooltipContent>
@@ -478,9 +478,9 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                         >
                           <ComboboxInput
                             placeholder="Search projects..."
-                            className="border-0 rounded-none px-3 py-2 text-sm text-foreground focus:ring-0 focus:ring-offset-0 focus:outline-none"
+                            className="py-2 px-3 text-sm rounded-none border-0 focus:ring-0 focus:ring-offset-0 focus:outline-none text-foreground"
                           />
-                          <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
+                          <ComboboxList className="overflow-y-auto p-1 max-h-[200px]">
                             {isProjectsLoading ? (
                               <ComboboxItem disabled value="__loading">
                                 Loading projects…
@@ -511,7 +511,9 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                       </Label>
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         {roles?.map((role) => {
-                          const isSelected = field.roles.includes(role.name);
+                          const isSelected = (field.roles ?? []).includes(
+                            role.name,
+                          );
                           return (
                             <Tooltip key={role.id}>
                               <TooltipTrigger asChild>
@@ -519,10 +521,10 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                                   variant={isSelected ? "default" : "outline"}
                                   onClick={() => {
                                     const newRoles = isSelected
-                                      ? field.roles.filter(
+                                      ? (field.roles ?? []).filter(
                                           (r) => r !== role.name,
                                         )
-                                      : [...field.roles, role.name];
+                                      : [...(field.roles ?? []), role.name];
                                     const updatedField = {
                                       ...field,
                                       roles: newRoles,
@@ -548,8 +550,8 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                           );
                         })}
                       </div>
-                      {field.roles.length === 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">
+                      {(field.roles ?? []).length === 0 && (
+                        <p className="mt-1 text-xs text-muted-foreground">
                           No roles assigned
                         </p>
                       )}
@@ -558,7 +560,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                 ))}
 
                 {projectFields.length === 0 && (
-                  <div className="text-center py-6 text-muted-foreground text-sm border-2 border-dashed border-muted-foreground/20 rounded-xl">
+                  <div className="py-6 text-sm text-center rounded-xl border-2 border-dashed text-muted-foreground border-muted-foreground/20">
                     No project assignments
                   </div>
                 )}
@@ -576,9 +578,9 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                   appendProject({ project_id: "", roles: [] });
                   setProjectsModified(true);
                 }}
-                className="w-full rounded-full px-6 py-2 bg-muted text-foreground border border-border/50 transition-all duration-200 cursor-pointer"
+                className="py-2 px-6 w-full rounded-full border transition-all duration-200 cursor-pointer bg-muted text-foreground border-border/50"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 w-4 h-4" />
                 Add Project Assignment
               </Button>
             </div>
@@ -586,12 +588,12 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
         </Card>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
+      <div className="flex gap-3 justify-end pt-4">
         <Button
           type="button"
           variant="outline"
           onClick={onBack}
-          className="rounded-full px-6 py-2 bg-muted text-foreground border border-border/50 transition-all duration-200 cursor-pointer"
+          className="py-2 px-6 rounded-full border transition-all duration-200 cursor-pointer bg-muted text-foreground border-border/50"
         >
           Cancel
         </Button>
@@ -599,16 +601,16 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           type="submit"
           form="user-edit-form"
           disabled={updateMutation.isPending}
-          className="rounded-full min-w-[120px] bg-primary text-primary-foreground transition-all duration-200 cursor-pointer"
+          className="rounded-full transition-all duration-200 cursor-pointer min-w-[120px] bg-primary text-primary-foreground"
         >
           {updateMutation.isPending ? (
             <>
-              <Save className="h-4 w-4 mr-2 animate-pulse" />
+              <Save className="mr-2 w-4 h-4 animate-pulse" />
               Saving...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="mr-2 w-4 h-4" />
               Save Changes
             </>
           )}

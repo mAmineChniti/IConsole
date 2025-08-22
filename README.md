@@ -47,15 +47,15 @@ A modern web-based management console for cloud infrastructure, built with Next.
 
 ## Technology Stack
 
-| Technology   | Description                                 |
-|--------------|---------------------------------------------|
-| Next.js      | React framework (v14+, App Router)          |
-| React        | UI library                                  |
-| TypeScript   | Static typing for JavaScript                |
-| Tailwind CSS | Utility-first CSS framework                 |
-| ESLint       | Linting and code quality                    |
-| Prettier     | Code formatting                             |
-| Bun          | Fast JavaScript runtime                     |
+| Technology   | Description                        |
+| ------------ | ---------------------------------- |
+| Next.js      | React framework (v14+, App Router) |
+| React        | UI library                         |
+| TypeScript   | Static typing for JavaScript       |
+| Tailwind CSS | Utility-first CSS framework        |
+| ESLint       | Linting and code quality           |
+| Prettier     | Code formatting                    |
+| Bun          | Fast JavaScript runtime            |
 
 ---
 
@@ -69,32 +69,32 @@ A modern web-based management console for cloud infrastructure, built with Next.
 
 1. **Clone the repository:**
 
-    ```sh
-    git clone https://github.com/mAmineChniti/IConsole.git
-    cd IConsole
-    ```
+   ```sh
+   git clone https://github.com/mAmineChniti/IConsole.git
+   cd IConsole
+   ```
 
 2. **Install dependencies:**
 
-    ```sh
-    bun install
-    # or
-    npm install
-    ```
+   ```sh
+   bun install
+   # or
+   npm install
+   ```
 
 3. **Configure environment variables:**
-    - Copy `.env.example` to `.env.local` and fill in the required values (see [Configuration & Environment Variables](#configuration--environment-variables)).
+   - Copy `.env.example` to `.env.local` and fill in the required values (see [Configuration & Environment Variables](#configuration--environment-variables)).
 
 4. **Run the development server:**
 
-    ```sh
-    bun run dev
-    # or
-    npm run dev
-    ```
+   ```sh
+   bun run dev
+   # or
+   npm run dev
+   ```
 
 5. **Open your browser:**
-    - Visit [http://localhost:3000](http://localhost:3000) to view the app.
+   - Visit [http://localhost:3000](http://localhost:3000) to view the app.
 
 ---
 
@@ -153,6 +153,9 @@ IConsole/
 - `/dashboard/create-instance/`: Create new VMs
 - `/dashboard/images/`: Manage VM images
 - `/dashboard/networks/`: Network configuration and management
+- `/dashboard/volumes/`: Create, view, and delete block storage volumes
+- `/dashboard/snapshots/`: Manage volume snapshots
+- `/dashboard/volume-types/`: Define and manage volume types
 - `/dashboard/projects/`: Project organization and access control
 - `/dashboard/users/`: User management (create, edit, assign roles)
 - `/dashboard/scale/`: Scale resources up or down
@@ -172,9 +175,9 @@ IConsole/
 #### Example: Using a UI Button
 
 ```tsx
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 
-<Button onClick={handleClick}>Create Instance</Button>
+<Button onClick={handleClick}>Create Instance</Button>;
 ```
 
 ---
@@ -189,7 +192,7 @@ import { Button } from '@/components/ui/button';
 ### Example: Making an API Request
 
 ```ts
-import { ProjectService } from '@/lib/requests';
+import { ProjectService } from "@/lib/requests";
 
 const projects = await ProjectService.listDetails();
 ```
@@ -230,15 +233,15 @@ npm run build
 
 > Place screenshots in the `docs/` or `public/` directory and embed them below for clarity.
 
-| Screenshot                | Description                                 |
-|---------------------------|---------------------------------------------|
-| ![Landing Page](docs/landing.png)      | Landing or Home page overview             |
-| ![Sidebar](docs/sidebar.png)           | Navigation menu/sidebar                   |
-| ![Dashboard](docs/dashboard.png)       | Main dashboard with data tables           |
-| ![Form](docs/form.png)                 | Key component (e.g., create instance form)|
-| ![Mobile](docs/mobile.png)             | Responsive/mobile view                    |
-| ![Admin](docs/admin.png)               | Admin or user management page             |
-| ![Graph](docs/graph.png)               | Data visualization/graph page             |
+| Screenshot                        | Description                                |
+| --------------------------------- | ------------------------------------------ |
+| ![Landing Page](docs/landing.png) | Landing or Home page overview              |
+| ![Sidebar](docs/sidebar.png)      | Navigation menu/sidebar                    |
+| ![Dashboard](docs/dashboard.png)  | Main dashboard with data tables            |
+| ![Form](docs/form.png)            | Key component (e.g., create instance form) |
+| ![Mobile](docs/mobile.png)        | Responsive/mobile view                     |
+| ![Admin](docs/admin.png)          | Admin or user management page              |
+| ![Graph](docs/graph.png)          | Data visualization/graph page              |
 
 ---
 

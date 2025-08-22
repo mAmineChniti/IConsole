@@ -39,10 +39,10 @@ export function SummaryStep({
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-card text-card-foreground shadow-lg rounded-xl border border-border">
+        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Cpu className="h-5 w-5 text-primary" />
+            <CardTitle className="flex gap-2 items-center">
+              <Cpu className="w-5 h-5 text-primary" />
               Compute Resources
             </CardTitle>
           </CardHeader>
@@ -95,17 +95,17 @@ export function SummaryStep({
             )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Flavor ID:</span>
-              <span className="text-xs font-mono text-muted-foreground">
+              <span className="font-mono text-xs text-muted-foreground">
                 {data.flavor_id}
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground shadow-lg rounded-xl border border-border">
+        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <HardDrive className="h-5 w-5 text-primary" />
+            <CardTitle className="flex gap-2 items-center">
+              <HardDrive className="w-5 h-5 text-primary" />
               Operating System
             </CardTitle>
           </CardHeader>
@@ -118,17 +118,17 @@ export function SummaryStep({
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Image ID:</span>
-              <span className="text-xs font-mono text-muted-foreground">
-                {selectedImage?.id.slice(0, 8) ?? "N/A"}...
+              <span className="font-mono text-xs text-muted-foreground">
+                {selectedImage?.id?.slice(0, 8) ?? "N/A"}...{" "}
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground shadow-lg rounded-xl border border-border">
+        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Network className="h-5 w-5 text-primary" />
+            <CardTitle className="flex gap-2 items-center">
+              <Network className="w-5 h-5 text-primary" />
               Network Configuration
             </CardTitle>
           </CardHeader>
@@ -150,10 +150,10 @@ export function SummaryStep({
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground shadow-lg rounded-xl border border-border">
+        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
+            <CardTitle className="flex gap-2 items-center">
+              <Settings className="w-5 h-5 text-primary" />
               VM Details
             </CardTitle>
           </CardHeader>
@@ -176,33 +176,33 @@ export function SummaryStep({
 
       <Separator />
 
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <p className="text-muted-foreground text-center sm:text-left">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <p className="text-center sm:text-left text-muted-foreground">
           Ready to create your virtual machine?
         </p>
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Button
             onClick={onCancel}
             disabled={isCreating}
             variant="outline"
-            className="rounded-full cursor-pointer w-full sm:w-auto order-2 sm:order-1 bg-muted text-foreground border border-border transition-all duration-200"
+            className="order-2 w-full rounded-full border transition-all duration-200 cursor-pointer sm:order-1 sm:w-auto bg-muted text-foreground border-border"
           >
-            <ArrowLeft className="h-4 w-4 mr-2 flex-shrink-0" />
+            <ArrowLeft className="flex-shrink-0 mr-2 w-4 h-4" />
             <span className="truncate">Back to Details</span>
           </Button>
           <Button
             onClick={onCreateVM}
             disabled={isCreating}
-            className="rounded-full min-w-[180px] bg-primary text-primary-foreground transition-all duration-200 cursor-pointer w-full sm:w-auto order-1 sm:order-2"
+            className="order-1 w-full rounded-full transition-all duration-200 cursor-pointer sm:order-2 sm:w-auto min-w-[180px] bg-primary text-primary-foreground"
           >
             {isCreating ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                <Loader2 className="flex-shrink-0 mr-2 w-4 h-4 animate-spin" />
                 <span className="truncate">Creating VM...</span>
               </>
             ) : (
               <>
-                <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
+                <Zap className="flex-shrink-0 mr-2 w-4 h-4" />
                 <span className="truncate">Create Virtual Machine</span>
               </>
             )}

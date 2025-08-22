@@ -155,7 +155,7 @@ export const ComboboxTrigger = ({
     <PopoverTrigger asChild>
       <Button variant="outline" {...props} ref={ref}>
         {children ?? (
-          <span className="flex w-full items-center justify-between gap-2">
+          <span className="flex gap-2 justify-between items-center w-full">
             {value
               ? data.find((item) => item.value === value)?.label
               : `Select ${type}...`}
@@ -308,7 +308,7 @@ export const ComboboxCreateNew = ({
         children(inputValue)
       ) : (
         <>
-          <PlusIcon className="h-4 w-4 text-muted-foreground" />
+          <PlusIcon className="w-4 h-4 text-muted-foreground" />
           <span>
             Create new {type}: &quot;{inputValue}&quot;
           </span>
