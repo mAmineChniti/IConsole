@@ -13,6 +13,10 @@ export function middleware(request: NextRequest) {
     "/dashboard/images",
     "/dashboard/projects",
     "/dashboard/migrate-vm",
+    "/dashboard/volume-types",
+    "/dashboard/volumes",
+    "/dashboard/snapshots",
+    "/dashboard/clusters",
   ];
 
   if (pathname === "/") {

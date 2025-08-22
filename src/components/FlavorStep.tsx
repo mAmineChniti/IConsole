@@ -10,6 +10,8 @@ import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 import { Cpu, HardDrive, MemoryStick } from "lucide-react";
 import { type useForm } from "react-hook-form";
 
+type ResourceFlavorItem = ResourcesResponse["flavors"][number];
+
 export function FlavorStep({
   form,
   resources,
@@ -23,63 +25,48 @@ export function FlavorStep({
     return (
       <div className="space-y-6">
         <div className="space-y-2">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-4 w-80" />
-        </div>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card
-              key={i}
-              className="bg-card text-card-foreground border border-border/50 shadow-lg"
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                      <Skeleton className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <Skeleton className="h-4 w-20 mb-1" />
-                      <Skeleton className="h-3 w-12" />
+          <Skeleton className="w-32 h-5" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Card
+                key={i}
+                className="border shadow-lg bg-card text-card-foreground border-border/50"
+              >
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex gap-2 items-center">
+                      <div className="flex justify-center items-center w-8 h-8 rounded-full bg-muted" />
+                      <div className="space-y-1">
+                        <Skeleton className="w-40 h-5" />
+                        <Skeleton className="w-16 h-3" />
+                      </div>
                     </div>
                   </div>
-                  <Skeleton className="h-5 w-14 rounded-full" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                      <Skeleton className="h-3 w-3" />
+
+                  <div className="space-y-2">
+                    <div className="flex gap-2 items-center">
+                      <div className="w-6 h-6 rounded-full bg-muted" />
+                      <div className="flex-1">
+                        <Skeleton className="w-24 h-4" />
+                      </div>
                     </div>
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                      <Skeleton className="h-3 w-3" />
+                    <div className="flex gap-2 items-center">
+                      <div className="w-6 h-6 rounded-full bg-muted" />
+                      <div className="flex-1">
+                        <Skeleton className="w-28 h-4" />
+                      </div>
                     </div>
-                    <Skeleton className="h-3 w-20" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                      <Skeleton className="h-3 w-3" />
+                    <div className="flex gap-2 items-center">
+                      <div className="w-6 h-6 rounded-full bg-muted" />
+                      <div className="flex-1">
+                        <Skeleton className="w-20 h-4" />
+                      </div>
                     </div>
-                    <Skeleton className="h-3 w-20" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                      <Skeleton className="h-3 w-3" />
-                    </div>
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                      <Skeleton className="h-3 w-3" />
-                    </div>
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -92,116 +79,135 @@ export function FlavorStep({
           name="flavor_id"
           render={({ field }) => (
             <FormItem>
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <div
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                role="radiogroup"
+                aria-label="Available flavors"
+              >
                 {(resources?.flavors?.length ?? 0) === 0 ? (
-                  <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                    <div className="rounded-full bg-muted/50 p-3 mb-4">
-                      <Cpu className="h-6 w-6 text-muted-foreground" />
+                  <div className="flex flex-col col-span-full justify-center items-center py-12 text-center">
+                    <div className="p-3 mb-4 rounded-full bg-muted/50">
+                      <Cpu className="w-6 h-6 text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-medium mb-2">
+                    <h3 className="mb-2 text-lg font-medium">
                       No flavors available
                     </h3>
-                    <p className="text-sm text-muted-foreground max-w-sm">
+                    <p className="max-w-sm text-sm text-muted-foreground">
                       Contact your administrator to create flavors before you
                       can launch instances.
                     </p>
                   </div>
                 ) : (
-                  (resources?.flavors ?? []).map((flavor) => (
-                    <Card
-                      key={flavor.id}
-                      className={cn(
-                        "cursor-pointer transition-all hover:shadow-md border-2 rounded-md bg-card text-card-foreground",
-                        field.value === flavor.id
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-border/80",
-                      )}
-                      onClick={() => field.onChange(flavor.id)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                              <Cpu className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold leading-none">
-                                {flavor.name}
-                              </h3>
-                              {!flavor.is_public && (
-                                <Badge
-                                  variant="secondary"
-                                  className="mt-1 text-xs"
+                  (resources?.flavors ?? []).map(
+                    (flavor: ResourceFlavorItem) => (
+                      <Card
+                        key={flavor.id}
+                        className={cn(
+                          "cursor-pointer transition-all hover:shadow-md border-2 rounded-md bg-card text-card-foreground",
+                          field.value === flavor.id
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-border/80",
+                        )}
+                        onClick={() => field.onChange(flavor.id)}
+                        role="radio"
+                        aria-checked={field.value === flavor.id}
+                        aria-labelledby={`flavor-${flavor.id}-label`}
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            field.onChange(flavor.id);
+                          }
+                        }}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-center mb-3">
+                            <div className="flex gap-2 items-center">
+                              <div className="flex justify-center items-center w-8 h-8 rounded-full bg-primary/10">
+                                <Cpu className="w-4 h-4 text-primary" />
+                              </div>
+                              <div>
+                                <h3
+                                  id={`flavor-${flavor.id}-label`}
+                                  className="font-semibold leading-none"
                                 >
-                                  Private
-                                </Badge>
-                              )}
+                                  {flavor.name}
+                                </h3>
+                                {!flavor.is_public && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="mt-1 text-xs"
+                                  >
+                                    Private
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                              <Cpu className="h-3 w-3 text-muted-foreground" />
-                            </div>
-                            <div className="flex-1">
-                              <span className="font-medium">
-                                {flavor.vcpus} vCPU
-                                {flavor.vcpus !== 1 ? "s" : ""}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                              <MemoryStick className="h-3 w-3 text-muted-foreground" />
-                            </div>
-                            <div className="flex-1">
-                              <span className="font-medium">
-                                {(flavor.ram / 1024).toFixed(
-                                  flavor.ram >= 1024 ? 1 : 0,
-                                )}{" "}
-                                {flavor.ram >= 1024 ? "GB" : "MB"} RAM
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                              <HardDrive className="h-3 w-3 text-muted-foreground" />
-                            </div>
-                            <div className="flex-1">
-                              <span className="font-medium">
-                                {flavor.disk} GB Storage
-                              </span>
-                            </div>
-                          </div>
-                          {flavor.ephemeral > 0 && (
-                            <div className="flex items-center gap-2">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                                <HardDrive className="h-3 w-3 text-muted-foreground/60" />
+                          <div className="space-y-2">
+                            <div className="flex gap-2 items-center">
+                              <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
+                                <Cpu className="w-3 h-3 text-muted-foreground" />
                               </div>
                               <div className="flex-1">
-                                <span className="text-muted-foreground">
-                                  {flavor.ephemeral} GB Ephemeral
+                                <span className="font-medium">
+                                  {flavor.vcpus} vCPU
+                                  {flavor.vcpus !== 1 ? "s" : ""}
                                 </span>
                               </div>
                             </div>
-                          )}
-                          {flavor.swap > 0 && (
-                            <div className="flex items-center gap-2">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                                <MemoryStick className="h-3 w-3 text-muted-foreground/60" />
+                            <div className="flex gap-2 items-center">
+                              <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
+                                <MemoryStick className="w-3 h-3 text-muted-foreground" />
                               </div>
                               <div className="flex-1">
-                                <span className="text-muted-foreground text-xs">
-                                  {flavor.swap} MB Swap
+                                <span className="font-medium">
+                                  {flavor.ram >= 1024
+                                    ? `${(flavor.ram / 1024).toFixed(1)} GB`
+                                    : `${flavor.ram} MB`}{" "}
+                                  RAM
                                 </span>
                               </div>
                             </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                            <div className="flex gap-2 items-center">
+                              <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
+                                <HardDrive className="w-3 h-3 text-muted-foreground" />
+                              </div>
+                              <div className="flex-1">
+                                <span className="font-medium">
+                                  {flavor.disk} GB Storage
+                                </span>
+                              </div>
+                            </div>
+                            {flavor.ephemeral > 0 && (
+                              <div className="flex gap-2 items-center">
+                                <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
+                                  <HardDrive className="w-3 h-3 text-muted-foreground/60" />
+                                </div>
+                                <div className="flex-1">
+                                  <span className="text-muted-foreground">
+                                    {flavor.ephemeral} GB Ephemeral
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                            {flavor.swap > 0 && (
+                              <div className="flex gap-2 items-center">
+                                <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
+                                  <MemoryStick className="w-3 h-3 text-muted-foreground/60" />
+                                </div>
+                                <div className="flex-1">
+                                  <span className="text-muted-foreground">
+                                    {flavor.swap} MB Swap
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ),
+                  )
                 )}
               </div>
               <FormMessage />

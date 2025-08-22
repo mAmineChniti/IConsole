@@ -19,3 +19,47 @@ export function calculateAge(createdAt: string) {
   }
   return `${hours} hour${hours !== 1 ? "s" : ""}`;
 }
+
+export function parseComposite(val: string): string {
+  return val.split(":::")[0] ?? "";
+}
+
+export function makeDupSafeSelect<T>(
+  items: T[],
+  getStored: (t: T) => string,
+  getLabel: (t: T) => string,
+) {
+  const options = items.map((item, idx) => {
+    const stored = getStored(item);
+    const label = getLabel(item);
+    return {
+      key: `${label}-${idx}`,
+      value: `${stored}:::${idx}`,
+      label,
+    };
+  });
+  const toForm = parseComposite;
+  const fromForm = (storedValue: string | undefined) => {
+    if (!storedValue) return undefined;
+    const idx = items.findIndex((it) => getStored(it) === storedValue);
+    return idx >= 0 ? `${storedValue}:::${idx}` : undefined;
+  };
+  return { options, toForm, fromForm } as const;
+}
+
+export function parseVolumeSizeGiB(size: string): number {
+  if (!size) return 1;
+  const m = /(\d+(?:\.\d+)?)/.exec(size);
+  const n = m ? Number(m[1]) : NaN;
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
+}
+
+export function createSearchParams<T extends object>(data: T): URLSearchParams {
+  const params = new URLSearchParams();
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") {
+      params.append(key, String(value));
+    }
+  });
+  return params;
+}

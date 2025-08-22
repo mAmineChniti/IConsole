@@ -50,21 +50,13 @@ const ComboboxContext = createContext<ComboboxContextType>({
   data: [],
   type: "item",
   value: "",
-  onValueChange: () => {
-    // Default empty implementation
-  },
+  onValueChange: (_value: string) => undefined,
   open: false,
-  onOpenChange: () => {
-    // Default empty implementation
-  },
+  onOpenChange: (_open: boolean) => undefined,
   width: 200,
-  setWidth: () => {
-    // Default empty implementation
-  },
+  setWidth: (_width: number) => undefined,
   inputValue: "",
-  setInputValue: () => {
-    // Default empty implementation
-  },
+  setInputValue: (_value: string) => undefined,
 });
 
 export type ComboboxProps = ComponentProps<typeof Popover> & {
@@ -131,7 +123,6 @@ export const ComboboxTrigger = ({
   const ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    // Create a ResizeObserver to detect width changes
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const newWidth = (entry.target as HTMLElement).offsetWidth;
@@ -145,7 +136,6 @@ export const ComboboxTrigger = ({
       resizeObserver.observe(ref.current);
     }
 
-    // Clean up the observer when component unmounts
     return () => {
       resizeObserver.disconnect();
     };
@@ -155,7 +145,7 @@ export const ComboboxTrigger = ({
     <PopoverTrigger asChild>
       <Button variant="outline" {...props} ref={ref}>
         {children ?? (
-          <span className="flex w-full items-center justify-between gap-2">
+          <span className="flex gap-2 justify-between items-center w-full">
             {value
               ? data.find((item) => item.value === value)?.label
               : `Select ${type}...`}
@@ -210,9 +200,8 @@ export const ComboboxInput = ({
     defaultProp: defaultValue ?? inputValue,
     prop: controlledValue,
     onChange: (newValue) => {
-      // Sync with context state
       setInputValue(newValue);
-      // Call external onChange if provided
+
       controlledOnValueChange?.(newValue);
     },
   });
@@ -308,7 +297,7 @@ export const ComboboxCreateNew = ({
         children(inputValue)
       ) : (
         <>
-          <PlusIcon className="h-4 w-4 text-muted-foreground" />
+          <PlusIcon className="w-4 h-4 text-muted-foreground" />
           <span>
             Create new {type}: &quot;{inputValue}&quot;
           </span>

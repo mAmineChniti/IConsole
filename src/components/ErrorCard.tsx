@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { useId } from "react";
 
 interface ErrorCardProps {
   title?: string;
@@ -17,38 +18,59 @@ export function ErrorCard({
   onRetry,
   isRetrying = false,
 }: ErrorCardProps) {
+  const titleId = useId();
+  const messageId = useId();
   return (
-    <div className="space-y-6 px-2 sm:px-4 lg:px-6 max-w-none">
-      <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl w-full overflow-hidden">
-        <CardContent className="p-4 sm:p-6 lg:p-8 text-center">
+    <div className="px-2 space-y-6 max-w-none sm:px-4 lg:px-6">
+      <Card className="overflow-hidden w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <CardContent className="p-4 text-center sm:p-6 lg:p-8">
           <div className="flex flex-col items-center space-y-4">
-            <div className="p-2 sm:p-3 bg-destructive/10 rounded-full flex-shrink-0">
-              <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-destructive" />
+            <div className="flex-shrink-0 p-2 rounded-full sm:p-3 bg-destructive/10">
+              <AlertTriangle
+                aria-hidden="true"
+                focusable="false"
+                className="w-6 h-6 sm:w-8 sm:h-8 text-destructive"
+              />
             </div>
-            <div className="space-y-2 w-full">
-              <h3 className="text-lg sm:text-xl font-semibold text-destructive leading-tight break-words font-sans">
+            <div
+              className="space-y-2 w-full"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+              aria-labelledby={titleId}
+              aria-describedby={messageId}
+            >
+              <h3
+                id={titleId}
+                className="font-sans text-lg font-semibold leading-tight break-words sm:text-xl text-destructive"
+              >
                 {title}
               </h3>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-full sm:max-w-md mx-auto leading-relaxed break-words font-sans">
+              <p
+                id={messageId}
+                className="mx-auto max-w-full font-sans text-sm leading-relaxed break-words sm:max-w-md sm:text-base text-muted-foreground"
+              >
                 {message}
               </p>
             </div>
             {onRetry && (
               <Button
+                type="button"
                 onClick={onRetry}
                 disabled={isRetrying}
-                className="mt-4 cursor-pointer w-full sm:w-auto min-w-[120px] rounded-full font-sans tracking-tight shadow-md transition-colors"
+                aria-busy={isRetrying}
+                className="mt-4 w-full font-sans tracking-tight rounded-full shadow-md transition-colors cursor-pointer sm:w-auto min-w-[120px]"
                 variant="destructive"
               >
                 {isRetrying ? (
                   <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin flex-shrink-0 text-white" />
-                    <span className="truncate text-white">Retrying...</span>
+                    <RefreshCw className="flex-shrink-0 mr-2 w-4 h-4 text-white animate-spin" />
+                    <span className="text-white truncate">Retrying...</span>
                   </>
                 ) : (
                   <>
-                    <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0 text-white" />
-                    <span className="truncate text-white">Retry</span>
+                    <RefreshCw className="flex-shrink-0 mr-2 w-4 h-4 text-white" />
+                    <span className="text-white truncate">Retry</span>
                   </>
                 )}
               </Button>

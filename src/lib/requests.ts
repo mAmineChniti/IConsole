@@ -1,32 +1,91 @@
 import { env } from "@/env";
+import { createSearchParams } from "@/lib/utils";
 import type {
   AssignUserToProjectRequest,
+  ClusterActionRequest,
+  ClusterCreateRequest,
+  ClusterTokenRequest,
   CreateFromDescriptionRequest,
+  CreateSnapshotRequest,
+  FlavorCreateRequest,
+  FlavorDeleteRequest,
+  FlavorUpdateRequest,
+  FloatingIPRequest,
+  IdRequest,
+  ImageCreateVolumeRequest,
+  ImageDeleteRequest,
   ImageImportFromNameRequest,
+  ImageImportFromUploadRequest,
   ImageImportFromUrlRequest,
+  ImageUpdateRequest,
+  ImportVMwareRequest,
+  InstanceDeleteRequest,
+  InstanceRebootRequest,
+  InstanceStartRequest,
+  InstanceStopRequest,
+  InterfaceRequest,
+  KeyPairCreateRequest,
+  KeyPairDeleteRequest,
+  KeyPairImportFromFileRequest,
   LoginRequest,
   NetworkCreateRequest,
+  NetworkDeleteRequest,
   ProjectCreateRequest,
   ProjectUpdateRequest,
   RemoveUserFromProjectRequest,
+  ResizeRequest,
   RouterAddInterfaceRequest,
   RouterCreateRequest,
   ScaleNodeRequest,
+  SecurityGroupCreateRequest,
+  SecurityGroupDeleteRequest,
+  SecurityGroupRuleCreateRequest,
+  SecurityGroupRuleDeleteRequest,
+  SecurityGroupUpdateRequest,
+  SSHHostPassword,
   SwitchProjectRequest,
   UpdateUserRolesRequest,
   UserCreateRequest,
   UserUpdateRequest,
   VMCreateRequest,
+  VolumeAttachRequest,
+  VolumeChangeTypeRequest,
+  VolumeCreateFromSnapshotRequest,
+  VolumeCreateRequest,
+  VolumeDeleteRequest,
+  VolumeDetachRequest,
+  VolumeExtendRequest,
+  VolumeRequest,
+  VolumeSnapshotCreateRequest,
+  VolumeSnapshotDeleteRequest,
+  VolumeSnapshotUpdateRequest,
+  VolumeTypeCreateRequest,
+  VolumeTypeUpdateRequest,
+  VolumeUploadToImageRequest,
 } from "@/types/RequestInterfaces";
 import type {
   AssignUserResponse,
+  ClusterActionResponse,
+  ClusterDashboardTokenResponse,
+  ClusterDetailsResponse,
+  ClusterListResponse,
   CreateFromDescriptionResponse,
   DashboardOverviewResponse,
   DebugRoleAssignmentsResponse,
+  FlavorActionResponse,
+  FlavorDetails,
+  ImageDeleteResponse,
+  ImageDetails,
   ImageImportFromNameResponse,
+  ImageImportFromUploadResponse,
   ImageImportFromUrlResponse,
   InstanceDetailsResponse,
   InstanceListResponse,
+  KeyPairCreateResponse,
+  KeyPairDeleteResponse,
+  KeyPairDetails,
+  KeyPairImportResponse,
+  KeyPairListResponse,
   LoginResponse,
   LogoutResponse,
   NetworkCreateResponse,
@@ -38,6 +97,7 @@ import type {
   ProjectListResponse,
   ProjectsResponse,
   QemuImgCheckResponse,
+  RemoveSshKeyResponse,
   RemoveUserResponse,
   ResourcesResponse,
   RolesResponse,
@@ -45,6 +105,13 @@ import type {
   RouterCreateResponse,
   ScaleHealthResponse,
   ScaleNodeResponse,
+  SecurityGroup,
+  SecurityGroupCreateResponse,
+  SecurityGroupDeleteResponse,
+  SecurityGroupListResponse,
+  SecurityGroupRuleCreateResponse,
+  SecurityGroupRuleDeleteResponse,
+  SecurityGroupRuleListResponse,
   UnassignedUsersResponse,
   UpdateUserRolesResponse,
   UserCreateResponse,
@@ -53,12 +120,44 @@ import type {
   UserListResponse,
   VMCreateResponse,
   VMwareImportResponse,
+  VolumeActionResponse,
+  VolumeAttachedInstancesResponse,
+  VolumeAttachmentsDetailsResponse,
+  VolumeAvailableInstancesResponse,
+  VolumeDetails,
+  VolumeGetDetails,
+  VolumeSnapshotDetails,
+  VolumeSnapshotListResponse,
+  VolumeType,
+  VolumeTypeListResponse,
 } from "@/types/ResponseInterfaces";
 import { TFetchClient } from "@thatguyjamal/type-fetch";
 import { getCookie } from "cookies-next";
 
 const API_CONFIG = {
   BASE_URL: env.NEXT_PUBLIC_BACKEND ?? "http://127.0.0.1:8000/api/v1",
+  VOLUME: {
+    BASE: "/volume/volumes",
+    SNAPSHOTS: "/volume/snapshots",
+    TYPES: "/volume/volume-types/list",
+    TYPES_CREATE: "/volume/volume-types/create",
+    TYPES_UPDATE: "/volume/volume-types/update/",
+    TYPES_DELETE: "/volume/volume-types/delete/",
+    ATTACH: "/volume/volumes",
+    DETACH: "/volume/volumes/attachments",
+    ATTACHMENTS: "/volume/volumes",
+    AVAILABLE_INSTANCES: "/volume/volumes",
+    ATTACHED_INSTANCES: "/volume/volumes",
+  },
+  FLAVOR: {
+    BASE: "/flavor/flavors",
+    FULL_UPDATE: "/flavor/flavors/",
+  },
+  SECURITY_GROUP: {
+    BASE: "/securitygroups/security-groups",
+    RULES: "/securitygroups/security-groups/",
+    DELETE_RULE: "/securitygroups/security-groups/rules/",
+  },
   AUTH: {
     LOGIN: "/auth/login",
     SWITCH_PROJECT: "/auth/switch-project",
@@ -78,6 +177,22 @@ const API_CONFIG = {
     RESOURCES: "/nova/resources",
     CHECK_QEMU: "/nova/check-qemu-img",
     OVERVIEW: "/dashboard/overview",
+    RESIZE: "/nova/resize",
+    PAUSE: "/nova/pause",
+    SUSPEND: "/nova/suspend",
+    SHELVE: "/nova/shelve",
+    RESCUE: "/nova/rescue",
+    CONSOLE: "/nova/console",
+    LOGS: "/nova/logs",
+    SNAPSHOT: "/nova/snapshot",
+    FLOATING_ATTACH: "/nova/attach",
+    FLOATING_DETACH: "/nova/detach",
+    INTERFACE_ATTACH: "/nova/interface/attach",
+    INTERFACE_DETACH: "/nova/interface/detach",
+    VOLUMES_AVAILABLE: "/nova/volumes_avaible/list",
+    VOLUMES_ATTACHED: "/nova/volumes/attached",
+    VOLUME_ATTACH: "/nova/volume/attach",
+    VOLUME_DETACH: "/nova/volume/detach",
   },
   PROJECTS: {
     BASE: "/projects",
@@ -92,8 +207,11 @@ const API_CONFIG = {
     PROJECTS: "/users/projects",
   },
   IMAGE: {
+    BASE: "/image/images",
     IMPORT_FROM_URL: "/image/images/import-from-url",
     IMPORT_FROM_NAME: "/image/images/import-from-name",
+    IMPORT_FROM_UPLOAD: "/image/images/import-from-upload",
+    VOLUMES: "/image/volumes",
   },
   NETWORK: {
     LIST: "/network/list",
@@ -106,12 +224,57 @@ const API_CONFIG = {
     HEALTH: "/scale/",
     NODE: "/scale/node",
   },
+  KEYPAIRS: {
+    BASE: "/keypairs/keypairs",
+    CREATE: "/keypairs/keypairs/create",
+    IMPORT_FROM_FILE: "/keypairs/keypairs/import-from-file",
+  },
+  CLUSTER: {
+    CREATE_AUTO: "/cluster/create-vm-cluster-auto",
+    REMOVE_SSH_KEY: "/cluster/remove-ssh-key",
+    DASHBOARD_TOKEN: "/cluster/k8s-dashboard/token",
+    CLUSTERS: "/cluster/clusters",
+    START: "/cluster/clusters/start",
+    STOP: "/cluster/clusters/stop",
+    DELETE: "/cluster/clusters/delete",
+  },
 } as const;
 
 const client = new TFetchClient();
+
+type TokenCookie = {
+  token: string;
+  expires_at: string;
+  expires_at_ts: number;
+};
+
+const isTokenCookie = (v: unknown): v is TokenCookie =>
+  typeof v === "object" &&
+  v !== undefined &&
+  typeof (v as Record<string, unknown>).token === "string" &&
+  typeof (v as Record<string, unknown>).expires_at === "string" &&
+  typeof (v as Record<string, unknown>).expires_at_ts === "number";
+
 const authHeaders = (): Record<string, string> => {
-  const t = getCookie("token") as string;
-  return t ? { Authorization: `Bearer ${t}` } : {};
+  const raw = getCookie("token");
+  if (!raw || typeof raw !== "string") return {};
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (isTokenCookie(parsed)) {
+      const expMs =
+        parsed.expires_at_ts > 1e12
+          ? parsed.expires_at_ts
+          : parsed.expires_at_ts * 1000;
+      if (Date.now() >= expMs) return {};
+      return { Authorization: `Bearer ${parsed.token}` };
+    }
+  } catch {}
+
+  if (raw.trim().length > 0) {
+    return { Authorization: `Bearer ${raw}` };
+  }
+  return {};
 };
 
 export const AuthService = {
@@ -152,22 +315,211 @@ export const AuthService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
+  async createSnapshot(
+    data: CreateSnapshotRequest,
+  ): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SNAPSHOT,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async resize(data: ResizeRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.RESIZE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error)
+      throw new Error(`Error resizing instance: ${result.error.message}`);
+    if (!result.data) throw new Error("No data received from resize endpoint");
+    return result.data;
+  },
+
+  async pause(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.PAUSE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async suspend(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SUSPEND,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async shelve(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SHELVE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async rescue(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.RESCUE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async getConsole(data: IdRequest): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.CONSOLE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async getLogs(data: IdRequest): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.LOGS,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async attachFloatingIp(data: FloatingIPRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.FLOATING_ATTACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async detachFloatingIp(data: FloatingIPRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.FLOATING_DETACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async attachInterface(data: InterfaceRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.INTERFACE_ATTACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async detachInterface(data: InterfaceRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.INTERFACE_DETACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async listAvailableVolumes(): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUMES_AVAILABLE,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async listAttachedVolumes(data: IdRequest): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUMES_ATTACHED,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async attachVolume(data: VolumeRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUME_ATTACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async detachVolume(data: VolumeRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUME_DETACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
 };
 
 export const ProjectService = {
-  async listDetails(): Promise<ProjectDetailsResponse[]> {
-    const projectsResponse = await AuthService.getProjects();
-    if (!projectsResponse.projects || projectsResponse.projects.length === 0)
-      return [];
-    const settled = await Promise.allSettled(
-      projectsResponse.projects.map((p) => this.get(p.project_id)),
+  async list(): Promise<ProjectListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<ProjectListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + "/",
+      { headers: token },
     );
-    return settled
-      .filter(
-        (r): r is PromiseFulfilledResult<ProjectDetailsResponse> =>
-          r.status === "fulfilled",
-      )
-      .map((r) => r.value);
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
   },
   async create(data: ProjectCreateRequest): Promise<ProjectDetailsResponse> {
     const token = authHeaders();
@@ -198,7 +550,7 @@ export const ProjectService = {
     const result = await client.get<UnassignedUsersResponse>(
       API_CONFIG.BASE_URL +
         API_CONFIG.PROJECTS.BASE +
-        `${projectId}/unassigned_users`,
+        `/${projectId}/unassigned_users`,
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
@@ -256,7 +608,7 @@ export const ProjectService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.put<ProjectDetailsResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + projectId,
+      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + `/${projectId}`,
       { type: "json", data },
       { headers: token },
     );
@@ -267,7 +619,7 @@ export const ProjectService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.delete<ProjectDeleteResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + projectId,
+      API_CONFIG.BASE_URL + API_CONFIG.PROJECTS.BASE + `/${projectId}`,
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
@@ -295,7 +647,6 @@ export const UserService = {
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
-    console.log(result.data);
     return result.data!;
   },
   async get(userId: string): Promise<UserDetailsResponse> {
@@ -409,6 +760,91 @@ export const ImageService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
+
+  async listImages(): Promise<ImageDetails[]> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const url = API_CONFIG.BASE_URL + "/image/images";
+    const result = await client.get<ImageDetails[]>(url, { headers: token });
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async getImageDetails(imageId: string): Promise<ImageDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const url = API_CONFIG.BASE_URL + `/image/images/${imageId}`;
+    const result = await client.get<ImageDetails>(url, { headers: token });
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async deleteImage(data: ImageDeleteRequest): Promise<ImageDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const url = API_CONFIG.BASE_URL + `/image/images/${data.image_id}`;
+    const result = await client.delete<ImageDeleteResponse>(url, {
+      headers: token,
+    });
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async importFromUpload(
+    data: ImageImportFromUploadRequest,
+  ): Promise<ImageImportFromUploadResponse> {
+    const formData = new FormData();
+    formData.append("file", data.file);
+    formData.append("image_name", data.image_name);
+    if (data.visibility) formData.append("visibility", data.visibility);
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const url = API_CONFIG.BASE_URL + "/image/images/import-from-upload";
+    const result = await client.post<ImageImportFromUploadResponse>(
+      url,
+      { type: "form", data: formData },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async createVolume(data: ImageCreateVolumeRequest): Promise<VolumeDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const params = new URLSearchParams();
+    params.set("name", data.name);
+    params.set("size", String(data.size));
+    params.set("image_id", data.image_id);
+    if (data.volume_type) params.set("volume_type", data.volume_type);
+    if (data.visibility) params.set("visibility", data.visibility);
+    if (typeof data.protected === "boolean")
+      params.set("protected", String(data.protected));
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.IMAGE.VOLUMES}?${params.toString()}`;
+    const result = await client.post<VolumeDetails>(
+      url,
+      { type: "json", data: {} },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async updateImage(
+    imageId: string,
+    data: ImageUpdateRequest,
+  ): Promise<ImageDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const url = API_CONFIG.BASE_URL + `/image/images/${imageId}/update`;
+    const result = await client.put<ImageDetails>(
+      url,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
 };
 
 export const NetworkService = {
@@ -460,11 +896,11 @@ export const NetworkService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
-  async delete(networkId: string): Promise<NetworkDeleteResponse> {
+  async delete(data: NetworkDeleteRequest): Promise<NetworkDeleteResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.delete<NetworkDeleteResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.DELETE + networkId,
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.DELETE + data.network_id,
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
@@ -474,7 +910,7 @@ export const NetworkService = {
 export const InfraService = {
   async listDetails(): Promise<InstanceDetailsResponse[]> {
     const instanceList = await this.listInstances();
-    // InstanceListResponse is an array of InstanceListItem
+
     if (!Array.isArray(instanceList) || instanceList.length === 0) return [];
     const settled = await Promise.allSettled(
       instanceList.map((i) => this.getInstanceDetails(i.id)),
@@ -576,7 +1012,24 @@ export const InfraService = {
     return result.data;
   },
 
-  async importVMwareVM(formData: FormData): Promise<VMwareImportResponse> {
+  async importVMwareVM(
+    data: ImportVMwareRequest,
+  ): Promise<VMwareImportResponse> {
+    const formData = new FormData();
+    formData.append("vmdk_file", data.vmdk_file);
+    formData.append("vm_name", data.vm_name);
+    if (data.description) formData.append("description", data.description);
+    if (typeof data.min_disk === "number")
+      formData.append("min_disk", data.min_disk.toString());
+    if (typeof data.min_ram === "number")
+      formData.append("min_ram", data.min_ram.toString());
+    formData.append("is_public", (data.is_public ?? false).toString());
+    formData.append("flavor_id", data.flavor_id);
+    formData.append("network_id", data.network_id);
+    formData.append("key_name", data.key_name);
+    formData.append("security_group", data.security_group);
+    if (data.admin_password)
+      formData.append("admin_password", data.admin_password);
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<VMwareImportResponse>(
@@ -609,11 +1062,13 @@ export const InfraService = {
     return result.data;
   },
 
-  async startInstance(instanceId: string): Promise<NovaActionResponse> {
+  async startInstance(data: InstanceStartRequest): Promise<NovaActionResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.START_INSTANCE + `/${instanceId}`,
+      API_CONFIG.BASE_URL +
+        API_CONFIG.INFRA.START_INSTANCE +
+        `/${data.server_id}`,
       { type: "json", data: {} },
       { headers: token },
     );
@@ -626,11 +1081,13 @@ export const InfraService = {
     return result.data;
   },
 
-  async stopInstance(instanceId: string): Promise<NovaActionResponse> {
+  async stopInstance(data: InstanceStopRequest): Promise<NovaActionResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.STOP_INSTANCE + `/${instanceId}`,
+      API_CONFIG.BASE_URL +
+        API_CONFIG.INFRA.STOP_INSTANCE +
+        `/${data.server_id}`,
       { type: "json", data: {} },
       { headers: token },
     );
@@ -643,12 +1100,16 @@ export const InfraService = {
     return result.data;
   },
 
-  async rebootInstance(instanceId: string): Promise<NovaActionResponse> {
+  async rebootInstance(
+    data: InstanceRebootRequest,
+  ): Promise<NovaActionResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.REBOOT_INSTANCE + `/${instanceId}`,
-      { type: "json", data: {} },
+      API_CONFIG.BASE_URL +
+        API_CONFIG.INFRA.REBOOT_INSTANCE +
+        `/${data.server_id}`,
+      { type: "json", data: { type: data.type ?? "SOFT" } },
       { headers: token },
     );
     if (result.error) {
@@ -660,11 +1121,15 @@ export const InfraService = {
     return result.data;
   },
 
-  async deleteInstance(instanceId: string): Promise<NovaActionResponse> {
+  async deleteInstance(
+    data: InstanceDeleteRequest,
+  ): Promise<NovaActionResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.delete<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.DELETE_INSTANCE + `/${instanceId}`,
+      API_CONFIG.BASE_URL +
+        API_CONFIG.INFRA.DELETE_INSTANCE +
+        `/${data.server_id}`,
       { headers: token },
     );
     if (result.error) {
@@ -705,6 +1170,626 @@ export const ScaleService = {
     const result = await client.post<ScaleNodeResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.SCALE.NODE,
       { type: "json", data },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+};
+
+export const FlavorService = {
+  async create(data: FlavorCreateRequest): Promise<FlavorDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<FlavorDetails>(
+      API_CONFIG.BASE_URL + API_CONFIG.FLAVOR.BASE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async list(): Promise<FlavorDetails[]> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<FlavorDetails[]>(
+      API_CONFIG.BASE_URL + API_CONFIG.FLAVOR.BASE,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async get(flavorId: string): Promise<FlavorDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<FlavorDetails>(
+      API_CONFIG.BASE_URL + API_CONFIG.FLAVOR.BASE + `/${flavorId}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async update(data: FlavorUpdateRequest): Promise<FlavorDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const params = new URLSearchParams();
+    if (typeof data.name === "string") params.set("name", data.name);
+    if (typeof data.vcpus === "number") params.set("vcpus", String(data.vcpus));
+    if (typeof data.ram === "number") params.set("ram", String(data.ram));
+    if (typeof data.disk === "number") params.set("disk", String(data.disk));
+    if (typeof data.ephemeral === "number")
+      params.set("ephemeral", String(data.ephemeral));
+    if (typeof data.swap === "number") params.set("swap", String(data.swap));
+    if (typeof data.is_public === "boolean")
+      params.set("is_public", String(data.is_public));
+    if (typeof data.description === "string")
+      params.set("description", data.description);
+
+    const url =
+      API_CONFIG.BASE_URL +
+      API_CONFIG.FLAVOR.FULL_UPDATE +
+      `${data.flavor_id}/full-update` +
+      (params.toString() ? `?${params.toString()}` : "");
+    const result = await client.put<FlavorDetails>(
+      url,
+      { type: "json", data: {} },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async delete(data: FlavorDeleteRequest): Promise<FlavorActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<FlavorActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.FLAVOR.BASE + `/${data.flavor_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+};
+
+export const VolumeService = {
+  async list(): Promise<VolumeDetails[]> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeDetails[]>(
+      API_CONFIG.BASE_URL + API_CONFIG.VOLUME.BASE,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async create(data: VolumeCreateRequest): Promise<VolumeDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+
+    const params = createSearchParams(data);
+    const result = await client.post<VolumeDetails>(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.VOLUME.BASE}?${params.toString()}`,
+      { type: "json", data: {} },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async get(volumeId: string): Promise<VolumeGetDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeGetDetails>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.VOLUME.BASE}/${volumeId}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async delete(data: VolumeDeleteRequest): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<VolumeActionResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.VOLUME.BASE}/${data.volume_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async extend(data: VolumeExtendRequest): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.put<VolumeActionResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/extend`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async attach(data: VolumeAttachRequest): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const url =
+      API_CONFIG.BASE_URL +
+      `${API_CONFIG.VOLUME.ATTACH}/${data.volume_id}/attach?instance_id=${encodeURIComponent(data.instance_id)}`;
+    const result = await client.post<VolumeActionResponse>(
+      url,
+      { type: "json", data: {} },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async detach(data: VolumeDetachRequest): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<VolumeActionResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.DETACH}/${data.attachment_id}/detach`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async changeType(
+    data: VolumeChangeTypeRequest,
+    volumeId: string,
+  ): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.put<VolumeActionResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.VOLUME.BASE}/${volumeId}/change-type`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async uploadToImage(
+    data: VolumeUploadToImageRequest,
+  ): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<VolumeActionResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/upload-to-image`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async createSnapshot(
+    data: VolumeSnapshotCreateRequest,
+  ): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const params = new URLSearchParams();
+    params.set("name", data.name);
+    if (data.description) params.set("description", data.description);
+    const url =
+      API_CONFIG.BASE_URL +
+      `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/snapshot?${params.toString()}`;
+    const result = await client.post<VolumeActionResponse>(
+      url,
+      { type: "json", data: {} },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async deleteSnapshot(
+    data: VolumeSnapshotDeleteRequest,
+  ): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<VolumeActionResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.SNAPSHOTS}/${data.snapshot_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async listSnapshots(): Promise<VolumeSnapshotListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeSnapshotListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.VOLUME.SNAPSHOTS,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async getSnapshotDetails(snapshotId: string): Promise<VolumeSnapshotDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeSnapshotDetails>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.VOLUME.SNAPSHOTS}/${snapshotId}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async listTypes(): Promise<VolumeTypeListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeTypeListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.VOLUME.TYPES,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async getAvailableInstances(
+    volumeId: string,
+  ): Promise<VolumeAvailableInstancesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeAvailableInstancesResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.AVAILABLE_INSTANCES}/${volumeId}/available-instances`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async getAttachedInstances(
+    volumeId: string,
+  ): Promise<VolumeAttachedInstancesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeAttachedInstancesResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.ATTACHED_INSTANCES}/${volumeId}/attached-instances`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async getAttachments(
+    volumeId: string,
+  ): Promise<VolumeAttachmentsDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeAttachmentsDetailsResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.ATTACHMENTS}/${volumeId}/attachement`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async createVolumeFromSnapshot(
+    data: VolumeCreateFromSnapshotRequest,
+  ): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<VolumeActionResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.SNAPSHOTS}/${data.snapshot_id}/create-volume`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async updateSnapshot(
+    data: VolumeSnapshotUpdateRequest,
+    snapshotId: string,
+  ): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.put<VolumeActionResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.VOLUME.SNAPSHOTS}/${snapshotId}`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async listVolumeTypes(): Promise<VolumeType[]> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VolumeType[]>(
+      API_CONFIG.BASE_URL + API_CONFIG.VOLUME.TYPES,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async createVolumeType(data: VolumeTypeCreateRequest): Promise<VolumeType> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<VolumeType>(
+      API_CONFIG.BASE_URL + API_CONFIG.VOLUME.TYPES_CREATE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async updateVolumeType(data: VolumeTypeUpdateRequest): Promise<VolumeType> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.put<VolumeType>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.VOLUME.TYPES_UPDATE}${data.volume_type_id}`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async deleteVolumeType(volumeTypeId: string): Promise<VolumeActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<VolumeActionResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.VOLUME.TYPES_DELETE}${volumeTypeId}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+};
+
+export const SecurityGroupService = {
+  async list(): Promise<SecurityGroupListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<SecurityGroupListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.SECURITY_GROUP.BASE,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async get(securityGroupId: string): Promise<SecurityGroup> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<SecurityGroup>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.SECURITY_GROUP.BASE}/${securityGroupId}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async create(
+    data: SecurityGroupCreateRequest,
+  ): Promise<SecurityGroupCreateResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<SecurityGroupCreateResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.SECURITY_GROUP.BASE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async update(
+    data: SecurityGroupUpdateRequest,
+    securityGroupId: string,
+  ): Promise<SecurityGroup> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.put<SecurityGroup>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.SECURITY_GROUP.BASE}/${securityGroupId}`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async delete(
+    data: SecurityGroupDeleteRequest,
+  ): Promise<SecurityGroupDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<SecurityGroupDeleteResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.SECURITY_GROUP.BASE}/${data.security_group_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async addRule(
+    data: SecurityGroupRuleCreateRequest,
+    securityGroupId: string,
+  ): Promise<SecurityGroupRuleCreateResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<SecurityGroupRuleCreateResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.SECURITY_GROUP.RULES}${securityGroupId}/rules`,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async listRules(
+    securityGroupId: string,
+  ): Promise<SecurityGroupRuleListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<SecurityGroupRuleListResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.SECURITY_GROUP.RULES}${securityGroupId}/rules`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async deleteRule(
+    data: SecurityGroupRuleDeleteRequest,
+  ): Promise<SecurityGroupRuleDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<SecurityGroupRuleDeleteResponse>(
+      API_CONFIG.BASE_URL +
+        `${API_CONFIG.SECURITY_GROUP.DELETE_RULE}${data.rule_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+};
+
+export const KeyPairService = {
+  async list(): Promise<KeyPairListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<KeyPairListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.KEYPAIRS.BASE,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async create(data: KeyPairCreateRequest): Promise<KeyPairCreateResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<KeyPairCreateResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.KEYPAIRS.CREATE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async importFromFile(
+    data: KeyPairImportFromFileRequest,
+  ): Promise<KeyPairImportResponse> {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("file", data.public_key);
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<KeyPairImportResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.KEYPAIRS.IMPORT_FROM_FILE,
+      { type: "form", data: formData },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async get(name: string): Promise<KeyPairDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<KeyPairDetails>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.KEYPAIRS.BASE}/${name}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async delete(data: KeyPairDeleteRequest): Promise<KeyPairDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<KeyPairDeleteResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.KEYPAIRS.BASE}/${data.name}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+};
+
+export const ClusterService = {
+  async createAuto(data: ClusterCreateRequest): Promise<ClusterActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<ClusterActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.CREATE_AUTO,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async removeSshKey(data: SSHHostPassword): Promise<RemoveSshKeyResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<RemoveSshKeyResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.REMOVE_SSH_KEY,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async getDashboardToken(
+    data: ClusterTokenRequest,
+  ): Promise<ClusterDashboardTokenResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<ClusterDashboardTokenResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.DASHBOARD_TOKEN,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async list(): Promise<ClusterListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<ClusterListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.CLUSTERS,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async get(clusterId: number): Promise<ClusterDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<ClusterDetailsResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.CLUSTERS}/${clusterId}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async start(data: ClusterActionRequest): Promise<ClusterActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<ClusterActionResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.START}/${data.cluster_id}`,
+      { type: "json", data: {} },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async stop(data: ClusterActionRequest): Promise<ClusterActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<ClusterActionResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.STOP}/${data.cluster_id}`,
+      { type: "json", data: {} },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async delete(data: ClusterActionRequest): Promise<ClusterActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<ClusterActionResponse>(
+      API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.DELETE}/${data.cluster_id}`,
+      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;

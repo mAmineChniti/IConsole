@@ -1,5 +1,19 @@
+export interface ErrorResponse {
+  detail: string;
+}
+
 type ServiceStatus = "enabled" | "disabled";
 type ServiceState = "up" | "down";
+
+interface ProjectInfo {
+  project_id: string;
+  project_name: string;
+  roles: string[];
+}
+
+interface NetworkReference {
+  uuid: string;
+}
 
 export interface LoginResponse {
   token: string;
@@ -11,12 +25,6 @@ export interface LoginResponse {
   message: string;
 }
 
-interface ProjectInfo {
-  project_id: string;
-  project_name: string;
-  roles: string[];
-}
-
 export interface ProjectsResponse {
   projects: ProjectInfo[];
 }
@@ -25,7 +33,186 @@ export interface LogoutResponse {
   message: string;
 }
 
-interface InstanceListItem {
+export interface VolumeDetails {
+  ID: string;
+  Name: string;
+  Description: string;
+  Size: string;
+  Status: string;
+  Group: string;
+  Type: string;
+  "Attached To": string;
+  "Availability Zone": string;
+  Bootable: string;
+  Encrypted: string;
+}
+
+export type VolumeListResponse = VolumeDetails[];
+
+export interface VolumeGetDetails {
+  Nom: string;
+  ID: string;
+  Description: string;
+  Projet: string;
+  Statut: string;
+  Groupe: string;
+  Spécifications: {
+    Taille: string;
+    Type: string;
+    Amorçable: string;
+    Chiffré: string;
+    Créé: string;
+  };
+  Attachements: {
+    "Attaché à": string;
+  };
+  Métadonnées: Record<string, unknown> | string;
+}
+
+export interface VolumeActionResponse {
+  message: string;
+  [key: string]: unknown;
+}
+
+export interface VolumeAvailableInstancesResponse {
+  volume_id: string;
+  volume_name: string;
+  available_instances: Array<{
+    id: string;
+    name: string;
+    status: string;
+  }>;
+}
+
+export interface VolumeAttachedInstancesResponse {
+  volume_id: string;
+  volume_name: string;
+  attached_instances: Array<{
+    id: string;
+    name: string;
+    status: string;
+    device: string;
+  }>;
+}
+
+export interface VolumeAttachmentsDetailsResponse {
+  volume_id: string;
+  volume_name: string;
+  attachments: Array<{
+    attachment_id: string;
+    server_id: string;
+    server_name: string;
+    device: string;
+    host: string;
+    attached_at: string;
+  }>;
+}
+
+export interface VolumeSnapshot {
+  ID: string;
+  Name: string;
+  Description: string;
+  "Volume Name": string;
+  Status: string;
+  Size: string;
+}
+
+export type VolumeSnapshotListResponse = VolumeSnapshot[];
+
+export interface VolumeSnapshotDetails {
+  ID: string;
+  Name: string;
+  Description: string;
+  "Project Name": string;
+  Status: string;
+  "Volume ID": string;
+  "Volume Name": string;
+  "Group Snapshot": string;
+  Size: string;
+  Created: string;
+  Metadata: Record<string, unknown>;
+}
+
+export interface VolumeType {
+  ID: string;
+  Name: string;
+  Description: string;
+  Is_Public: boolean;
+}
+
+export type VolumeTypeListResponse = VolumeType[];
+
+export interface FlavorDetails {
+  id: string;
+  name: string;
+  ram: number;
+  vcpus: number;
+  disk: number;
+  ephemeral_disk: number;
+  swap: number;
+  rxtx_factor: number;
+  public: boolean;
+  disabled: boolean;
+}
+
+export interface FlavorGetDetails {
+  id: string;
+  name: string;
+  ram: number;
+  vcpus: number;
+  disk: number;
+  ephemeral_disk: number;
+  swap: number;
+  rxtx_factor: number;
+  public: boolean;
+  disabled: boolean;
+}
+
+export type FlavorListResponse = FlavorDetails[];
+
+export interface FlavorActionResponse {
+  message: string;
+  status: string;
+}
+
+export interface ImageDetails {
+  id: string;
+  name: string;
+  status: string;
+  visibility: "public" | "private" | "shared" | "community";
+  protected: boolean;
+  size?: string;
+  disk_format?: string;
+  container_format?: string;
+  created?: string;
+  updated?: string;
+}
+
+export type ImageListResponse = ImageDetails[];
+
+export interface ImageDeleteResponse {
+  message: string;
+}
+
+export interface ImageImportFromUploadResponse {
+  message: string;
+  image_id: string;
+  format: string;
+}
+
+export interface ImageImportFromUrlResponse {
+  message: string;
+  image_id: string;
+  format: string;
+}
+
+export interface ImageImportFromNameResponse
+  extends ImageImportFromUrlResponse {
+  source_url: string;
+}
+
+export interface InstanceListItem {
+  id: string;
   instance_name: string;
   image_name: string;
   ip_address: string;
@@ -36,37 +223,16 @@ interface InstanceListItem {
   task: string;
   power_state: string;
   age: string;
-  id: string;
+  floating_ip: string;
+  has_volume: boolean;
 }
 
 export type InstanceListResponse = InstanceListItem[];
 
-export interface NovaActionResponse {
-  message: string;
-}
-
-interface FlavorDetails {
-  name: string;
-  ram: string;
-  vcpus: number;
-  disk: string;
-}
-
-interface ImageDetails {
-  name: string;
-  id: string;
-}
-
-interface NetworkDetails {
+export interface NetworkDetails {
   network: string;
   ip: string;
   type: string;
-}
-
-interface VolumeDetails {
-  id: string;
-  name: string;
-  size: string;
 }
 
 export interface InstanceDetailsResponse {
@@ -98,6 +264,19 @@ export interface VMCreateResponse {
   };
 }
 
+export interface CreateFromDescriptionResponse {
+  status: "success";
+  server_id: string;
+  server_name: string;
+  image_source: string;
+  flavor: string;
+  networks: NetworkReference[];
+  security_groups: string[];
+  admin_username: string;
+  admin_password: string;
+  floating_ip: string;
+}
+
 export interface VMwareImportResponse {
   status: "success";
   image: {
@@ -112,21 +291,8 @@ export interface VMwareImportResponse {
   };
 }
 
-export interface CreateFromDescriptionResponse {
-  status: "success";
-  server_id: string;
-  server_name: string;
-  image_source: string;
-  flavor: string;
-  networks: NetworkReference[];
-  security_groups: string[];
-  admin_username: string;
-  admin_password: string;
-  floating_ip: string;
-}
-
-interface NetworkReference {
-  uuid: string;
+export interface NovaActionResponse {
+  message: string;
 }
 
 interface ResourceFlavor {
@@ -167,7 +333,59 @@ export interface ResourcesResponse {
   security_groups: ResourceSecurityGroup[];
 }
 
-interface Project {
+export interface QemuImgCheckResponse {
+  installed: boolean;
+  version?: string;
+}
+
+export interface SecurityGroup {
+  Name: string;
+  "Security Group ID": string;
+  Description: string;
+  Shared: boolean;
+}
+
+export type SecurityGroupListResponse = SecurityGroup[];
+
+export interface SecurityGroupCreateResponse {
+  id: string;
+  name: string;
+  description: string;
+  project_id?: string;
+}
+
+export interface SecurityGroupDeleteResponse {
+  message: string;
+}
+
+export interface SecurityGroupRule {
+  ID: string;
+  Direction: string;
+  "Ether Type": string;
+  "IP Protocol": string;
+  "Port Range": string;
+  "Remote IP Prefix": string;
+  "Remote Security Group": string;
+  Description: string;
+}
+
+export type SecurityGroupRuleListResponse = {
+  "Security Group": string;
+  "Security Group ID": string;
+  Rules: SecurityGroupRule[];
+};
+
+export interface SecurityGroupRuleCreateResponse {
+  id: string;
+  security_group_id: string;
+  message?: string;
+}
+
+export interface SecurityGroupRuleDeleteResponse {
+  message: string;
+}
+
+export interface Project {
   id: string;
   name: string;
   description: string;
@@ -230,7 +448,7 @@ export interface UserCreateResponse {
   name: string;
 }
 
-interface User {
+export interface User {
   id: string;
   name: string;
   project: string;
@@ -254,23 +472,50 @@ export interface UserDeleteResponse {
   message: string;
 }
 
-interface Role {
+export interface Role {
   id: string;
   name: string;
 }
 
 export type RolesResponse = Role[];
 
-export interface ImageImportFromUrlResponse {
-  message: string;
-  image_id: string;
-  format: string;
+export interface DebugRoleAssignmentsResponse {
+  user_id: string;
+  assignments: Array<{
+    project_id: string;
+    project_name?: string;
+    roles: string[];
+  }>;
 }
 
-export interface ImageImportFromNameResponse
-  extends ImageImportFromUrlResponse {
-  source_url: string;
+export interface NetworkListItem {
+  id: string;
+  name: string;
+  status: string;
+  is_external: boolean;
+  shared: boolean;
+  subnets: string[];
 }
+
+export type NetworkListResponse = NetworkListItem[];
+
+export interface NetworkCreateResponse {
+  message: string;
+}
+
+export interface RouterCreateResponse {
+  id: string;
+  name: string;
+}
+
+export interface RouterAddInterfaceResponse {
+  message: string;
+}
+
+export interface NetworkDeleteResponse {
+  message: string;
+}
+
 interface PlatformInfo {
   nodes: number;
   projects: number;
@@ -281,16 +526,12 @@ interface PlatformInfo {
 interface InstanceResources {
   total: number;
   ACTIVE: number;
-  SHUTOFF: number;
-  ERROR: number;
   OTHERS: number;
 }
 
 interface VolumeResources {
   total: number;
   available: number;
-  "in-use": number;
-  error?: number;
   OTHERS: number;
 }
 
@@ -337,37 +578,8 @@ export interface DashboardOverviewResponse {
   network_services: NetworkService[];
 }
 
-interface NetworkListItem {
-  id: string;
-  name: string;
+export interface ScaleHealthResponse {
   status: string;
-  is_external: boolean;
-  shared: boolean;
-  subnets: string[];
-}
-
-export type NetworkListResponse = NetworkListItem[];
-
-export interface NetworkCreateResponse {
-  message: string;
-}
-
-export interface RouterCreateResponse {
-  id: string;
-  name: string;
-}
-
-export interface RouterAddInterfaceResponse {
-  message: string;
-}
-
-export interface NetworkDeleteResponse {
-  message: string;
-}
-
-export interface QemuImgCheckResponse {
-  installed: boolean;
-  version?: string;
 }
 
 export interface ScaleNodeResponse {
@@ -378,20 +590,57 @@ export interface ScaleNodeResponse {
   logs?: string;
 }
 
-export interface ScaleHealthResponse {
+export interface SecurityGroupActionResponse {
+  message: string;
   status: string;
 }
 
-export interface SendTestEmailResponse {
-  message: string;
-  to: string;
+export interface KeyPairs {
+  name: string;
+  type: string;
 }
 
-export interface DebugRoleAssignmentsResponse {
-  user_id: string;
-  assignments: Array<{
-    project_id: string;
-    project_name?: string;
-    roles: string[];
-  }>;
+export type KeyPairListResponse = KeyPairs[];
+
+export interface KeyPairDetails {
+  name: string;
+  type: string;
+  fingerprint: string;
+  public_key: string;
+}
+
+export interface KeyPairCreateResponse {
+  message: string;
+  keypair: KeyPairs;
+  private_key?: string;
+}
+
+export interface KeyPairImportResponse {
+  message: string;
+  keypair: KeyPairs;
+}
+
+export interface KeyPairDeleteResponse {
+  message: string;
+  status: string;
+}
+
+// Cluster responses (schemas not explicitly defined in OpenAPI; keep generic)
+export interface ClusterActionResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
+export type ClusterListResponse = unknown;
+
+export type ClusterDetailsResponse = unknown;
+
+export interface ClusterDashboardTokenResponse {
+  token?: string;
+  [key: string]: unknown;
+}
+
+export interface RemoveSshKeyResponse {
+  message?: string;
+  [key: string]: unknown;
 }

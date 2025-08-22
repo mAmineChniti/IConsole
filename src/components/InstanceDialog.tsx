@@ -13,7 +13,6 @@ import type { InstanceDetailsResponse } from "@/types/ResponseInterfaces";
 import {
   HardDrive,
   Key,
-  // Loader2,
   MapPin,
   MemoryStick,
   Network,
@@ -34,7 +33,7 @@ export function InstanceDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border border-border shadow-lg rounded-xl left-[calc(50%+8rem)] translate-x-[-50%]">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between pr-8">
+          <DialogTitle className="flex justify-between items-center pr-8">
             <span className="text-xl font-semibold">{instance?.name}</span>
             {instance?.status && (
               <InstanceStatusBadge status={instance.status} />
@@ -43,34 +42,34 @@ export function InstanceDialog({
         </DialogHeader>
 
         {instance && (
-          <div className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-[color:var(--chart-2)]/20">
-                    <HardDrive className="h-4 w-4 text-[color:var(--chart-2)]" />
+                <div className="flex gap-1.5 items-center">
+                  <span className="inline-flex justify-center items-center w-7 h-7 rounded-md bg-[color:var(--chart-2)]/20">
+                    <HardDrive className="w-4 h-4 text-[color:var(--chart-2)]" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Image
                   </p>
                 </div>
                 <div className="pl-6">
-                  <p className="text-base font-medium text-card-foreground break-words">
+                  <p className="text-base font-medium break-words text-card-foreground">
                     {instance.image.name}
                   </p>
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-gray-200 dark:bg-gray-800">
-                    <Server className="h-4 w-4 text-gray-500 dark:text-gray-300" />
+                <div className="flex gap-1.5 items-center">
+                  <span className="inline-flex justify-center items-center w-7 h-7 bg-gray-200 rounded-md dark:bg-gray-800">
+                    <Server className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Project ID
                   </p>
                 </div>
                 <div className="pl-6">
-                  <p className="text-sm font-mono text-card-foreground break-all">
+                  <p className="font-mono text-sm break-all text-card-foreground">
                     {instance.project_id}
                   </p>
                 </div>
@@ -79,11 +78,11 @@ export function InstanceDialog({
 
             <Separator />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-green-100 dark:bg-green-900/30">
-                    <Network className="h-4 w-4 text-green-500 dark:text-green-400" />
+                <div className="flex gap-1.5 items-center">
+                  <span className="inline-flex justify-center items-center w-7 h-7 bg-green-100 rounded-md dark:bg-green-900/30">
+                    <Network className="w-4 h-4 text-green-500 dark:text-green-400" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Networks
@@ -92,7 +91,7 @@ export function InstanceDialog({
                 <div className="pl-6 space-y-2">
                   {instance.networks.map((network, index) => (
                     <div key={index} className="text-sm">
-                      <p className="font-mono text-card-foreground break-all">
+                      <p className="font-mono break-all text-card-foreground">
                         {network.ip}
                       </p>
                       <p className="text-muted-foreground">
@@ -103,9 +102,9 @@ export function InstanceDialog({
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-[color:var(--chart-1)]/20">
-                    <Timer className="h-4 w-4 text-[color:var(--chart-1)]" />
+                <div className="flex gap-1.5 items-center">
+                  <span className="inline-flex justify-center items-center w-7 h-7 rounded-md bg-[color:var(--chart-1)]/20">
+                    <Timer className="w-4 h-4 text-[color:var(--chart-1)]" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Created
@@ -116,8 +115,7 @@ export function InstanceDialog({
                     {calculateAge(instance.created_at)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(instance.created_at).toLocaleDateString()}
-                    {new Date(instance.created_at).toLocaleTimeString()}
+                    {new Date(instance.created_at).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -125,26 +123,26 @@ export function InstanceDialog({
 
             <Separator />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-pink-100 dark:bg-pink-900/30">
-                    <MapPin className="h-4 w-4 text-pink-500 dark:text-pink-400" />
+                <div className="flex gap-1.5 items-center">
+                  <span className="inline-flex justify-center items-center w-7 h-7 bg-pink-100 rounded-md dark:bg-pink-900/30">
+                    <MapPin className="w-4 h-4 text-pink-500 dark:text-pink-400" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Host
                   </p>
                 </div>
                 <div className="pl-6">
-                  <p className="text-base font-medium text-card-foreground break-words">
+                  <p className="text-base font-medium break-words text-card-foreground">
                     {instance.host}
                   </p>
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-purple-100 dark:bg-purple-900/30">
-                    <Key className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+                <div className="flex gap-1.5 items-center">
+                  <span className="inline-flex justify-center items-center w-7 h-7 bg-purple-100 rounded-md dark:bg-purple-900/30">
+                    <Key className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Security Groups
@@ -172,10 +170,10 @@ export function InstanceDialog({
               </div>
             </div>
 
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex items-center gap-1.5 mb-3">
-                <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-purple-100 dark:bg-purple-900/30">
-                  <MemoryStick className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+            <div className="p-4 rounded-lg bg-muted">
+              <div className="flex gap-1.5 items-center mb-3">
+                <span className="inline-flex justify-center items-center w-7 h-7 bg-purple-100 rounded-md dark:bg-purple-900/30">
+                  <MemoryStick className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                 </span>
                 <p className="text-sm font-medium text-muted-foreground">
                   Flavor Details
@@ -209,10 +207,10 @@ export function InstanceDialog({
             </div>
 
             {instance.volumes && instance.volumes.length > 0 && (
-              <div className="bg-muted rounded-lg p-4">
-                <div className="flex items-center gap-1.5 mb-3">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-[color:var(--chart-2)]/20">
-                    <HardDrive className="h-4 w-4 text-[color:var(--chart-2)]" />
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="flex gap-1.5 items-center mb-3">
+                  <span className="inline-flex justify-center items-center w-7 h-7 rounded-md bg-[color:var(--chart-2)]/20">
+                    <HardDrive className="w-4 h-4 text-[color:var(--chart-2)]" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Attached Volumes
@@ -222,10 +220,10 @@ export function InstanceDialog({
                   {instance.volumes.map((volume, index) => (
                     <div key={index} className="text-sm">
                       <p className="font-medium text-card-foreground">
-                        {volume.name}
+                        {volume.Name}
                       </p>
                       <p className="text-muted-foreground">
-                        Size: {volume.size}
+                        Size: {volume.Size}
                       </p>
                     </div>
                   ))}
@@ -234,10 +232,10 @@ export function InstanceDialog({
             )}
 
             {instance.floating_ips.length > 0 && (
-              <div className="bg-muted rounded-lg p-4">
-                <div className="flex items-center gap-1.5 mb-3">
-                  <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-green-100 dark:bg-green-900/30">
-                    <Network className="h-4 w-4 text-green-500 dark:text-green-400" />
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="flex gap-1.5 items-center mb-3">
+                  <span className="inline-flex justify-center items-center w-7 h-7 bg-green-100 rounded-md dark:bg-green-900/30">
+                    <Network className="w-4 h-4 text-green-500 dark:text-green-400" />
                   </span>
                   <p className="text-sm font-medium text-muted-foreground">
                     Floating IPs
@@ -247,7 +245,7 @@ export function InstanceDialog({
                   {instance.floating_ips.map((ip, index) => (
                     <p
                       key={index}
-                      className="text-base font-medium text-card-foreground font-mono break-all"
+                      className="font-mono text-base font-medium break-all text-card-foreground"
                     >
                       {ip}
                     </p>
