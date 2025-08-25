@@ -23,7 +23,7 @@ export function InstanceActions({
   const queryClient = useQueryClient();
 
   const startMutation = useMutation({
-    mutationFn: (id: string) => InfraService.startInstance(id),
+    mutationFn: (id: string) => InfraService.startInstance({ server_id: id }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["instances", "details"],
@@ -42,7 +42,7 @@ export function InstanceActions({
   });
 
   const stopMutation = useMutation({
-    mutationFn: (id: string) => InfraService.stopInstance(id),
+    mutationFn: (id: string) => InfraService.stopInstance({ server_id: id }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["instances", "details"],
@@ -61,7 +61,7 @@ export function InstanceActions({
   });
 
   const rebootMutation = useMutation({
-    mutationFn: (id: string) => InfraService.rebootInstance(id),
+    mutationFn: (id: string) => InfraService.rebootInstance({ server_id: id }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["instances", "details"],
@@ -80,7 +80,7 @@ export function InstanceActions({
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => InfraService.deleteInstance(id),
+    mutationFn: (id: string) => InfraService.deleteInstance({ server_id: id }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["instances", "details"],
@@ -104,7 +104,7 @@ export function InstanceActions({
   const canReboot = status === "ACTIVE" && !isDisabled;
 
   return (
-    <div className="flex flex-wrap justify-center gap-2 gap-y-2 pt-4 mt-4 border-t border-border w-full max-w-full overflow-x-auto sm:flex-nowrap">
+    <div className="flex overflow-x-auto flex-wrap gap-2 gap-y-2 justify-center pt-4 mt-4 w-full max-w-full border-t sm:flex-nowrap border-border">
       {canStart && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -116,10 +116,10 @@ export function InstanceActions({
               disabled={startMutation.isPending || isDisabled}
               size="sm"
               variant="outline"
-              className="group rounded-full transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer"
+              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
             >
-              <Power className="h-4 w-4 mr-1 group-hover:text-accent-foreground transition-colors duration-200" />
-              <span className="group-hover:text-accent-foreground transition-colors duration-200">
+              <Power className="mr-1 w-4 h-4 transition-colors duration-200 group-hover:text-accent-foreground" />
+              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
                 Start
               </span>
             </Button>
@@ -139,10 +139,10 @@ export function InstanceActions({
               disabled={stopMutation.isPending || isDisabled}
               size="sm"
               variant="outline"
-              className="group rounded-full transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer"
+              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
             >
-              <PowerOff className="h-4 w-4 mr-1 group-hover:text-accent-foreground transition-colors duration-200" />
-              <span className="group-hover:text-accent-foreground transition-colors duration-200">
+              <PowerOff className="mr-1 w-4 h-4 transition-colors duration-200 group-hover:text-accent-foreground" />
+              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
                 Stop
               </span>
             </Button>
@@ -162,10 +162,10 @@ export function InstanceActions({
               disabled={rebootMutation.isPending || isDisabled}
               size="sm"
               variant="outline"
-              className="group rounded-full transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer"
+              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
             >
-              <RotateCcw className="h-4 w-4 mr-1 group-hover:text-accent-foreground group-hover:rotate-180 transition-all duration-300" />
-              <span className="group-hover:text-accent-foreground transition-colors duration-200">
+              <RotateCcw className="mr-1 w-4 h-4 transition-all duration-300 group-hover:rotate-180 group-hover:text-accent-foreground" />
+              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
                 Reboot
               </span>
             </Button>
@@ -184,9 +184,9 @@ export function InstanceActions({
             disabled={deleteMutation.isPending || isDisabled}
             size="sm"
             variant="destructive"
-            className="group rounded-full transition-all duration-200 bg-destructive text-destructive-foreground border-border cursor-pointer"
+            className="rounded-full transition-all duration-200 cursor-pointer group bg-destructive text-destructive-foreground border-border"
           >
-            <Trash2 className="h-4 w-4 mr-1 text-white transition-colors duration-200" />
+            <Trash2 className="mr-1 w-4 h-4 text-white transition-colors duration-200" />
             <span className="text-white transition-colors duration-200">
               Delete
             </span>

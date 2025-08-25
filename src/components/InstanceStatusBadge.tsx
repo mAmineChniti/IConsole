@@ -28,7 +28,7 @@ export function InstanceStatusBadge({ status }: { status: string }) {
       )}
     >
       {status === "BUILD" ? (
-        <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
+        <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
       ) : (
         <div
           className={cn(
