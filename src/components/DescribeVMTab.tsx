@@ -9,13 +9,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { CreateFromDescriptionRequest } from "@/types/RequestInterfaces";
 import { CreateFromDescriptionRequestSchema } from "@/types/RequestSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { pipeline, read_audio } from "@huggingface/transformers";
 import { Languages, Loader2, Mic, MicOff, Send, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import SpeechRecognition, {
   useSpeechRecognition,
@@ -29,7 +30,7 @@ export function DescribeVMTab({
   onCreateVM,
   isCreating,
 }: {
-  onCreateVM: (description: string) => void;
+  onCreateVM: (data: CreateFromDescriptionRequest) => void;
   isCreating: boolean;
 }) {
   const [language, setLanguage] = useState<"en-US" | "fr-FR">("en-US");
@@ -39,6 +40,7 @@ export function DescribeVMTab({
   const mediaRecorderRef = useRef<MediaRecorder | undefined>(undefined);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | undefined>(undefined);
+  const preListenDescriptionRef = useRef<string>("");
   const WHISPER_MODEL_ID = "Xenova/whisper-base";
 
   const {
@@ -111,28 +113,34 @@ export function DescribeVMTab({
 
   const form = useForm<CreateFromDescriptionRequest>({
     resolver: zodResolver(CreateFromDescriptionRequestSchema),
-    defaultValues: { description: "" },
+    defaultValues: {
+      description: "",
+      vm_name: "",
+      timeout: 300,
+    },
     mode: "onChange",
   });
 
   const description = form.watch("description");
-  const setDescription = useCallback(
-    (val: string) => {
-      form.setValue("description", val, { shouldValidate: true });
-    },
-    [form],
-  );
 
   useEffect(() => {
     if (browserSupportsSpeechRecognition && !isFirefox && listening) {
-      setDescription(transcript);
+      if (!preListenDescriptionRef.current) {
+        preListenDescriptionRef.current = form.getValues("description");
+      }
+      const base = preListenDescriptionRef.current || "";
+      form.setValue(
+        "description",
+        [base, transcript].filter(Boolean).join(" ").trim(),
+        { shouldValidate: true },
+      );
     }
   }, [
     transcript,
     listening,
     browserSupportsSpeechRecognition,
     isFirefox,
-    setDescription,
+    form,
   ]);
 
   useEffect(() => {
@@ -264,7 +272,12 @@ export function DescribeVMTab({
             }
 
             if (text) {
-              setDescription((description ? description + " " : "") + text);
+              const previous = form.getValues("description") || "";
+              form.setValue(
+                "description",
+                [previous, text].filter(Boolean).join(" ").trim(),
+                { shouldValidate: true },
+              );
             } else {
               toast.error("No text recognized");
             }
@@ -313,30 +326,31 @@ export function DescribeVMTab({
   };
 
   const clearInput = async () => {
-    setDescription("");
+    form.setValue("description", "", { shouldValidate: true });
     resetTranscript();
   };
 
-  const handleSubmit = (values: CreateFromDescriptionRequest) => {
-    if (values.description.trim()) {
-      onCreateVM(values.description.trim());
+  const handleSubmit = (data: CreateFromDescriptionRequest) => {
+    const { vm_name, description } = data;
+    if (vm_name && description) {
+      onCreateVM({ vm_name, description });
     }
   };
 
   useEffect(() => {
     if (!listening && browserSupportsSpeechRecognition && !isFirefox) {
     } else if (!listening && transcript) {
-      setDescription((description ? description + " " : "") + transcript);
+      preListenDescriptionRef.current = "";
       resetTranscript();
     }
   }, [
     description,
     listening,
     resetTranscript,
-    setDescription,
     transcript,
     browserSupportsSpeechRecognition,
     isFirefox,
+    form,
   ]);
 
   useEffect(() => {
@@ -357,7 +371,7 @@ export function DescribeVMTab({
   }, []);
 
   return (
-    <div className="mx-auto max-w-2xl rounded-2xl border bg-background p-6 shadow-sm">
+    <div className="p-6 mx-auto max-w-2xl rounded-2xl border shadow-sm bg-background">
       <div className="mb-6 text-center">
         <h2 className="text-2xl font-semibold text-foreground">
           {LANG[language].title}
@@ -375,7 +389,7 @@ export function DescribeVMTab({
                 variant={
                   listening || transformersListening ? "destructive" : "default"
                 }
-                className="rounded-full flex-1 min-w-[160px] cursor-pointer transition-none"
+                className="flex-1 rounded-full transition-none cursor-pointer min-w-[160px]"
                 disabled={
                   isCreating ||
                   !isSpeechSupported ||
@@ -397,7 +411,7 @@ export function DescribeVMTab({
                       <Mic className="w-5 h-5" />
                     )}
                   </span>
-                  <span className="ml-2 text-base min-w-[110px] text-left select-none">
+                  <span className="ml-2 text-base text-left select-none min-w-[110px]">
                     {!isSpeechSupported
                       ? LANG[language].mic.notSupported
                       : listening || transformersListening
@@ -410,11 +424,11 @@ export function DescribeVMTab({
                 type="button"
                 onClick={toggleLanguage}
                 variant="outline"
-                className="rounded-full min-w-[80px] cursor-pointer"
+                className="rounded-full cursor-pointer min-w-[80px]"
                 disabled={isCreating}
                 aria-label={LANG[language].langAria}
               >
-                <Languages className="h-5 w-5" />
+                <Languages className="w-5 h-5" />
                 <span className="ml-2 font-medium">
                   {LANG[language].langBtn}
                 </span>
@@ -424,7 +438,7 @@ export function DescribeVMTab({
               type="button"
               onClick={clearInput}
               variant="ghost"
-              className="rounded-full min-w-[100px] cursor-pointer"
+              className="rounded-full cursor-pointer min-w-[100px]"
               disabled={
                 isCreating ||
                 listening ||
@@ -432,11 +446,29 @@ export function DescribeVMTab({
                 isTransformersLoading
               }
             >
-              <Trash2 className="h-5 w-5" />
+              <Trash2 className="w-5 h-5" />
               <span className="ml-2">{LANG[language].clear}</span>
             </Button>
           </div>
-
+          <FormField
+            control={form.control}
+            name="vm_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>VM Name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    placeholder="Enter VM name"
+                    className="w-full text-base rounded-full"
+                    disabled={isCreating}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="description"
@@ -449,20 +481,20 @@ export function DescribeVMTab({
                       {...field}
                       placeholder={LANG[language].placeholder}
                       rows={6}
-                      className="resize-none w-full min-h-[140px] text-base p-4 border rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary"
+                      className="p-4 w-full text-base rounded-xl border resize-none focus-visible:ring-2 min-h-[140px] focus-visible:ring-ring focus-visible:border-primary"
                       disabled={isCreating}
                     />
                     {((isFirefox && transformersListening) ||
                       (!isFirefox && listening) ||
                       (isFirefox && isTransformersLoading)) && (
-                      <div className="absolute bottom-4 left-4 right-4 p-3">
+                      <div className="absolute right-4 bottom-4 left-4 p-3">
                         <div className="flex items-center">
                           <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-150"></div>
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-300"></div>
+                            <div className="w-2 h-2 rounded-full animate-bounce bg-primary"></div>
+                            <div className="w-2 h-2 rounded-full delay-150 animate-bounce bg-primary"></div>
+                            <div className="w-2 h-2 rounded-full delay-300 animate-bounce bg-primary"></div>
                           </div>
-                          <span className="ml-2 text-primary font-medium">
+                          <span className="ml-2 font-medium text-primary">
                             {isFirefox && isTransformersLoading
                               ? language === "fr-FR"
                                 ? "Traitement..."
@@ -480,7 +512,7 @@ export function DescribeVMTab({
           />
 
           {!isSpeechSupported && (
-            <div className="bg-muted border text-foreground dark:text-foreground p-4 rounded-lg">
+            <div className="p-4 rounded-lg border bg-muted text-foreground dark:text-foreground">
               <p className="font-medium">{LANG[language].speechNotSupported}</p>
               <p className="mt-1 text-sm">
                 {LANG[language].speechNotSupportedDesc}
@@ -488,19 +520,19 @@ export function DescribeVMTab({
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+          <div className="flex flex-col gap-2 justify-between items-center sm:flex-row">
             <div className="text-xs text-muted-foreground">
               {LANG[language].works}
             </div>
             <Button
               type="submit"
               disabled={isCreating || !description.trim()}
-              className="rounded-full px-6 py-3 font-medium shadow-sm hover:shadow-md cursor-pointer"
+              className="py-3 px-6 font-medium rounded-full shadow-sm cursor-pointer hover:shadow-md"
             >
               {isCreating ? (
-                <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                <Loader2 className="mr-2 w-5 h-5 animate-spin" />
               ) : (
-                <Send className="h-5 w-5 mr-2" />
+                <Send className="mr-2 w-5 h-5" />
               )}
               {LANG[language].submit}
             </Button>
@@ -508,9 +540,9 @@ export function DescribeVMTab({
         </form>
       </Form>
 
-      <div className="mt-8 rounded-lg border bg-muted p-4">
+      <div className="p-4 mt-8 rounded-lg border bg-muted">
         <h3 className="font-medium text-foreground">{LANG[language].howTo}</h3>
-        <ul className="mt-2 space-y-1 text-sm text-muted-foreground list-disc pl-5">
+        <ul className="pl-5 mt-2 space-y-1 text-sm list-disc text-muted-foreground">
           {LANG[language].howToList.map((item, i) => (
             <li key={i}>{item}</li>
           ))}

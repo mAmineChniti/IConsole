@@ -181,7 +181,7 @@ export function ProjectFormDialog({
       ...data,
       assignments: assignments.map((a) => ({
         user_id: a.user_id,
-        roles: a.roles,
+        roles: a.roles ?? [],
       })),
     };
     createMutation.mutate(createPayload);
@@ -193,12 +193,12 @@ export function ProjectFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card text-card-foreground border border-border shadow-lg rounded-xl mx-4 sm:mx-auto max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="overflow-y-auto mx-4 max-w-3xl rounded-xl border shadow-lg sm:mx-auto bg-card text-card-foreground border-border max-h-[90vh]">
         <DialogHeader className="space-y-3">
           <DialogTitle className="text-lg text-card-foreground">
             {isEditing ? "Edit Project" : "Create New Project"}
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
+          <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
             {isEditing
               ? "Update the project details"
               : "Create a new project and assign users with roles"}
@@ -255,7 +255,7 @@ export function ProjectFormDialog({
                 control={form.control}
                 name="enabled"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-muted/30">
+                  <FormItem className="flex flex-row justify-between items-center p-3 rounded-lg border shadow-sm bg-muted/30">
                     <div className="space-y-0.5">
                       <FormLabel className="text-sm font-medium text-foreground">
                         Enabled
@@ -268,7 +268,7 @@ export function ProjectFormDialog({
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
-                        className="border-border bg-background cursor-pointer"
+                        className="cursor-pointer border-border bg-background"
                       />
                     </FormControl>
                   </FormItem>
@@ -280,8 +280,8 @@ export function ProjectFormDialog({
               <>
                 <Separator />
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-foreground" />
+                  <div className="flex gap-2 items-center">
+                    <Users className="w-5 h-5 text-foreground" />
                     <h3 className="text-lg font-semibold text-card-foreground">
                       User Assignments
                     </h3>
@@ -290,15 +290,15 @@ export function ProjectFormDialog({
                     Assign users to this project and define their roles
                   </p>
 
-                  <Card className="bg-card text-card-foreground border border-border shadow-md rounded-xl">
+                  <Card className="rounded-xl border shadow-md bg-card text-card-foreground border-border">
                     <CardHeader>
-                      <CardTitle className="text-base flex items-center gap-2 text-card-foreground">
-                        <UserPlus className="h-4 w-4 text-foreground" />
+                      <CardTitle className="flex gap-2 items-center text-base text-card-foreground">
+                        <UserPlus className="w-4 h-4 text-foreground" />
                         Add User Assignment
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                             Select User
@@ -314,7 +314,7 @@ export function ProjectFormDialog({
                             value={selectedUser}
                             onValueChange={setSelectedUser}
                           >
-                            <ComboboxTrigger className="w-full cursor-pointer rounded-full bg-input text-foreground border-border" />
+                            <ComboboxTrigger className="w-full rounded-full cursor-pointer bg-input text-foreground border-border" />
                             <ComboboxContent
                               popoverOptions={{
                                 className:
@@ -323,11 +323,11 @@ export function ProjectFormDialog({
                             >
                               <ComboboxInput
                                 placeholder="Search users..."
-                                className="border-0 rounded-none px-3 py-2 text-sm text-foreground focus:ring-0 focus:ring-offset-0 focus:outline-none"
+                                className="py-2 px-3 text-sm rounded-none border-0 focus:ring-0 focus:ring-offset-0 focus:outline-none text-foreground"
                               />
-                              <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
+                              <ComboboxList className="overflow-y-auto p-1 max-h-[200px]">
                                 {loadingUsers ? (
-                                  <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
+                                  <div className="py-2 px-3 text-sm text-slate-500 dark:text-slate-400">
                                     Loading users...
                                   </div>
                                 ) : availableUsers.length > 0 ? (
@@ -336,7 +336,7 @@ export function ProjectFormDialog({
                                       key={user.id}
                                       value={user.id}
                                       keywords={[user.name]}
-                                      className="px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground text-foreground rounded-full mx-1 transition-colors"
+                                      className="py-2 px-3 mx-1 text-sm rounded-full transition-colors cursor-pointer text-foreground hover:bg-accent hover:text-accent-foreground"
                                     >
                                       {user.name}
                                     </ComboboxItem>
@@ -353,9 +353,9 @@ export function ProjectFormDialog({
                           <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                             Select Roles
                           </Label>
-                          <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto p-3 border border-border rounded-md text-foreground">
+                          <div className="grid overflow-y-auto grid-cols-1 gap-2 p-3 max-h-32 rounded-md border border-border text-foreground">
                             {loadingRoles ? (
-                              <div className="text-center text-sm text-muted-foreground">
+                              <div className="text-sm text-center text-muted-foreground">
                                 Loading roles...
                               </div>
                             ) : (
@@ -396,9 +396,9 @@ export function ProjectFormDialog({
                         type="button"
                         onClick={handleAddUserAssignment}
                         disabled={!selectedUser || selectedRoles.length === 0}
-                        className="w-full rounded-full bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer group transition-all duration-200"
+                        className="w-full rounded-full transition-all duration-200 cursor-pointer bg-primary text-primary-foreground group hover:bg-accent hover:text-accent-foreground"
                       >
-                        <UserPlus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                        <UserPlus className="mr-2 w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
                         Add User Assignment
                       </Button>
                     </CardContent>
@@ -413,21 +413,23 @@ export function ProjectFormDialog({
                         {assignments.map((assignment) => (
                           <Card
                             key={assignment.user_id}
-                            className="bg-card text-card-foreground border border-border shadow rounded-xl"
+                            className="rounded-xl border shadow bg-card text-card-foreground border-border"
                           >
                             <CardContent className="p-4">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
+                              <div className="flex justify-between items-center">
+                                <div className="flex gap-3 items-center">
                                   <div className="flex flex-wrap gap-1 mt-1">
-                                    {assignment.roles.map((role: string) => (
-                                      <Badge
-                                        key={role}
-                                        variant="secondary"
-                                        className="text-xs"
-                                      >
-                                        {role}
-                                      </Badge>
-                                    ))}
+                                    {(assignment.roles ?? []).map(
+                                      (role: string) => (
+                                        <Badge
+                                          key={role}
+                                          variant="secondary"
+                                          className="text-xs"
+                                        >
+                                          {role}
+                                        </Badge>
+                                      ),
+                                    )}
                                   </div>
                                 </div>
                                 <Button
@@ -439,9 +441,9 @@ export function ProjectFormDialog({
                                       assignment.user_id,
                                     )
                                   }
-                                  className="rounded-full bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer group transition-all duration-200"
+                                  className="rounded-full transition-all duration-200 cursor-pointer bg-background text-foreground border-border group hover:bg-accent hover:text-accent-foreground"
                                 >
-                                  <X className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                                  <X className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
                                 </Button>
                               </div>
                             </CardContent>
@@ -454,23 +456,23 @@ export function ProjectFormDialog({
               </>
             )}
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+            <div className="flex flex-col gap-3 justify-end pt-4 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="rounded-full bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer group transition-all duration-200 w-full sm:w-auto order-2 sm:order-1"
+                className="order-2 w-full rounded-full transition-all duration-200 cursor-pointer sm:order-1 sm:w-auto bg-background text-foreground border-border group hover:bg-accent hover:text-accent-foreground"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="rounded-full bg-primary text-primary-foreground cursor-pointer group transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
+                className="order-1 w-full rounded-full transition-all duration-200 cursor-pointer sm:order-2 sm:w-auto bg-primary text-primary-foreground group"
               >
                 {createMutation.isPending || updateMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                     <span className="truncate">
                       {isEditing ? "Updating..." : "Creating..."}
                     </span>

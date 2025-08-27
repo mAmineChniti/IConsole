@@ -1,6 +1,8 @@
 "use client";
 
+import { EmptyState } from "@/components/EmptyState";
 import { ErrorCard } from "@/components/ErrorCard";
+import { HeaderActions } from "@/components/HeaderActions";
 import { InstanceActions } from "@/components/InstanceActions";
 import { InstanceDialog } from "@/components/InstanceDialog";
 import { InstanceStatusBadge } from "@/components/InstanceStatusBadge";
@@ -8,26 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { VM } from "@/components/VM";
+import { XSearch } from "@/components/XSearch";
 import { InfraService } from "@/lib/requests";
-import { calculateAge, cn } from "@/lib/utils";
+import { calculateAge } from "@/lib/utils";
 import type { InstanceDetailsResponse } from "@/types/ResponseInterfaces";
 import { useQuery } from "@tanstack/react-query";
-import {
-  HardDrive,
-  MemoryStick,
-  Network,
-  Plus,
-  RefreshCw,
-  Server,
-  Timer,
-} from "lucide-react";
-import { useState } from "react";
+import { HardDrive, MemoryStick, Network, Server, Timer } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function Instances() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -36,6 +26,8 @@ export function Instances() {
   >(undefined);
   const [visibleCount, setVisibleCount] = useState(6);
   const [showVM, setShowVM] = useState(false);
+  const [search, setSearch] = useState("");
+  useEffect(() => setVisibleCount(6), [search]);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery<
     InstanceDetailsResponse[]
@@ -49,8 +41,23 @@ export function Instances() {
   });
 
   const safeData = data ?? [];
-  const totalItems = safeData.length;
-  const visibleData = safeData.slice(0, visibleCount);
+  const q = search.trim().toLowerCase();
+  const filteredInstances = q
+    ? safeData.filter((inst) => {
+        const fields = [
+          inst.name,
+          inst.image?.name,
+          inst.flavor?.name,
+          inst.status,
+          inst.networks?.[0]?.ip,
+        ]
+          .filter(Boolean)
+          .map((s) => String(s).toLowerCase());
+        return fields.some((f) => f.includes(q));
+      })
+    : safeData;
+  const totalItems = filteredInstances.length;
+  const visibleData = filteredInstances.slice(0, visibleCount);
   const hasMore = visibleCount < totalItems;
 
   const handleShowMore = () => {
@@ -63,67 +70,67 @@ export function Instances() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 px-2 sm:px-0">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-          <Skeleton className="h-4 w-40" />
-          <div className="flex gap-3 items-center justify-end w-full sm:w-auto">
-            <Skeleton className="h-9 w-9 rounded-full" />
-            <Skeleton className="h-10 w-40 rounded-full" />
+      <div className="px-2 space-y-6 sm:px-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
+          <Skeleton className="w-40 h-4" />
+          <div className="flex gap-3 justify-end items-center w-full sm:w-auto">
+            <Skeleton className="w-9 h-9 rounded-full" />
+            <Skeleton className="w-40 h-10 rounded-full" />
           </div>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl cursor-pointer"
+              className="rounded-xl border shadow-lg cursor-pointer bg-card text-card-foreground border-border/50"
             >
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <Skeleton className="h-6 w-32 rounded" />
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-6 w-20 rounded-full" />
-                    <Skeleton className="h-6 w-12 rounded-full" />
+                <div className="flex justify-between items-center">
+                  <Skeleton className="w-32 h-6 rounded" />
+                  <div className="flex gap-2 items-center">
+                    <Skeleton className="w-20 h-6 rounded-full" />
+                    <Skeleton className="w-12 h-6 rounded-full" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="flex flex-col gap-3 mt-2">
-                  <div className="flex flex-row items-center gap-3">
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <Skeleton className="h-7 w-7 rounded-md" />
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <Skeleton className="h-3 w-12 mb-1" />
-                          <Skeleton className="h-4 w-24" />
+                  <div className="flex flex-row gap-3 items-center">
+                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                      <div className="flex gap-2 items-center w-full">
+                        <Skeleton className="w-7 h-7 rounded-md" />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <Skeleton className="mb-1 w-12 h-3" />
+                          <Skeleton className="w-24 h-4" />
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <Skeleton className="h-7 w-7 rounded-md" />
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <Skeleton className="h-3 w-12 mb-1" />
-                          <Skeleton className="h-4 w-20" />
+                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                      <div className="flex gap-2 items-center w-full">
+                        <Skeleton className="w-7 h-7 rounded-md" />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <Skeleton className="mb-1 w-12 h-3" />
+                          <Skeleton className="w-20 h-4" />
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row items-center gap-3">
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <Skeleton className="h-7 w-7 rounded-md" />
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <Skeleton className="h-3 w-8 mb-1" />
-                          <Skeleton className="h-4 w-28" />
+                  <div className="flex flex-row gap-3 items-center">
+                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                      <div className="flex gap-2 items-center w-full">
+                        <Skeleton className="w-7 h-7 rounded-md" />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <Skeleton className="mb-1 w-8 h-3" />
+                          <Skeleton className="w-28 h-4" />
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <Skeleton className="h-7 w-7 rounded-md" />
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <Skeleton className="h-3 w-12 mb-1" />
-                          <Skeleton className="h-4 w-16" />
+                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                      <div className="flex gap-2 items-center w-full">
+                        <Skeleton className="w-7 h-7 rounded-md" />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <Skeleton className="mb-1 w-12 h-3" />
+                          <Skeleton className="w-16 h-4" />
                         </div>
                       </div>
                     </div>
@@ -134,7 +141,7 @@ export function Instances() {
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="h-9 w-40 rounded-full" />
+          <Skeleton className="w-40 h-9 rounded-full" />
         </div>
       </div>
     );
@@ -155,48 +162,16 @@ export function Instances() {
 
   if (!safeData || safeData.length === 0) {
     return (
-      <div className="space-y-6">
-        <Card className="bg-card text-card-foreground border border-border shadow-lg rounded-xl">
-          <CardContent className="p-8 text-center">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="p-3 bg-muted rounded-full">
-                <Server className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-foreground">
-                  No Instances Found
-                </h3>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  You don&apos;t have any instances yet. Create your first
-                  instance to get started.
-                </p>
-              </div>
-              <Button
-                onClick={() => refetch()}
-                disabled={isFetching}
-                variant="outline"
-                className="mt-4 rounded-full group transition-all duration-200 bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
-              >
-                {isFetching ? (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin group-hover:text-accent-foreground" />
-                    <span className="group-hover:text-accent-foreground">
-                      Refreshing...
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 group-hover:text-accent-foreground" />
-                    <span className="group-hover:text-accent-foreground">
-                      Refresh
-                    </span>
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <EmptyState
+        title="No instances found"
+        text="You don't have any instances yet. Create your first instance to get started."
+        onRefresh={() => refetch()}
+        refreshing={isFetching}
+        primaryLabel="Create Instance"
+        onPrimary={() => setShowVM(true)}
+        icon={<Server className="w-7 h-7 text-muted-foreground" />}
+        variant="dashed"
+      />
     );
   }
 
@@ -207,8 +182,8 @@ export function Instances() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-        <div className="text-sm text-muted-foreground leading-relaxed">
+      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
+        <div className="text-sm leading-relaxed text-muted-foreground">
           {totalItems} instance{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -217,150 +192,150 @@ export function Instances() {
             </>
           )}
         </div>
-        <div className="flex gap-3 items-center justify-end w-full sm:w-auto">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetch()}
-                disabled={isFetching}
-                className="h-9 w-9 p-0 rounded-full bg-card text-card-foreground border border-border/50 transition-all duration-200 cursor-pointer"
-              >
-                <RefreshCw
-                  className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    isFetching && "animate-spin",
-                  )}
-                />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Refresh instances list</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="sm"
-                onClick={() => setShowVM(true)}
-                className="gap-2 px-4 rounded-full font-semibold shadow-md bg-primary text-primary-foreground transition-all duration-300 cursor-pointer"
-              >
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Create Instance</span>
-                <span className="sm:hidden">New</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add a new instance</TooltipContent>
-          </Tooltip>
+        <HeaderActions
+          onRefresh={() => refetch()}
+          isRefreshing={isFetching}
+          refreshTooltip="Refresh instances list"
+          refreshAriaLabel="Refresh instances list"
+          mainButton={{
+            onClick: () => setShowVM(true),
+            label: "Create Instance",
+            shortLabel: "New",
+            tooltip: "Add a new instance",
+          }}
+        />
+      </div>
+
+      <div className="flex-1 max-w-full sm:max-w-md">
+        <XSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Search instances..."
+          aria-label="Search instances"
+        />
+      </div>
+
+      {totalItems === 0 ? (
+        <div className="flex justify-center items-center p-8 text-center rounded-2xl border text-muted-foreground min-h-32">
+          No instances match your search.
         </div>
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {visibleData.map((instance) => (
-          <Card
-            key={instance.id}
-            className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl cursor-pointer"
-            onClick={() => handleCardClick(instance)}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-card-foreground truncate">
-                  {instance.name}
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <InstanceStatusBadge status={instance.status} />
-                  {instance.locked && (
-                    <Badge variant="outline" className="text-muted-foreground">
-                      Locked
-                    </Badge>
-                  )}
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {visibleData.map((instance) => (
+            <Card
+              key={instance.id}
+              className="rounded-xl border shadow-lg cursor-pointer bg-card text-card-foreground border-border/50"
+              onClick={() => handleCardClick(instance)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleCardClick(instance);
+                }
+              }}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-lg font-semibold text-card-foreground truncate">
+                    {instance.name}
+                  </CardTitle>
+                  <div className="flex gap-2 items-center">
+                    <InstanceStatusBadge status={instance.status} />
+                    {instance.locked && (
+                      <Badge
+                        variant="outline"
+                        className="text-muted-foreground"
+                      >
+                        Locked
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
+              </CardHeader>
 
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                <div className="flex flex-col gap-3 mt-2">
-                  <div className="flex flex-row items-center gap-3">
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-blue-100 dark:bg-blue-900/30">
-                          <HardDrive className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                        </span>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs text-muted-foreground font-medium">
-                            Image
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-3 mt-2">
+                    <div className="flex flex-row gap-3 items-center">
+                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                        <div className="flex gap-2 items-center w-full">
+                          <span className="inline-flex justify-center items-center w-7 h-7 bg-blue-100 rounded-md dark:bg-blue-900/30">
+                            <HardDrive className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                           </span>
-                          <span className="text-sm font-semibold text-card-foreground truncate">
-                            {instance.image.name}
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-muted-foreground">
+                              Image
+                            </span>
+                            <span className="text-sm font-semibold text-card-foreground truncate">
+                              {instance.image?.name ?? "Unknown image"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                        <div className="flex gap-2 items-center w-full">
+                          <span className="inline-flex justify-center items-center w-7 h-7 bg-purple-100 rounded-md dark:bg-purple-900/30">
+                            <MemoryStick className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                           </span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-muted-foreground">
+                              Flavor
+                            </span>
+                            <span className="text-sm font-semibold text-card-foreground truncate">
+                              {instance.flavor?.name ?? "Unknown flavor"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-purple-100 dark:bg-purple-900/30">
-                          <MemoryStick className="h-4 w-4 text-purple-500 dark:text-purple-400" />
-                        </span>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs text-muted-foreground font-medium">
-                            Flavor
+                    <div className="flex flex-row gap-3 items-center">
+                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                        <div className="flex gap-2 items-center w-full">
+                          <span className="inline-flex justify-center items-center w-7 h-7 bg-amber-100 rounded-md dark:bg-amber-900/30">
+                            <Timer className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                           </span>
-                          <span className="text-sm font-semibold text-card-foreground truncate">
-                            {instance.flavor.name}
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-muted-foreground">
+                              Age
+                            </span>
+                            <span className="text-sm font-semibold text-card-foreground truncate">
+                              {calculateAge(instance.created_at)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
+                        <div className="flex gap-2 items-center w-full">
+                          <span className="inline-flex justify-center items-center w-7 h-7 bg-green-100 rounded-md dark:bg-green-900/30">
+                            <Network className="w-4 h-4 text-green-500 dark:text-green-400" />
                           </span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-muted-foreground">
+                              Network
+                            </span>
+                            <span className="font-mono text-sm font-semibold text-card-foreground truncate">
+                              {instance.networks?.[0]?.ip ?? "No IP"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row items-center gap-3">
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-amber-100 dark:bg-amber-900/30">
-                          <Timer className="h-4 w-4 text-amber-500 dark:text-amber-400" />
-                        </span>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs text-muted-foreground font-medium">
-                            Age
-                          </span>
-                          <span className="text-sm font-semibold text-card-foreground truncate">
-                            {calculateAge(instance.created_at)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-1 min-w-0 bg-muted/60 rounded-lg p-2">
-                      <div className="flex items-center gap-2 w-full">
-                        <span className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-green-100 dark:bg-green-900/30">
-                          <Network className="h-4 w-4 text-green-500 dark:text-green-400" />
-                        </span>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs text-muted-foreground font-medium">
-                            Network
-                          </span>
-                          <span className="text-sm font-semibold text-card-foreground font-mono truncate">
-                            {instance.networks.length > 0 &&
-                            instance.networks[0]
-                              ? instance.networks[0].ip
-                              : "No IP"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <InstanceActions
+                      instanceId={instance.id}
+                      status={instance.status}
+                      disabled={instance.status === "BUILD"}
+                    />
                   </div>
                 </div>
-
-                <div onClick={(e) => e.stopPropagation()}>
-                  <InstanceActions
-                    instanceId={instance.id}
-                    status={instance.status}
-                    disabled={instance.status === "BUILD"}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="flex justify-center">
         <Button

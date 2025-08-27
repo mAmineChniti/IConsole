@@ -1,19 +1,14 @@
 "use client";
 
+import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
+import { EmptyState } from "@/components/EmptyState";
 import { ErrorCard } from "@/components/ErrorCard";
+import { HeaderActions } from "@/components/HeaderActions";
 import { ProjectFormDialog } from "@/components/ProjectFormDialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -22,26 +17,32 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UserManagementDialog } from "@/components/UserManagementDialog";
+import { XSearch } from "@/components/XSearch";
 import { ProjectService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
+  Project,
   ProjectDetailsResponse,
+  ProjectListResponse,
   UserAssignment,
   UserRole,
 } from "@/types/ResponseInterfaces";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Building,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
   ChevronDown,
   ChevronUp,
   Edit,
-  Plus,
-  RefreshCw,
+  FolderPlus,
   Trash2,
   UserPlus,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 function ProjectActions({
@@ -54,16 +55,16 @@ function ProjectActions({
   onDelete: (projectId: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 sm:gap-2">
+    <div className="flex gap-1 items-center sm:gap-2">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant="outline"
             size="sm"
             onClick={() => onEdit(project)}
-            className="h-8 w-8 p-0 rounded-full flex-shrink-0 bg-card text-card-foreground border border-border/50 cursor-pointer hover:bg-card hover:text-card-foreground focus:bg-card focus:text-card-foreground"
+            className="flex-shrink-0 p-0 w-8 h-8 rounded-full border cursor-pointer bg-card text-card-foreground border-border/50 hover:bg-card hover:text-card-foreground focus:bg-card focus:text-card-foreground"
           >
-            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Edit project</TooltipContent>
@@ -74,9 +75,9 @@ function ProjectActions({
             variant="outline"
             size="sm"
             onClick={() => onDelete(project.id)}
-            className="h-8 w-8 p-0 rounded-full flex-shrink-0 bg-destructive text-white dark:text-white dark:bg-destructive cursor-pointer hover:bg-destructive hover:text-white dark:hover:bg-destructive focus:bg-destructive focus:text-white"
+            className="flex-shrink-0 p-0 w-8 h-8 text-white rounded-full cursor-pointer dark:text-white hover:text-white focus:text-white bg-destructive dark:bg-destructive dark:hover:bg-destructive hover:bg-destructive focus:bg-destructive"
           >
-            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Delete project</TooltipContent>
@@ -90,6 +91,8 @@ export function Projects() {
     ProjectDetailsResponse | undefined
   >();
   const [visibleCount, setVisibleCount] = useState(6);
+  const [search, setSearch] = useState("");
+  useEffect(() => setVisibleCount(6), [search]);
   const [dialogProject, setDialogProject] = useState<
     ProjectDetailsResponse | undefined
   >(undefined);
@@ -105,33 +108,56 @@ export function Projects() {
 
   const queryClient = useQueryClient();
   const {
-    data: projects,
-    isLoading,
-    isFetching,
-    error,
-    refetch,
-  } = useQuery<ProjectDetailsResponse[]>({
-    queryKey: ["projects", "details"],
-    queryFn: () => ProjectService.listDetails(),
+    data: projectList,
+    isLoading: isListLoading,
+    isFetching: isListFetching,
+    error: listError,
+    isSuccess: isListSuccess,
+  } = useQuery<ProjectListResponse>({
+    queryKey: ["projects", "list"],
+    queryFn: () => ProjectService.list(),
     staleTime: 30000,
     refetchInterval: 60000,
   });
 
-  const projectData = Array.isArray(projects) ? projects : [];
-  const isLoadingInitial = isLoading;
-  const isRefetching = isFetching;
-  const isError = !!error;
-  const isEmpty = !isLoadingInitial && !isError && projectData.length === 0;
+  const detailsQueries = useQueries({
+    queries: (projectList ?? []).map((p: Project) => ({
+      queryKey: ["projects", "get", p.id],
+      queryFn: () => ProjectService.get(p.id),
+      staleTime: 30000,
+      refetchInterval: 60000,
+      enabled: !!projectList,
+    })),
+  });
+
+  const projectData = detailsQueries
+    .map((q) => q.data)
+    .filter(Boolean) as ProjectDetailsResponse[];
+
+  const anyDetailsLoading = detailsQueries.some((q) => q.isLoading && !q.data);
+  const anyDetailsFetching = detailsQueries.some((q) => q.isFetching);
+  const anyDetailsError = detailsQueries.some((q) => q.isError);
+
+  const isLoadingInitial =
+    isListLoading || (isListSuccess && anyDetailsLoading);
+  const isRefetching = isListFetching || anyDetailsFetching;
+  const isError = !!listError || anyDetailsError;
+  const isEmpty =
+    !isLoadingInitial && !isError && (projectList?.length ?? 0) === 0;
+
+  const refetchAll = async () => {
+    await queryClient.cancelQueries({ queryKey: ["projects"] });
+    await queryClient.invalidateQueries({ queryKey: ["projects"] });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: (projectId: string) => ProjectService.delete(projectId),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["projects", "details"],
+    onSuccess: async (_data, projectId) => {
+      queryClient.removeQueries({
+        queryKey: ["projects", "get", projectId],
       });
-      await queryClient.invalidateQueries({
-        queryKey: ["auth", "projects"],
-      });
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      await queryClient.invalidateQueries({ queryKey: ["auth", "projects"] });
       toast.success("Project deleted successfully");
       setShowDeleteDialog(false);
       setProjectToDelete(undefined);
@@ -160,17 +186,6 @@ export function Projects() {
     }
   };
 
-  const confirmDelete = () => {
-    if (projectToDelete) {
-      deleteMutation.mutate(projectToDelete.id);
-    }
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteDialog(false);
-    setProjectToDelete(undefined);
-  };
-
   const handleManageUsers = (project: ProjectDetailsResponse) => {
     setSelectedProject(project);
     setShowUserManagement(true);
@@ -188,8 +203,17 @@ export function Projects() {
     });
   };
 
-  const totalItems = projectData.length;
-  const visibleData = projectData.slice(0, visibleCount);
+  // Apply search filtering to projectData (after details fetched)
+  const q = search.trim().toLowerCase();
+  const filteredProjects = q
+    ? projectData.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.description ? p.description.toLowerCase().includes(q) : false),
+      )
+    : projectData;
+  const totalItems = filteredProjects.length;
+  const visibleData = filteredProjects.slice(0, visibleCount);
 
   const hasMore = visibleCount < totalItems;
   const remaining = Math.max(0, totalItems - visibleCount);
@@ -197,21 +221,22 @@ export function Projects() {
   const handleShowMore = () => {
     setVisibleCount((prev) => prev + 6);
   };
+  // pagination reset handled by useEffect above
 
   if (isLoadingInitial) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <Skeleton className="h-4 w-40" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
+          <div className="flex gap-2 items-center text-sm text-muted-foreground">
+            <Skeleton className="w-40 h-4" />
           </div>
           <div className="flex gap-3">
-            <Skeleton className="h-9 w-9 rounded-full" />
-            <Skeleton className="h-9 w-32 rounded-full" />
+            <Skeleton className="w-9 h-9 rounded-full" />
+            <Skeleton className="w-32 h-9 rounded-full" />
           </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-start">
+        <div className="grid gap-6 items-start sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
@@ -220,53 +245,53 @@ export function Projects() {
               )}
             >
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex gap-2 justify-between items-start">
                   <div className="flex-1 min-w-0">
-                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="mb-2 w-32 h-6" />
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <Skeleton className="h-6 w-20 rounded-full" />
+                  <div className="flex flex-shrink-0 gap-2 items-center">
+                    <Skeleton className="w-20 h-6 rounded-full" />
                   </div>
                 </div>
-                <Skeleton className="h-4 w-40 mt-2" />
+                <Skeleton className="mt-2 w-40 h-4" />
               </CardHeader>
 
-              <CardContent className="pt-0 flex-grow flex flex-col">
-                <div className="space-y-3 flex-grow">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-black dark:bg-black dark:text-white shadow-sm">
-                        <Skeleton className="h-4 w-4" />
+              <CardContent className="flex flex-col flex-grow pt-0">
+                <div className="flex-grow space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-1.5 items-center">
+                      <span className="inline-flex justify-center items-center w-7 h-7 text-black bg-white rounded-full shadow-sm dark:text-white dark:bg-black">
+                        <Skeleton className="w-4 h-4" />
                       </span>
-                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="w-20 h-4" />
                     </div>
-                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="w-8 h-8 rounded-full" />
                   </div>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <div className="overflow-y-auto space-y-2 max-h-32">
                     {Array.from({ length: 2 }).map((_, j) => (
                       <div
                         key={j}
-                        className="flex items-center justify-between gap-2 p-2 bg-muted/20 rounded-full"
+                        className="flex gap-2 justify-between items-center p-2 rounded-full bg-muted/20"
                       >
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <Skeleton className="h-6 w-6 rounded-full" />
-                          <Skeleton className="h-4 w-24" />
+                        <div className="flex flex-1 gap-2 items-center min-w-0">
+                          <Skeleton className="w-6 h-6 rounded-full" />
+                          <Skeleton className="w-24 h-4" />
                         </div>
                         <div className="flex flex-wrap gap-1 max-w-[40%]">
-                          <Skeleton className="h-5 w-12 rounded-full" />
-                          <Skeleton className="h-5 w-12 rounded-full" />
+                          <Skeleton className="w-12 h-5 rounded-full" />
+                          <Skeleton className="w-12 h-5 rounded-full" />
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="mt-auto pt-3">
+                <div className="pt-3 mt-auto">
                   <Separator />
-                  <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
-                    <Skeleton className="h-10 w-32 rounded-full" />
-                    <div className="flex justify-center sm:justify-end gap-2">
-                      <Skeleton className="h-8 w-8 rounded-full" />
-                      <Skeleton className="h-8 w-8 rounded-full" />
+                  <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center">
+                    <Skeleton className="w-32 h-10 rounded-full" />
+                    <div className="flex gap-2 justify-center sm:justify-end">
+                      <Skeleton className="w-8 h-8 rounded-full" />
+                      <Skeleton className="w-8 h-8 rounded-full" />
                     </div>
                   </div>
                 </div>
@@ -275,7 +300,7 @@ export function Projects() {
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="h-9 w-40 rounded-full" />
+          <Skeleton className="w-40 h-9 rounded-full" />
         </div>
       </div>
     );
@@ -286,7 +311,7 @@ export function Projects() {
       <ErrorCard
         title="Failed to Load Projects"
         message="There was an error loading projects. Please check your connection and try again."
-        onRetry={() => refetch()}
+        onRetry={() => refetchAll()}
         isRetrying={isRefetching}
       />
     );
@@ -295,54 +320,21 @@ export function Projects() {
   if (isEmpty) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-          <p className="text-sm text-muted-foreground">No projects found</p>
-          <Button
-            variant="default"
-            onClick={() => {
-              setDialogProject(undefined);
-              setDialogOpen(true);
-            }}
-            className="rounded-full w-full sm:w-auto px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Create Project
-          </Button>
-        </div>
-
-        <Card
-          className={cn(
-            "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl",
-          )}
-        >
-          <CardContent className="p-8 text-center">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="p-3 bg-muted rounded-full">
-                <Building className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-foreground">
-                  No Projects Found
-                </h3>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  You don&apos;t have any projects yet. Create your first
-                  project to get started.
-                </p>
-              </div>
-              <Button
-                variant="default"
-                onClick={() => {
-                  setDialogProject(undefined);
-                  setDialogOpen(true);
-                }}
-                className="mt-4 rounded-full px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Your First Project
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No projects found."
+          icon={<FolderPlus />}
+          text="Create your first project to get started."
+          onRefresh={refetchAll}
+          refreshing={isRefetching}
+          primaryLabel="Create Project"
+          primaryDisabled={isRefetching}
+          onPrimary={() => {
+            setDialogProject(undefined);
+            setDialogOpen(true);
+          }}
+          variant="dashed"
+          compact={false}
+        />
         <ProjectFormDialog
           project={dialogProject}
           open={dialogOpen}
@@ -357,8 +349,8 @@ export function Projects() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-        <div className="text-sm text-muted-foreground flex items-center gap-2">
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
+        <div className="flex gap-2 items-center text-sm text-muted-foreground">
           <span>
             {totalItems} project{totalItems !== 1 ? "s" : ""} total
             {totalItems > 0 && (
@@ -369,202 +361,190 @@ export function Projects() {
             )}
           </span>
         </div>
-        <div className="flex gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetch()}
-                disabled={isRefetching}
-                className={cn(
-                  "cursor-pointer w-10 h-9 p-0 sm:w-auto sm:px-3 rounded-full",
-                  isRefetching && "opacity-70",
-                )}
-                aria-label="Refresh projects"
-              >
-                {isRefetching ? (
-                  <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
-                ) : (
-                  <RefreshCw className="h-4 w-4 flex-shrink-0" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Refresh</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="sm"
-                onClick={() => {
-                  setDialogProject(undefined);
-                  setDialogOpen(true);
-                }}
-                className={cn(
-                  "cursor-pointer flex-1 sm:flex-none min-w-[120px] rounded-full",
-                )}
-              >
-                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="truncate">Create Project</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Create Project</TooltipContent>
-          </Tooltip>
+        <HeaderActions
+          onRefresh={() => refetchAll()}
+          isRefreshing={isRefetching}
+          refreshTooltip="Refresh"
+          refreshAriaLabel="Refresh projects"
+          mainButton={{
+            onClick: () => {
+              setDialogProject(undefined);
+              setDialogOpen(true);
+            },
+            label: "Create Project",
+            shortLabel: "Create",
+            tooltip: "Create Project",
+          }}
+        />
+      </div>
+      <div className="flex-1 max-w-full sm:max-w-md">
+        <XSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Search projects..."
+          aria-label="Search projects"
+        />
+      </div>
+
+      {totalItems === 0 ? (
+        <div className="flex justify-center items-center p-8 text-center rounded-2xl border text-muted-foreground min-h-32">
+          No projects match your search.
         </div>
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-start">
-        {visibleData.map((project) => (
-          <Card
-            key={project.id}
-            className={cn(
-              "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden",
-            )}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-lg font-semibold text-foreground truncate">
-                    {project.name}
-                  </CardTitle>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Badge
-                    variant={project.enabled ? "default" : "secondary"}
-                    className={cn(
-                      "text-xs px-2 py-0.5 gap-1.5 flex items-center",
-                      project.enabled
-                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                        : "bg-muted text-muted-foreground",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "w-1.5 h-1.5 rounded-full animate-pulse inline-block",
-                        project.enabled
-                          ? "bg-green-500"
-                          : "bg-muted-foreground/40",
-                      )}
-                    />
-                    {project.enabled ? "Enabled" : "Disabled"}
-                  </Badge>
-                </div>
-              </div>
-              {project.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
-                  {project.description}
-                </p>
+      ) : (
+        <div className="grid gap-6 items-start sm:grid-cols-2 lg:grid-cols-3">
+          {visibleData.map((project) => (
+            <Card
+              key={project.id}
+              className={cn(
+                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden",
               )}
-            </CardHeader>
-
-            <CardContent className="pt-0 flex-grow flex flex-col">
-              <div className="space-y-3 flex-grow">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-black dark:bg-black dark:text-white shadow-sm">
-                      <Users className="h-4 w-4 text-card-foreground" />
-                    </span>
-                    <span className="text-sm font-medium">
-                      {project.assignments?.length ?? 0} user
-                      {project.assignments?.length !== 1 ? "s" : ""}
-                    </span>
+            >
+              <CardHeader className="pb-3">
+                <div className="flex gap-2 justify-between items-start">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-lg font-semibold text-foreground truncate">
+                      {project.name}
+                    </CardTitle>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleProjectExpansion(project.id)}
-                    className="rounded-full px-2 py-1 bg-muted cursor-pointer"
-                  >
-                    {expandedProjects.has(project.id) ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-
-                {expandedProjects.has(project.id) && (
-                  <>
-                    <Separator />
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {project.assignments && project.assignments.length > 0 ? (
-                        project.assignments.map(
-                          (assignment: UserAssignment) => (
-                            <div
-                              key={assignment.user_id}
-                              className="flex items-center justify-between gap-2 p-2 bg-muted/20 rounded-full"
-                            >
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <Avatar className="h-6 w-6 flex-shrink-0">
-                                  <AvatarFallback className="bg-white text-black dark:bg-black dark:text-white text-xs font-medium">
-                                    {(
-                                      assignment.user_name?.charAt(0) ?? "?"
-                                    ).toUpperCase()}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium truncate">
-                                  {assignment.user_name ?? "Unknown"}
-                                </span>
-                              </div>
-                              <div className="flex flex-wrap gap-1 max-w-[40%]">
-                                {assignment.roles
-                                  .slice(0, 2)
-                                  .map((role: UserRole) => (
-                                    <Badge
-                                      key={role.role_id}
-                                      variant="outline"
-                                      className="text-xs max-w-full truncate rounded-full"
-                                    >
-                                      {role.role_name}
-                                    </Badge>
-                                  ))}
-                                {assignment.roles.length > 2 && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs rounded-full"
-                                  >
-                                    +{assignment.roles.length - 2}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          ),
-                        )
-                      ) : (
-                        <p className="text-sm text-muted-foreground text-center">
-                          No users assigned
-                        </p>
+                  <div className="flex flex-shrink-0 gap-2 items-center">
+                    <Badge
+                      variant={project.enabled ? "default" : "secondary"}
+                      className={cn(
+                        "text-xs px-2 py-0.5 gap-1.5 flex items-center",
+                        project.enabled
+                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                          : "bg-muted text-muted-foreground",
                       )}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="mt-auto pt-3">
-                <Separator />
-                <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => handleManageUsers(project)}
-                    className="flex-1 rounded-full px-6 py-2 bg-primary text-primary-foreground cursor-pointer"
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    <span className="truncate">Manage Users</span>
-                  </Button>
-                  <div className="flex justify-center sm:justify-end">
-                    <ProjectActions
-                      project={project}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                    />
+                    >
+                      <span
+                        className={cn(
+                          "w-1.5 h-1.5 rounded-full animate-pulse inline-block",
+                          project.enabled
+                            ? "bg-green-500"
+                            : "bg-muted-foreground/40",
+                        )}
+                      />
+                      {project.enabled ? "Enabled" : "Disabled"}
+                    </Badge>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                {project.description && (
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                    {project.description}
+                  </p>
+                )}
+              </CardHeader>
+
+              <CardContent className="flex flex-col flex-grow pt-0">
+                <div className="flex-grow space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-1.5 items-center">
+                      <span className="inline-flex justify-center items-center w-7 h-7 text-black bg-white rounded-full shadow-sm dark:text-white dark:bg-black">
+                        <Users className="w-4 h-4 text-card-foreground" />
+                      </span>
+                      <span className="text-sm font-medium">
+                        {project.assignments?.length ?? 0} user
+                        {project.assignments?.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleProjectExpansion(project.id)}
+                      className="py-1 px-2 rounded-full cursor-pointer bg-muted"
+                    >
+                      {expandedProjects.has(project.id) ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {expandedProjects.has(project.id) && (
+                    <>
+                      <Separator />
+                      <div className="overflow-y-auto space-y-2 max-h-32">
+                        {project.assignments &&
+                        project.assignments.length > 0 ? (
+                          project.assignments.map(
+                            (assignment: UserAssignment) => (
+                              <div
+                                key={assignment.user_id}
+                                className="flex gap-2 justify-between items-center p-2 rounded-full bg-muted/20"
+                              >
+                                <div className="flex flex-1 gap-2 items-center min-w-0">
+                                  <Avatar className="flex-shrink-0 w-6 h-6">
+                                    <AvatarFallback className="text-xs font-medium text-black bg-white dark:text-white dark:bg-black">
+                                      {(
+                                        assignment.user_name?.charAt(0) ?? "?"
+                                      ).toUpperCase()}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span className="text-sm font-medium truncate">
+                                    {assignment.user_name ?? "Unknown"}
+                                  </span>
+                                </div>
+                                <div className="flex flex-wrap gap-1 max-w-[40%]">
+                                  {(assignment.roles ?? [])
+                                    .slice(0, 2)
+                                    .map((role: UserRole) => (
+                                      <Badge
+                                        key={role.role_id}
+                                        variant="outline"
+                                        className="max-w-full text-xs rounded-full truncate"
+                                      >
+                                        {role.role_name}
+                                      </Badge>
+                                    ))}
+                                  {(assignment.roles ?? []).length > 2 && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs rounded-full"
+                                    >
+                                      +{(assignment.roles ?? []).length - 2}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            ),
+                          )
+                        ) : (
+                          <p className="text-sm text-center text-muted-foreground">
+                            No users assigned
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="pt-3 mt-auto">
+                  <Separator />
+                  <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleManageUsers(project)}
+                      className="flex-1 py-2 px-6 rounded-full cursor-pointer bg-primary text-primary-foreground"
+                    >
+                      <UserPlus className="mr-2 w-4 h-4" />
+                      <span className="truncate">Manage Users</span>
+                    </Button>
+                    <div className="flex justify-center sm:justify-end">
+                      <ProjectActions
+                        project={project}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="flex justify-center px-4">
         <Button
@@ -606,77 +586,26 @@ export function Projects() {
         />
       )}
 
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent
-          className={cn(
-            "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl max-w-lg mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto",
-          )}
-        >
-          <DialogHeader className="space-y-3">
-            <DialogTitle className="flex items-center gap-2 text-lg text-foreground">
-              <Trash2 className="h-5 w-5 text-foreground flex-shrink-0" />
-              <span className="truncate">Delete Project</span>
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
-              Are you sure you want to delete this project? This action cannot
-              be undone.
-            </DialogDescription>
-          </DialogHeader>
-
-          {projectToDelete && (
-            <div className="py-4">
-              <div className="bg-destructive/10 border border-destructive rounded-xl p-3 sm:p-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-destructive/20 rounded-full flex-shrink-0">
-                    <Building className="h-4 w-4 text-destructive" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-destructive truncate">
-                      {projectToDelete.name}
-                    </h4>
-                    {projectToDelete.description && (
-                      <p className="text-sm text-destructive mt-1 line-clamp-2">
-                        {projectToDelete.description}
-                      </p>
-                    )}
-                    <p className="text-xs text-destructive w-fit mt-2 font-mono truncate bg-destructive/10 px-2 py-1 rounded">
-                      ID: {projectToDelete.id}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="gap-3 flex-col sm:flex-row pt-4">
-            <Button
-              variant="outline"
-              onClick={cancelDelete}
-              className="rounded-full px-6 py-2 w-full sm:w-auto order-2 sm:order-1 bg-muted text-foreground cursor-pointer"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={deleteMutation.isPending}
-              className="rounded-full px-6 py-2 w-full sm:w-auto order-1 sm:order-2 bg-destructive text-white cursor-pointer"
-            >
-              {deleteMutation.isPending ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-destructive-foreground border-t-transparent" />
-                  <span className="truncate">Deleting...</span>
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span className="truncate">Delete Project</span>
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Project"
+        description={
+          <>
+            Are you sure you want to delete this project{" "}
+            <span className="font-semibold text-foreground">
+              {projectToDelete?.name}
+            </span>
+            ? This action cannot be undone.
+          </>
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        confirming={deleteMutation.isPending}
+        onConfirm={() =>
+          projectToDelete && deleteMutation.mutate(projectToDelete.id)
+        }
+      />
     </div>
   );
 }

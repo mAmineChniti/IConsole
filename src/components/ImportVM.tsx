@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorCard } from "@/components/ErrorCard";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,6 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dropzone,
+  DropzoneContent,
+  DropzoneEmptyState,
+} from "@/components/ui/dropzone";
 import {
   Form,
   FormControl,
@@ -28,8 +34,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InfraService } from "@/lib/requests";
-import type { ImportVMFormData } from "@/types/RequestInterfaces";
-import { importVMSchema } from "@/types/RequestSchemas";
+import { makeDupSafeSelect } from "@/lib/utils";
+import type { ImportVMwareRequest } from "@/types/RequestInterfaces";
+import { ImportVMwareRequestSchema } from "@/types/RequestSchemas";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -42,7 +49,6 @@ import {
   Loader2,
   MemoryStick,
   Network,
-  Package,
   Server,
   ShieldCheck,
   Upload,
@@ -51,14 +57,13 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ErrorCard } from "./ErrorCard";
 
 export function ImportVM() {
   const [importFile, setImportFile] = useState<File | undefined>(undefined);
   const queryClient = useQueryClient();
 
-  const importForm = useForm<ImportVMFormData>({
-    resolver: zodResolver(importVMSchema),
+  const importForm = useForm<ImportVMwareRequest>({
+    resolver: zodResolver(ImportVMwareRequestSchema),
     defaultValues: {
       vm_name: "",
       description: "",
@@ -86,23 +91,16 @@ export function ImportVM() {
   });
 
   const importVMMutation = useMutation({
-    mutationFn: async (data: ImportVMFormData) => {
+    mutationFn: async (data: ImportVMwareRequest) => {
       if (!importFile) {
         throw new Error("Please select a VMDK file to import");
       }
-      const formData = new FormData();
-      formData.append("vmdk_file", importFile);
-      formData.append("vm_name", data.vm_name);
-      formData.append("description", data.description ?? "");
-      formData.append("min_disk", data.min_disk?.toString() ?? "20");
-      formData.append("min_ram", data.min_ram?.toString() ?? "2048");
-      formData.append("is_public", data.is_public.toString());
-      formData.append("flavor_id", data.flavor_id);
-      formData.append("network_id", data.network_id);
-      formData.append("key_name", data.key_name);
-      formData.append("security_group", data.security_group);
-      formData.append("admin_password", data.admin_password);
-      return InfraService.importVMwareVM(formData);
+      const payload: ImportVMwareRequest = {
+        ...data,
+        is_public: data.is_public ?? false,
+        vmdk_file: importFile,
+      };
+      return InfraService.importVMwareVM(payload);
     },
     onSuccess: async (response) => {
       toast.success("VM imported successfully!", {
@@ -137,45 +135,33 @@ export function ImportVM() {
       />
     );
   }
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (!file.name.toLowerCase().endsWith(".vmdk")) {
-        toast.error("Invalid file type", {
-          description: "Please select a valid VMDK file",
-        });
-        return;
-      }
-      setImportFile(file);
-    }
-  };
 
   if (resourcesLoading)
     return (
-      <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl">
+      <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-muted rounded-full">
-              <Skeleton className="h-5 w-5" />
+          <CardTitle className="flex gap-2 items-center">
+            <div className="p-2 rounded-full bg-muted">
+              <Skeleton className="w-5 h-5" />
             </div>
-            <Skeleton className="h-6 w-44" />
+            <Skeleton className="w-44 h-6" />
           </CardTitle>
           <CardDescription>
-            <Skeleton className="h-4 w-64" />
+            <Skeleton className="w-64 h-4" />
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             <div>
-              <Skeleton className="h-4 w-24 mb-2" />
-              <div className="flex items-center justify-center w-full">
-                <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <div className="p-2 bg-muted rounded-full mb-2">
+              <Skeleton className="mb-2 w-24 h-4" />
+              <div className="flex justify-center items-center w-full">
+                <div className="flex flex-col justify-center items-center w-full h-32 rounded-lg border-2 border-dashed border-border">
+                  <div className="flex flex-col justify-center items-center pt-5 pb-6">
+                    <div className="p-2 mb-2 rounded-full bg-muted">
                       <Skeleton className="w-8 h-8" />
                     </div>
-                    <Skeleton className="h-4 w-40 mb-2" />
-                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="mb-2 w-40 h-4" />
+                    <Skeleton className="w-24 h-3" />
                   </div>
                 </div>
               </div>
@@ -183,104 +169,104 @@ export function ImportVM() {
 
             <Separator />
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
                   </div>
-                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="w-24 h-4" />
                 </div>
-                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
                   </div>
-                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="w-32 h-4" />
                 </div>
-                <Skeleton className="h-10 w-full rounded-full" />
-              </div>
-            </div>
-
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
-                  </div>
-                  <Skeleton className="h-4 w-24" />
-                </div>
-                <Skeleton className="h-10 w-full rounded-full" />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
-                  </div>
-                  <Skeleton className="h-4 w-24" />
-                </div>
-                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
               </div>
             </div>
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
                   </div>
-                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="w-24 h-4" />
                 </div>
-                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
                   </div>
-                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="w-24 h-4" />
                 </div>
-                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
               </div>
             </div>
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
                   </div>
-                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="w-28 h-4" />
                 </div>
-                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1 bg-muted rounded-full">
-                    <Skeleton className="h-4 w-4" />
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
                   </div>
-                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="w-32 h-4" />
                 </div>
-                <Skeleton className="h-10 w-full rounded-full" />
+                <Skeleton className="w-full h-10 rounded-full" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
+                  </div>
+                  <Skeleton className="w-28 h-4" />
+                </div>
+                <Skeleton className="w-full h-10 rounded-full" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex gap-2 items-center mb-1">
+                  <div className="p-1 rounded-full bg-muted">
+                    <Skeleton className="w-4 h-4" />
+                  </div>
+                  <Skeleton className="w-36 h-4" />
+                </div>
+                <Skeleton className="w-full h-10 rounded-full" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="p-1 bg-muted rounded-full">
-                  <Skeleton className="h-4 w-4" />
+              <div className="flex gap-2 items-center mb-1">
+                <div className="p-1 rounded-full bg-muted">
+                  <Skeleton className="w-4 h-4" />
                 </div>
-                <Skeleton className="h-4 w-36" />
+                <Skeleton className="w-36 h-4" />
               </div>
-              <Skeleton className="h-10 w-full rounded-full" />
+              <Skeleton className="w-full h-10 rounded-full" />
             </div>
 
             <Separator />
 
             <div className="flex justify-center sm:justify-end">
-              <Skeleton className="h-10 w-full sm:w-48 rounded-full" />
+              <Skeleton className="w-full h-10 rounded-full sm:w-48" />
             </div>
           </div>
         </CardContent>
@@ -288,11 +274,11 @@ export function ImportVM() {
     );
 
   return (
-    <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl">
+    <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <div className="p-2 bg-muted rounded-full">
-            <Upload className="h-5 w-5 text-primary" />
+        <CardTitle className="flex gap-2 items-center">
+          <div className="p-2 rounded-full bg-muted">
+            <Upload className="w-5 h-5 text-primary" />
           </div>
           Import Virtual Machine
         </CardTitle>
@@ -312,33 +298,58 @@ export function ImportVM() {
               <div>
                 <label className="text-sm font-medium">VMDK File</label>
                 <div className="mt-2">
-                  <div className="flex items-center justify-center w-full">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-border/80 transition-colors">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Package className="w-8 h-8 mb-2 text-muted-foreground" />
-                        <p className="mb-2 text-sm text-muted-foreground">
-                          <span className="font-semibold">Click to upload</span>{" "}
-                          or drag and drop
+                  <Dropzone
+                    src={importFile ? [importFile] : undefined}
+                    maxFiles={1}
+                    accept={{
+                      "application/octet-stream": [".vmdk"],
+                      "": [".vmdk"],
+                    }}
+                    onDrop={(accepted) => {
+                      const file = accepted?.[0];
+                      if (!file) return;
+                      if (!file.name.toLowerCase().endsWith(".vmdk")) {
+                        toast.error("Invalid file type", {
+                          description: "Please select a valid VMDK file",
+                        });
+                        importForm.setError("vmdk_file", {
+                          type: "validate",
+                          message: "Only .vmdk files are supported",
+                        });
+                        return;
+                      }
+                      setImportFile(file);
+                      importForm.setValue("vmdk_file", file, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                      importForm.clearErrors("vmdk_file");
+                    }}
+                    className="h-32 cursor-pointer"
+                  >
+                    <DropzoneEmptyState>
+                      <div className="flex flex-col justify-center items-center">
+                        <div className="flex justify-center items-center rounded-md size-8 bg-muted text-muted-foreground">
+                          <Upload size={16} />
+                        </div>
+                        <p className="my-2 w-full text-sm font-medium truncate text-wrap">
+                          Upload a file
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          VMDK files only
+                        <p className="w-full text-xs truncate text-wrap text-muted-foreground">
+                          Drag and drop or click to upload
+                        </p>
+                        <p className="text-xs text-wrap text-muted-foreground">
+                          Accepts .vmdk
                         </p>
                       </div>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept=".vmdk"
-                        onChange={handleFileChange}
-                      />
-                    </label>
-                  </div>
-                  {importFile && (
-                    <div className="mt-2 p-2 bg-muted rounded-lg">
-                      <p className="text-sm">
-                        Selected: {importFile.name} (
-                        {(importFile.size / 1024 / 1024).toFixed(2)} MB)
-                      </p>
-                    </div>
+                    </DropzoneEmptyState>
+                    <DropzoneContent />
+                  </Dropzone>
+                  {importForm.formState.errors.vmdk_file && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {importForm.formState.errors.vmdk_file.message?.toString() ??
+                        "Please select a VMDK file"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -346,15 +357,15 @@ export function ImportVM() {
 
             <Separator />
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={importForm.control}
                 name="vm_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <Server className="h-4 w-4 text-muted-foreground" />
+                    <FormLabel className="flex gap-2 items-center">
+                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                        <Server className="w-4 h-4 text-muted-foreground" />
                       </span>
                       VM Name
                     </FormLabel>
@@ -375,9 +386,9 @@ export function ImportVM() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
+                    <FormLabel className="flex gap-2 items-center">
+                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                        <FileText className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Description (Optional)
                     </FormLabel>
@@ -394,15 +405,15 @@ export function ImportVM() {
               />
             </div>
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={importForm.control}
                 name="min_disk"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <HardDrive className="h-4 w-4 text-muted-foreground" />
+                    <FormLabel className="flex gap-2 items-center">
+                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                        <HardDrive className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Minimum Disk (GB)
                     </FormLabel>
@@ -436,9 +447,9 @@ export function ImportVM() {
                 name="min_ram"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <MemoryStick className="h-4 w-4 text-muted-foreground" />
+                    <FormLabel className="flex gap-2 items-center">
+                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                        <MemoryStick className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Minimum RAM (MB)
                     </FormLabel>
@@ -468,15 +479,15 @@ export function ImportVM() {
               />
             </div>
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={importForm.control}
                 name="flavor_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <IceCream className="h-4 w-4 text-muted-foreground rotate-45" />
+                    <FormLabel className="flex gap-2 items-center">
+                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                        <IceCream className="w-4 h-4 rotate-45 text-muted-foreground" />
                       </span>
                       Flavor
                     </FormLabel>
@@ -504,9 +515,9 @@ export function ImportVM() {
                 name="network_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <Network className="h-4 w-4 text-muted-foreground" />
+                    <FormLabel className="flex gap-2 items-center">
+                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                        <Network className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Network
                     </FormLabel>
@@ -530,65 +541,87 @@ export function ImportVM() {
               />
             </div>
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={importForm.control}
                 name="key_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <KeyRound className="h-4 w-4 text-muted-foreground" />
-                      </span>
-                      Key Pair
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full rounded-full cursor-pointer">
-                          <SelectValue placeholder="Select key pair" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {resources?.keypairs.map((keypair) => (
-                          <SelectItem key={keypair.name} value={keypair.name}>
-                            {keypair.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const kpItems = resources?.keypairs ?? [];
+                  const { options, toForm, fromForm } = makeDupSafeSelect(
+                    kpItems,
+                    (k) => k.name,
+                    (k) => k.name,
+                  );
+                  return (
+                    <FormItem>
+                      <FormLabel className="flex gap-2 items-center">
+                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                          <KeyRound className="w-4 h-4 text-muted-foreground" />
+                        </span>
+                        Key Pair
+                      </FormLabel>
+                      <Select
+                        onValueChange={(val) => field.onChange(toForm(val))}
+                        value={fromForm(field.value)}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full rounded-full cursor-pointer">
+                            <SelectValue placeholder="Select key pair" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {options.map((opt) => (
+                            <SelectItem key={`kp-${opt.key}`} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               <FormField
                 control={importForm.control}
                 name="security_group"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                        <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                      </span>
-                      Security Group
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full rounded-full cursor-pointer">
-                          <SelectValue placeholder="Select security group" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {resources?.security_groups.map((group) => (
-                          <SelectItem key={group.name} value={group.name}>
-                            {group.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const sgItems = resources?.security_groups ?? [];
+                  const { options, toForm, fromForm } = makeDupSafeSelect(
+                    sgItems,
+                    (g) => g.name,
+                    (g) => g.name,
+                  );
+                  return (
+                    <FormItem>
+                      <FormLabel className="flex gap-2 items-center">
+                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                          <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+                        </span>
+                        Security Group
+                      </FormLabel>
+                      <Select
+                        onValueChange={(val) => field.onChange(toForm(val))}
+                        value={fromForm(field.value)}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full rounded-full cursor-pointer">
+                            <SelectValue placeholder="Select security group" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {options.map((opt) => (
+                            <SelectItem key={`sg-${opt.key}`} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             </div>
 
@@ -597,9 +630,9 @@ export function ImportVM() {
               name="admin_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <span className="p-1 bg-muted rounded-full flex items-center justify-center">
-                      <UserCog className="h-4 w-4 text-muted-foreground" />
+                  <FormLabel className="flex gap-2 items-center">
+                    <span className="flex justify-center items-center p-1 rounded-full bg-muted">
+                      <UserCog className="w-4 h-4 text-muted-foreground" />
                     </span>
                     Admin Password
                   </FormLabel>
@@ -625,16 +658,16 @@ export function ImportVM() {
               <Button
                 type="submit"
                 disabled={importVMMutation.isPending || !importFile}
-                className="rounded-full bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer w-full sm:w-auto"
+                className="w-full rounded-full cursor-pointer sm:w-auto bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
               >
                 {importVMMutation.isPending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                    <Loader2 className="flex-shrink-0 mr-2 w-4 h-4 animate-spin" />
                     <span className="truncate">Importing VM...</span>
                   </>
                 ) : (
                   <>
-                    <Download className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <Download className="flex-shrink-0 mr-2 w-4 h-4" />
                     <span className="truncate">Import Virtual Machine</span>
                   </>
                 )}

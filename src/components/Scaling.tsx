@@ -76,11 +76,11 @@ export function Scaling() {
   });
 
   return (
-    <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl">
+    <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <div className="p-2 bg-muted rounded-full">
-            <ServerCog className="h-5 w-5 text-primary" />
+        <CardTitle className="flex gap-2 items-center">
+          <div className="p-2 rounded-full bg-muted">
+            <ServerCog className="w-5 h-5 text-primary" />
           </div>
           Add Node
         </CardTitle>
@@ -97,15 +97,15 @@ export function Scaling() {
             )}
             className="space-y-6"
           >
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={nodeForm.control}
                 name="ip"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <Globe className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <Globe className="w-4 h-4 text-muted-foreground" />
                       </span>
                       IP Address
                     </FormLabel>
@@ -126,8 +126,8 @@ export function Scaling() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <Terminal className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <Terminal className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Hostname
                     </FormLabel>
@@ -144,15 +144,15 @@ export function Scaling() {
               />
             </div>
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={nodeForm.control}
                 name="type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <ServerCog className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <ServerCog className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Node Type
                     </FormLabel>
@@ -178,8 +178,8 @@ export function Scaling() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <KeyRound className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <KeyRound className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Deploy Tag
                     </FormLabel>
@@ -198,15 +198,15 @@ export function Scaling() {
 
             <Separator />
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={nodeForm.control}
                 name="neutron_external_interface"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <Network className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <Network className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Neutron External Interface
                     </FormLabel>
@@ -227,8 +227,8 @@ export function Scaling() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <Network className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <Network className="w-4 h-4 text-muted-foreground" />
                       </span>
                       Network Interface
                     </FormLabel>
@@ -247,15 +247,15 @@ export function Scaling() {
 
             <Separator />
 
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormField
                 control={nodeForm.control}
                 name="ssh_user"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <User className="w-4 h-4 text-muted-foreground" />
                       </span>
                       SSH User
                     </FormLabel>
@@ -276,8 +276,8 @@ export function Scaling() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <span className="p-1 bg-muted rounded-full flex items-center justify-center mr-2">
-                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex justify-center items-center p-1 mr-2 rounded-full bg-muted">
+                        <Lock className="w-4 h-4 text-muted-foreground" />
                       </span>
                       SSH Password
                     </FormLabel>
@@ -300,16 +300,16 @@ export function Scaling() {
               <Button
                 type="submit"
                 disabled={addNodeMutation.isPending}
-                className="rounded-full bg-primary text-primary-foreground cursor-pointer w-full sm:w-auto"
+                className="w-full rounded-full cursor-pointer sm:w-auto bg-primary text-primary-foreground"
               >
                 {addNodeMutation.isPending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                    <Loader2 className="flex-shrink-0 mr-2 w-4 h-4 animate-spin" />
                     <span className="truncate">Adding Node...</span>
                   </>
                 ) : (
                   <>
-                    <ServerCog className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <ServerCog className="flex-shrink-0 mr-2 w-4 h-4" />
                     <span className="truncate">Add Node</span>
                   </>
                 )}

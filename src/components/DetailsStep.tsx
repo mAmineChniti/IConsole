@@ -25,18 +25,18 @@ export function DetailsStep({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-2 text-base font-medium text-foreground">
-                <MonitorStop className="h-4 w-4 flex-shrink-0 text-primary" />
+              <FormLabel className="flex gap-2 items-center text-base font-medium text-foreground">
+                <MonitorStop className="flex-shrink-0 w-4 h-4 text-primary" />
                 <span className="truncate">VM Name</span>
               </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   placeholder="Enter VM name"
-                  className="h-11 w-full rounded-full bg-input text-foreground border border-border"
+                  className="w-full h-11 rounded-full border bg-input text-foreground border-border"
                 />
               </FormControl>
-              <FormDescription className="text-sm text-muted-foreground leading-relaxed">
+              <FormDescription className="text-sm leading-relaxed text-muted-foreground">
                 A unique name to identify your virtual machine
               </FormDescription>
               <FormMessage />
@@ -44,7 +44,7 @@ export function DetailsStep({
           )}
         />
 
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="admin_username"
@@ -57,10 +57,10 @@ export function DetailsStep({
                   <Input
                     {...field}
                     placeholder="Enter admin username"
-                    className="h-11 w-full rounded-full bg-input text-foreground border border-border"
+                    className="w-full h-11 rounded-full border bg-input text-foreground border-border"
                   />
                 </FormControl>
-                <FormDescription className="text-sm text-muted-foreground leading-relaxed">
+                <FormDescription className="text-sm leading-relaxed text-muted-foreground">
                   The administrative username for the VM
                 </FormDescription>
                 <FormMessage />
@@ -81,10 +81,10 @@ export function DetailsStep({
                     {...field}
                     type="password"
                     placeholder="Enter admin password"
-                    className="h-11 w-full rounded-full bg-input text-foreground border border-border"
+                    className="w-full h-11 rounded-full border bg-input text-foreground border-border"
                   />
                 </FormControl>
-                <FormDescription className="text-sm text-muted-foreground leading-relaxed">
+                <FormDescription className="text-sm leading-relaxed text-muted-foreground">
                   The password for the administrative user
                 </FormDescription>
                 <FormMessage />

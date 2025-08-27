@@ -172,8 +172,18 @@ export function VM({ onBack }: { onBack?: () => void }) {
   });
 
   const describeVMMutation = useMutation({
-    mutationFn: async (description: string) => {
-      return InfraService.createFromDescription({ description });
+    mutationFn: async ({
+      vm_name,
+      description,
+    }: {
+      vm_name: string;
+      description: string;
+    }) => {
+      return InfraService.createFromDescription({
+        vm_name,
+        description,
+        timeout: 300,
+      });
     },
     onSuccess: async (response) => {
       toast.success("VM created from description!", {
@@ -213,20 +223,20 @@ export function VM({ onBack }: { onBack?: () => void }) {
   return (
     <div className="space-y-6">
       {onBack && (
-        <div className="flex items-center gap-4 mb-2">
+        <div className="flex gap-4 items-center mb-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground bg-card border border-border/50 transition-all duration-200 cursor-pointer"
+            className="flex gap-2 items-center rounded-full border transition-all duration-200 cursor-pointer text-muted-foreground bg-card border-border/50 hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="w-4 h-4" />
             Back to Instances
           </Button>
         </div>
       )}
       <div
-        className="flex items-center space-x-1 bg-card text-card-foreground border border-border/50 rounded-full p-1 overflow-hidden"
+        className="flex overflow-hidden items-center p-1 space-x-1 rounded-full border bg-card text-card-foreground border-border/50"
         role="tablist"
         aria-label="VM tabs"
       >
@@ -244,7 +254,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
           aria-controls="create-tab-panel"
           id="create-tab"
         >
-          <Plus className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
+          <Plus className="flex-shrink-0 mr-1 w-4 h-4 sm:mr-2" />
           <span className="truncate">Create VM</span>
         </Button>
         <Button
@@ -261,7 +271,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
           aria-controls="describe-tab-panel"
           id="describe-tab"
         >
-          <Mic className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
+          <Mic className="flex-shrink-0 mr-1 w-4 h-4 sm:mr-2" />
           <span className="truncate">Describe VM</span>
         </Button>
       </div>
@@ -274,9 +284,9 @@ export function VM({ onBack }: { onBack?: () => void }) {
           aria-labelledby="create-tab"
           tabIndex={0}
         >
-          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl overflow-hidden">
+          <Card className="overflow-hidden rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
             <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center w-full overflow-x-auto">
+              <div className="flex overflow-x-auto items-center w-full">
                 {steps.map((step, index) => {
                   const isActive = step.key === currentStep;
                   const isCompleted = index < currentStepIndex;
@@ -285,7 +295,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
                   return (
                     <div
                       key={step.key}
-                      className="flex items-center flex-shrink-0"
+                      className="flex flex-shrink-0 items-center"
                       style={{
                         flex: index === steps.length - 1 ? "0 0 auto" : "1",
                         minWidth: "120px",
@@ -303,9 +313,9 @@ export function VM({ onBack }: { onBack?: () => void }) {
                           )}
                         >
                           {isCompleted ? (
-                            <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                           ) : (
-                            <StepIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                            <StepIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                           )}
                         </div>
                         <span
@@ -338,16 +348,16 @@ export function VM({ onBack }: { onBack?: () => void }) {
             </CardContent>
           </Card>
 
-          <Card className="bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl overflow-hidden">
+          <Card className="overflow-hidden rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
             <CardHeader className="space-y-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
+              <CardTitle className="flex gap-2 items-center text-lg">
                 {(() => {
                   const step = steps.find((s) => s.key === currentStep);
                   const StepIcon = step?.icon ?? Cpu;
                   return (
                     <>
-                      <div className="p-2 bg-primary/10 rounded-full flex-shrink-0">
-                        <StepIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                      <div className="flex-shrink-0 p-2 rounded-full bg-primary/10">
+                        <StepIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                       </div>
                       <span className="truncate">{step?.title}</span>
                     </>
@@ -406,22 +416,22 @@ export function VM({ onBack }: { onBack?: () => void }) {
             {currentStep !== "summary" && (
               <CardContent className="pt-0">
                 <Separator className="mb-6" />
-                <div className="flex flex-col sm:flex-row justify-between gap-3">
+                <div className="flex flex-col gap-3 justify-between sm:flex-row">
                   <Button
                     variant="outline"
                     onClick={goToPreviousStep}
                     disabled={currentStepIndex === 0}
-                    className="rounded-full cursor-pointer w-full sm:w-auto order-2 sm:order-1"
+                    className="order-2 w-full rounded-full cursor-pointer sm:order-1 sm:w-auto"
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <ArrowLeft className="flex-shrink-0 mr-2 w-4 h-4" />
                     <span className="truncate">Previous</span>
                   </Button>
                   <Button
                     onClick={goToNextStep}
-                    className="rounded-full cursor-pointer w-full sm:w-auto order-1 sm:order-2 bg-primary text-primary-foreground"
+                    className="order-1 w-full rounded-full cursor-pointer sm:order-2 sm:w-auto bg-primary text-primary-foreground"
                   >
                     <span className="truncate">Next</span>
-                    <ArrowRight className="h-4 w-4 ml-2 flex-shrink-0" />
+                    <ArrowRight className="flex-shrink-0 ml-2 w-4 h-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -436,7 +446,12 @@ export function VM({ onBack }: { onBack?: () => void }) {
           tabIndex={0}
         >
           <DescribeVMTab
-            onCreateVM={(desc) => describeVMMutation.mutate(desc)}
+            onCreateVM={(desc) =>
+              describeVMMutation.mutate({
+                vm_name: desc.vm_name,
+                description: desc.description,
+              })
+            }
             isCreating={describeVMMutation.isPending}
           />
         </div>
