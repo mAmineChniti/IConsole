@@ -840,3 +840,20 @@ export const NetworkDeleteRequestSchema = z.object({
 export const RouterDeleteRequestSchema = z.object({
   router_id: z.uuid("Invalid router ID format"),
 });
+
+export const ClusterNodeConfigSchema = z.object({
+  name_prefix: z.string(),
+  image_id: z.string(),
+  flavor_id: z.string(),
+  network_id: z.string(),
+  security_group: z.string(),
+  key_name: z.string(),
+});
+
+export const ClusterCreateRequestSchema = z.object({
+  name: z.string(),
+  password: z.string().optional().default("0000"),
+  nombremaster: z.number(),
+  nombreworker: z.number(),
+  node_config: ClusterNodeConfigSchema,
+});

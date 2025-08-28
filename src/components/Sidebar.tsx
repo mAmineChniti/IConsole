@@ -93,6 +93,11 @@ const secondSidebarItems = [
     icon: Expand,
     href: "/dashboard/scale",
   },
+  {
+    title: "Clusters",
+    icon: Monitor,
+    href: "/dashboard/clusters",
+  },
 ] as const;
 
 const computeSubItems = [

@@ -631,16 +631,40 @@ export interface ClusterActionResponse {
   [key: string]: unknown;
 }
 
-export type ClusterListResponse = unknown;
-
-export type ClusterDetailsResponse = unknown;
-
-export interface ClusterDashboardTokenResponse {
-  token?: string;
-  [key: string]: unknown;
+export interface ClusterListResponse {
+  clusters: Clusters[];
 }
 
-export interface RemoveSshKeyResponse {
-  message?: string;
-  [key: string]: unknown;
+export interface Clusters {
+  cluster_id: number;
+  cluster_name: string;
+  overall_status: string;
+  created_at: string | null;
+  master_count: number;
+  worker_count: number;
+}
+
+export interface ClusterDetails {
+  cluster_id: number;
+  cluster_name: string;
+  nodes: NodeInfo[];
+  created_at: string | null;
+  overall_status: string;
+}
+
+export interface NodeInfo {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+  ssh_key: string;
+  floating_ip: string;
+}
+
+export interface ClusterDashboardTokenResponse {
+  cluster_id: number;
+  master_ip: string;
+  token: string;
+  dashboard_path: string;
+  kubeconfig: string;
 }

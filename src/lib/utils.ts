@@ -24,26 +24,36 @@ export function parseComposite(val: string): string {
   return val.split(":::")[0] ?? "";
 }
 
+export interface DupSafeOption<T> {
+  key: string;
+  value: string;
+  label: string;
+  original: T;
+}
+
 export function makeDupSafeSelect<T>(
   items: T[],
   getStored: (t: T) => string,
   getLabel: (t: T) => string,
 ) {
-  const options = items.map((item, idx) => {
+  const options: DupSafeOption<T>[] = items.map((item, idx) => {
     const stored = getStored(item);
     const label = getLabel(item);
     return {
       key: `${label}-${idx}`,
       value: `${stored}:::${idx}`,
       label,
+      original: item,
     };
   });
+
   const toForm = parseComposite;
   const fromForm = (storedValue: string | undefined) => {
     if (!storedValue) return undefined;
     const idx = items.findIndex((it) => getStored(it) === storedValue);
     return idx >= 0 ? `${storedValue}:::${idx}` : undefined;
   };
+
   return { options, toForm, fromForm } as const;
 }
 
