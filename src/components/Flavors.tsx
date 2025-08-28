@@ -217,7 +217,7 @@ export function Flavors() {
       </div>
     );
   }
-  if (list.length === 0) {
+  if (!list || list.length === 0) {
     return (
       <>
         <EmptyState

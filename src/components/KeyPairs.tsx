@@ -34,6 +34,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -453,14 +454,14 @@ export function KeyPairs() {
                 size="sm"
                 className="gap-1.5 rounded-full cursor-pointer"
               >
-                <a
+                <Link
                   href={`data:text/plain;charset=utf-8,${encodeURIComponent((generatedPrivateKey ?? "").trim() + "\n")}`}
                   download={`${selected?.name ?? "key"}`}
                   aria-label="Download private key"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download</span>
-                </a>
+                </Link>
               </Button>
             ) : selected?.public_key ? (
               <Button
@@ -469,14 +470,14 @@ export function KeyPairs() {
                 size="sm"
                 className="gap-1.5 rounded-full cursor-pointer"
               >
-                <a
+                <Link
                   href={`data:text/plain;charset=utf-8,${encodeURIComponent(selected.public_key.trim() + "\n")}`}
                   download={`${selected.name ?? "key"}.pub`}
                   aria-label="Download public key"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download</span>
-                </a>
+                </Link>
               </Button>
             ) : undefined}
             <Button

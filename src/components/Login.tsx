@@ -224,7 +224,7 @@ export default function Login() {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-2 top-1/2 flex-shrink-0 p-0 w-6 h-6 transform -translate-y-1/2 cursor-pointer sm:w-8 sm:h-8"
+                            className="absolute right-2 top-1/2 flex-shrink-0 p-0 w-6 h-6 rounded-full transform -translate-y-1/2 cursor-pointer sm:w-8 sm:h-8"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (

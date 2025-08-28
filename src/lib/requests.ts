@@ -42,7 +42,6 @@ import type {
   SecurityGroupRuleCreateRequest,
   SecurityGroupRuleDeleteRequest,
   SecurityGroupUpdateRequest,
-  SSHHostPassword,
   SwitchProjectRequest,
   UpdateUserRolesRequest,
   UserCreateRequest,
@@ -67,7 +66,7 @@ import type {
   AssignUserResponse,
   ClusterActionResponse,
   ClusterDashboardTokenResponse,
-  ClusterDetailsResponse,
+  ClusterDetails,
   ClusterListResponse,
   CreateFromDescriptionResponse,
   DashboardOverviewResponse,
@@ -97,7 +96,6 @@ import type {
   ProjectListResponse,
   ProjectsResponse,
   QemuImgCheckResponse,
-  RemoveSshKeyResponse,
   RemoveUserResponse,
   ResourcesResponse,
   RolesResponse,
@@ -1703,8 +1701,22 @@ export const ClusterService = {
   async createAuto(data: ClusterCreateRequest): Promise<ClusterActionResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
+
+    let url = API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.CREATE_AUTO;
+    const searchParams = new URLSearchParams();
+
+    if (data.password) {
+      searchParams.append("password", data.password);
+      delete data.password;
+    }
+
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+
     const result = await client.post<ClusterActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.CREATE_AUTO,
+      url,
       { type: "json", data },
       { headers: token },
     );
@@ -1712,7 +1724,7 @@ export const ClusterService = {
     return result.data!;
   },
 
-  async removeSshKey(data: SSHHostPassword): Promise<RemoveSshKeyResponse> {
+  /*async removeSshKey(data: SSHHostPassword): Promise<RemoveSshKeyResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<RemoveSshKeyResponse>(
@@ -1723,6 +1735,7 @@ export const ClusterService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
+  */
 
   async getDashboardToken(
     data: ClusterTokenRequest,
@@ -1737,7 +1750,6 @@ export const ClusterService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
-
   async list(): Promise<ClusterListResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
@@ -1749,10 +1761,10 @@ export const ClusterService = {
     return result.data!;
   },
 
-  async get(clusterId: number): Promise<ClusterDetailsResponse> {
+  async get(clusterId: number): Promise<ClusterDetails> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.get<ClusterDetailsResponse>(
+    const result = await client.get<ClusterDetails>(
       API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.CLUSTERS}/${clusterId}`,
       { headers: token },
     );

@@ -396,6 +396,7 @@ export interface ClusterNodeConfig {
 
 export interface ClusterCreateRequest {
   name: string;
+  password?: string;
   nombremaster: number;
   nombreworker: number;
   node_config: ClusterNodeConfig;
