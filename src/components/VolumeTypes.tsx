@@ -1,12 +1,13 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoCard } from "@/components/reusable/InfoCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -166,8 +167,6 @@ export function VolumeTypes() {
     staleTime: 15000,
   });
 
-  // creation handled inside VolumeTypeCreateDialog
-
   const updateMutation = useMutation({
     mutationFn: async (data: VolumeTypeUpdateRequest) =>
       VolumeService.updateVolumeType({
@@ -322,76 +321,64 @@ export function VolumeTypes() {
         </div>
       </div>
 
-      {
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {filteredTypes.map((vt) => (
-            <Card
-              key={vt.ID}
-              className="flex flex-col rounded-xl border shadow-sm"
-            >
-              <CardHeader className="pb-2">
-                <div className="flex gap-3 items-center">
-                  <div className="flex justify-center items-center w-10 h-10 rounded-full bg-primary/10">
-                    <HardDrive className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex gap-2 justify-between items-center">
-                      <CardTitle className="text-base font-semibold truncate">
-                        {vt.Name}
-                      </CardTitle>
-                      <Badge
-                        variant="secondary"
-                        className="inline-flex gap-1 items-center px-2 h-5 text-xs rounded-full"
-                      >
-                        {vt.Is_Public ? (
-                          <>
-                            <Eye className="w-3.5 h-3.5" />
-                            Public
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="w-3.5 h-3.5" />
-                            Private
-                          </>
-                        )}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {vt.Description || "No description"}
-                    </p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <div className="flex gap-3 justify-center">
-                  <Button
-                    variant="outline"
-                    className="rounded-full cursor-pointer"
-                    onClick={() => {
-                      setEditingType(vt);
-                      setViewMode("edit");
-                    }}
-                  >
-                    <Edit className="mr-2 w-4 h-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="text-white rounded-full cursor-pointer"
-                    onClick={() => {
-                      setTypeToDelete(vt);
-                      setShowDelete(true);
-                    }}
-                  >
-                    <Trash2 className="mr-2 w-4 h-4" />
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      }
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {filteredTypes.map((vt) => (
+          <InfoCard
+            key={vt.ID}
+            title={vt.Name}
+            description={vt.Description || "No description"}
+            className="h-full"
+            badges={
+              <Badge
+                variant="secondary"
+                className="inline-flex gap-1 items-center px-2 h-5 text-xs rounded-full"
+              >
+                {vt.Is_Public ? (
+                  <>
+                    <Eye className="w-3.5 h-3.5" />
+                    Public
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-3.5 h-3.5" />
+                    Private
+                  </>
+                )}
+              </Badge>
+            }
+            actionButtons={
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingType(vt);
+                    setViewMode("edit");
+                  }}
+                >
+                  <Edit className="mr-2 w-4 h-4" />
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="text-white rounded-full cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTypeToDelete(vt);
+                    setShowDelete(true);
+                  }}
+                >
+                  <Trash2 className="mr-2 w-4 h-4" />
+                  Delete
+                </Button>
+              </>
+            }
+          />
+        ))}
+      </div>
 
       <Dialog
         open={viewMode === "edit" && !!editingType}

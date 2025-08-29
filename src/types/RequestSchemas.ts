@@ -843,17 +843,31 @@ export const RouterDeleteRequestSchema = z.object({
 
 export const ClusterNodeConfigSchema = z.object({
   name_prefix: z.string(),
-  image_id: z.string(),
+  image_id: z.uuid("Invalid image ID format"),
   flavor_id: z.string(),
-  network_id: z.string(),
+  network_id: z.uuid("Invalid network ID format"),
   security_group: z.string(),
   key_name: z.string(),
 });
 
 export const ClusterCreateRequestSchema = z.object({
   name: z.string(),
-  password: z.string().optional().default("0000"),
-  nombremaster: z.number(),
-  nombreworker: z.number(),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password must be at most 128 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,128}$/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character",
+    )
+    .optional(),
+  nombremaster: z
+    .number()
+    .int("Master count must be an integer")
+    .min(1, "At least 1 master node is required"),
+  nombreworker: z
+    .number()
+    .int("Worker count must be an integer")
+    .min(0, "Worker count cannot be negative"),
   node_config: ClusterNodeConfigSchema,
 });

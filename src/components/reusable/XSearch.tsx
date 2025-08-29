@@ -35,7 +35,7 @@ export function XSearch({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={cn("pl-10 h-10 rounded-full", className)}
+        className={cn("h-10 rounded-full pl-10", className)}
         aria-label={ariaLabel ?? "Search"}
         {...props}
       />

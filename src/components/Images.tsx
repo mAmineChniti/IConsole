@@ -1,10 +1,11 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { GetDistroIcon } from "@/components/GetDistroIcon";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,7 +51,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { XSearch } from "@/components/XSearch";
 import { ImageService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
@@ -114,7 +114,7 @@ function ImportFromUrlDialog({
 }: ImportFromUrlDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+      <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold truncate">
             Import Image from URL
@@ -236,7 +236,7 @@ function ImportByNameDialog({
 }: ImportByNameDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+      <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold truncate">
             Import Image by Name/Description
@@ -341,7 +341,7 @@ function UploadImageDialog({
 }: UploadImageDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+      <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold truncate">
             Upload Image File
@@ -387,16 +387,16 @@ function UploadImageDialog({
                       >
                         <DropzoneEmptyState>
                           <div className="flex flex-col justify-center items-center">
-                            <div className="flex justify-center items-center rounded-md size-8 bg-muted text-muted-foreground">
+                            <div className="flex justify-center items-center rounded-md bg-muted text-muted-foreground size-8">
                               <Upload size={16} />
                             </div>
                             <p className="my-2 w-full text-sm font-medium truncate text-wrap">
                               Upload a file
                             </p>
-                            <p className="w-full text-xs truncate text-wrap text-muted-foreground">
+                            <p className="w-full text-xs text-muted-foreground truncate text-wrap">
                               Drag and drop or click to upload
                             </p>
-                            <p className="text-xs text-wrap text-muted-foreground">
+                            <p className="text-xs text-muted-foreground text-wrap">
                               Accepts .qcow2, .raw, .vmdk, .vdi, .img, .iso
                             </p>
                           </div>
@@ -709,7 +709,6 @@ export function Images() {
     return fields.some((f) => f.includes(q));
   });
 
-  // Reset pagination when search changes
   useEffect(() => {
     setVisibleCount(6);
   }, [searchTerm]);
@@ -1020,7 +1019,7 @@ export function Images() {
           }
         }}
       >
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+        <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Create Volume
@@ -1166,7 +1165,7 @@ export function Images() {
           if (!open) return;
         }}
       >
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+        <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Edit Image
@@ -1315,7 +1314,7 @@ export function Images() {
                     <TableCell className="py-3 w-1/5 align-middle">
                       <button
                         type="button"
-                        className="inline-flex items-center max-w-full font-medium text-left underline cursor-pointer underline-offset-2 decoration-muted-foreground/50 truncate hover:decoration-current"
+                        className="inline-flex items-center max-w-full font-medium text-left underline cursor-pointer decoration-muted-foreground/50 truncate underline-offset-2 hover:decoration-current"
                         onClick={() => {
                           setDetailsImage(image);
                           setIsDetailsOpen(true);
@@ -1422,7 +1421,7 @@ export function Images() {
               <DialogHeader>
                 <div className="flex gap-4 items-start">
                   {detailsImage?.name && (
-                    <div className="p-2 rounded-md border shrink-0 bg-muted/40">
+                    <div className="p-2 rounded-md border bg-muted/40 shrink-0">
                       <GetDistroIcon imageName={detailsImage.name} />
                     </div>
                   )}
@@ -1555,8 +1554,8 @@ export function Images() {
               variant="outline"
               disabled={!hasMore}
               className={cn(
-                "rounded-full px-4 sm:px-6 py-2 w-full sm:w-auto max-w-xs bg-background text-foreground border-border/50",
-                !hasMore ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+                "bg-background text-foreground border-border/50 w-full max-w-xs rounded-full px-4 py-2 sm:w-auto sm:px-6",
+                !hasMore ? "cursor-not-allowed opacity-50" : "cursor-pointer",
               )}
             >
               <span className="truncate">

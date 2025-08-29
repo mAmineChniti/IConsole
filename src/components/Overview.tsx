@@ -1,8 +1,8 @@
 "use client";
 
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -292,7 +292,7 @@ export function Overview() {
             <div className="flex gap-3 items-center mb-3">
               <div
                 className={cn(
-                  "p-3 rounded-full",
+                  "rounded-full p-3",
                   platform_info.hypervisor_errors.length > 0
                     ? "bg-destructive/10"
                     : "bg-green-100 dark:bg-green-900/30",
@@ -576,7 +576,7 @@ export function Overview() {
                   <div
                     key={index}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-xl transition-colors",
+                      "flex items-center justify-between rounded-xl p-3 transition-colors",
                       isHealthy
                         ? "bg-muted/50 hover:bg-muted/70"
                         : "bg-destructive/10 hover:bg-destructive/20",
@@ -591,7 +591,7 @@ export function Overview() {
                         )}
                         <div
                           className={cn(
-                            "w-2 h-2 rounded-full animate-pulse",
+                            "h-2 w-2 animate-pulse rounded-full",
                             isHealthy ? "bg-green-500" : "bg-destructive",
                           )}
                         />
@@ -612,7 +612,7 @@ export function Overview() {
                         }
                         className={cn(
                           service.status === "enabled"
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                             : undefined,
                         )}
                       >
@@ -624,7 +624,7 @@ export function Overview() {
                         }
                         className={cn(
                           service.state === "up"
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                             : "bg-destructive/10 text-destructive",
                         )}
                       >
@@ -661,7 +661,7 @@ export function Overview() {
                   <div
                     key={index}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-xl transition-colors",
+                      "flex items-center justify-between rounded-xl p-3 transition-colors",
                       isOnline
                         ? "bg-muted/50 hover:bg-muted/70"
                         : "bg-destructive/10 hover:bg-destructive/20",
@@ -676,7 +676,7 @@ export function Overview() {
                         )}
                         <div
                           className={cn(
-                            "w-2 h-2 rounded-full animate-pulse",
+                            "h-2 w-2 animate-pulse rounded-full",
                             isOnline ? "bg-green-500" : "bg-destructive",
                           )}
                         />
@@ -696,13 +696,13 @@ export function Overview() {
                         className={cn(
                           "gap-1.5",
                           isOnline
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                             : "bg-destructive/10 text-destructive",
                         )}
                       >
                         <div
                           className={cn(
-                            "w-1.5 h-1.5 rounded-full animate-pulse",
+                            "h-1.5 w-1.5 animate-pulse rounded-full",
                             isOnline ? "bg-green-500" : "bg-destructive",
                           )}
                         />

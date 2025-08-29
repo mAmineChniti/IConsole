@@ -3,10 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { UploadIcon } from "lucide-react";
-import type { ReactNode } from "react";
-import { createContext, useContext } from "react";
-import type { DropEvent, DropzoneOptions, FileRejection } from "react-dropzone";
-import { useDropzone } from "react-dropzone";
+import { createContext, useContext, type ReactNode } from "react";
+import {
+  useDropzone,
+  type DropEvent,
+  type DropzoneOptions,
+  type FileRejection,
+} from "react-dropzone";
 
 type DropzoneContextType = {
   src?: File[];
@@ -84,7 +87,7 @@ export const Dropzone = ({
       <Button
         className={cn(
           "relative h-auto w-full flex-col overflow-hidden p-8",
-          isDragActive && "outline-none ring-1 ring-ring",
+          isDragActive && "ring-ring ring-1 outline-none",
           className,
         )}
         disabled={disabled}
@@ -132,7 +135,7 @@ export const DropzoneContent = ({
 
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>
-      <div className="flex justify-center items-center rounded-md size-8 bg-muted text-muted-foreground">
+      <div className="flex justify-center items-center rounded-md bg-muted text-muted-foreground size-8">
         <UploadIcon size={16} />
       </div>
       <p className="my-2 w-full text-sm font-medium truncate">
@@ -142,7 +145,7 @@ export const DropzoneContent = ({
             )} and ${src.length - maxLabelItems} more`
           : new Intl.ListFormat("en").format(src.map((file) => file.name))}
       </p>
-      <p className="w-full text-xs text-wrap text-muted-foreground">
+      <p className="w-full text-xs text-muted-foreground text-wrap">
         Drag and drop or click to replace
       </p>
     </div>
@@ -185,17 +188,17 @@ export const DropzoneEmptyState = ({
 
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>
-      <div className="flex justify-center items-center rounded-md size-8 bg-muted text-muted-foreground">
+      <div className="flex justify-center items-center rounded-md bg-muted text-muted-foreground size-8">
         <UploadIcon size={16} />
       </div>
       <p className="my-2 w-full text-sm font-medium truncate text-wrap">
         Upload {maxFiles === 1 ? "a file" : "files"}
       </p>
-      <p className="w-full text-xs truncate text-wrap text-muted-foreground">
+      <p className="w-full text-xs text-muted-foreground truncate text-wrap">
         Drag and drop or click to upload
       </p>
       {caption && (
-        <p className="text-xs text-wrap text-muted-foreground">{caption}.</p>
+        <p className="text-xs text-muted-foreground text-wrap">{caption}.</p>
       )}
     </div>
   );

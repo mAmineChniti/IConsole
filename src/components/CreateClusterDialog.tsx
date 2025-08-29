@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ClusterService, InfraService } from "@/lib/requests";
-import { cn, makeDupSafeSelect } from "@/lib/utils";
+import { cn, formatWithDuplicateCount, makeDupSafeSelect } from "@/lib/utils";
 import type { ClusterCreateRequest } from "@/types/RequestInterfaces";
 import { ClusterCreateRequestSchema } from "@/types/RequestSchemas";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
@@ -36,19 +36,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-// Type removed as it's not used
-
-interface CreateClusterDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCreated?: () => void;
-}
-
 export function CreateClusterDialog({
   open,
   onOpenChange,
   onCreated,
-}: CreateClusterDialogProps) {
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCreated?: () => void;
+}) {
   const [showPassword, setShowPassword] = useState(false);
   const { data: resources } = useQuery<ResourcesResponse>({
     queryKey: ["clusterResources"],
@@ -63,7 +59,6 @@ export function CreateClusterDialog({
     } as ResourcesResponse,
   });
 
-  // Ensure resources is never undefined
   const safeResources = resources ?? {
     images: [],
     flavors: [],
@@ -77,45 +72,36 @@ export function CreateClusterDialog({
     defaultValues: {
       name: "",
       password: "0000",
-      nombremaster: 0,
+      nombremaster: 1,
       nombreworker: 0,
       node_config: {
-        name_prefix: "",
+        name_prefix: "k8s",
         image_id: "",
         flavor_id: "",
         network_id: "",
         key_name: "",
-        security_group: "",
+        security_group: "default",
       },
     },
   });
 
   const createCluster = useMutation({
     mutationFn: (formData: ClusterCreateRequest) => {
-      const request: ClusterCreateRequest = {
-        ...formData,
-        node_config: {
-          ...formData.node_config,
-          name_prefix: formData.node_config.name_prefix ?? "k8s",
-          security_group: formData.node_config.security_group ?? "default",
-        },
-      };
-
-      return ClusterService.createAuto(request);
+      return ClusterService.createAuto(formData);
     },
     onSuccess: () => {
       toast.success("Cluster creation started");
       form.reset({
         name: "",
         password: "0000",
-        nombremaster: 0,
+        nombremaster: 1,
         nombreworker: 0,
         node_config: {
-          name_prefix: "",
+          name_prefix: "k8s",
           image_id: "",
           flavor_id: "",
           network_id: "",
-          security_group: "",
+          security_group: "default",
           key_name: "",
         },
       });
@@ -129,7 +115,7 @@ export function CreateClusterDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+      <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold truncate">
             Create New Kubernetes Cluster
@@ -172,9 +158,9 @@ export function CreateClusterDialog({
                         type={showPassword ? "text" : "password"}
                         placeholder="Leave empty for default (0000)"
                         className={cn(
-                          "w-full h-10 rounded-full pr-10",
-                          "border border-input bg-background text-foreground",
-                          "focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+                          "h-10 w-full rounded-full pr-10",
+                          "border-input bg-background text-foreground border",
+                          "focus:border-ring focus:ring-ring focus:ring-offset-background focus:ring-2 focus:ring-offset-2",
                         )}
                         {...field}
                         value={field.value ?? ""}
@@ -260,11 +246,6 @@ export function CreateClusterDialog({
                       const selectedItem = safeResources.images.find(
                         (img) => img.id === field.value,
                       );
-                      const duplicateCount = selectedItem
-                        ? safeResources.images.filter(
-                            (img) => img.name === selectedItem.name,
-                          ).length
-                        : 0;
 
                       return (
                         <Select
@@ -272,47 +253,38 @@ export function CreateClusterDialog({
                           value={fromForm(field.value)}
                         >
                           <FormControl>
-                            <SelectTrigger className="w-full rounded-full cursor-pointer">
+                            <SelectTrigger
+                              className={cn(
+                                "w-full cursor-pointer",
+                                "rounded-full",
+                              )}
+                            >
                               <SelectValue>
                                 {field.value && selectedItem
-                                  ? `${selectedItem?.name ?? `Image (${selectedItem?.id})`}${duplicateCount > 1 ? ` (${safeResources.images.findIndex((img) => img.id === field.value) + 1})` : ""}`
+                                  ? formatWithDuplicateCount(
+                                      selectedItem.name ??
+                                        `Image (${selectedItem.id})`,
+                                      safeResources.images,
+                                      selectedItem,
+                                      (img) => img.name ?? img.id,
+                                    )
                                   : "Select an image"}
                               </SelectValue>
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {options.map((option) => {
-                              const optionDuplicates =
-                                safeResources.images.filter((img) => {
-                                  if (
-                                    !option.original ||
-                                    !("name" in option.original)
-                                  )
-                                    return false;
-                                  return img.name === option.original.name;
-                                }).length;
-
                               return (
                                 <SelectItem
                                   key={option.key}
                                   value={option.value}
                                 >
-                                  {optionDuplicates > 1
-                                    ? `${option.label} (${
-                                        safeResources.images.findIndex(
-                                          (img) => {
-                                            if (
-                                              !option.original ||
-                                              !("id" in option.original)
-                                            )
-                                              return false;
-                                            return (
-                                              img.id === option.original.id
-                                            );
-                                          },
-                                        ) + 1
-                                      })`
-                                    : option.label}
+                                  {formatWithDuplicateCount(
+                                    option.label,
+                                    safeResources.images,
+                                    option.original,
+                                    (img) => img?.name ?? img?.id ?? "",
+                                  )}
                                 </SelectItem>
                               );
                             })}
@@ -342,11 +314,6 @@ export function CreateClusterDialog({
                       const selectedItem = safeResources.flavors.find(
                         (f) => f.id === field.value,
                       );
-                      const duplicateCount = selectedItem
-                        ? safeResources.flavors.filter(
-                            (f) => f.name === selectedItem.name,
-                          ).length
-                        : 0;
 
                       return (
                         <Select
@@ -354,49 +321,37 @@ export function CreateClusterDialog({
                           value={fromForm(field.value)}
                         >
                           <FormControl>
-                            <SelectTrigger className="w-full rounded-full cursor-pointer">
+                            <SelectTrigger
+                              className={cn(
+                                "w-full cursor-pointer",
+                                "rounded-full",
+                              )}
+                            >
                               <SelectValue>
                                 {field.value && selectedItem
-                                  ? `${selectedItem?.name}${duplicateCount > 1 ? ` (${safeResources.flavors.findIndex((f) => f.id === field.value) + 1})` : ""} (${selectedItem?.vcpus} vCPU, ${selectedItem?.ram}MB RAM, ${selectedItem?.disk}GB Disk)`
+                                  ? `${formatWithDuplicateCount(
+                                      selectedItem.name,
+                                      safeResources.flavors,
+                                      selectedItem,
+                                      (f) => f.name,
+                                    )} (${selectedItem.vcpus} vCPU, ${selectedItem.ram}MB RAM, ${selectedItem.disk}GB Disk)`
                                   : "Select a flavor"}
                               </SelectValue>
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {options.map((option) => {
-                              const optionDuplicates =
-                                safeResources.flavors.filter((f) => {
-                                  if (
-                                    !option.original ||
-                                    !("name" in option.original)
-                                  )
-                                    return false;
-                                  return f.name === option.original.name;
-                                }).length;
-
                               return (
                                 <SelectItem
                                   key={option.key}
                                   value={option.value}
                                 >
-                                  {`${option.label}${
-                                    optionDuplicates > 1
-                                      ? ` (${
-                                          safeResources.flavors.findIndex(
-                                            (f) => {
-                                              if (
-                                                !option.original ||
-                                                !("id" in option.original)
-                                              )
-                                                return false;
-                                              return (
-                                                f.id === option.original.id
-                                              );
-                                            },
-                                          ) + 1
-                                        })`
-                                      : ""
-                                  } (${option.original?.vcpus ?? "N/A"} vCPU, ${option.original?.ram ?? "N/A"}MB RAM, ${option.original?.disk ?? "N/A"}GB Disk)`}
+                                  {`${formatWithDuplicateCount(
+                                    option.label,
+                                    safeResources.flavors,
+                                    option.original,
+                                    (f) => f?.name ?? "",
+                                  )} (${option.original?.vcpus ?? "N/A"} vCPU, ${option.original?.ram ?? "N/A"}MB RAM, ${option.original?.disk ?? "N/A"}GB Disk)`}
                                 </SelectItem>
                               );
                             })}
@@ -426,14 +381,6 @@ export function CreateClusterDialog({
                       const selectedItem = safeResources.networks.find(
                         (n) => n.id === field.value,
                       );
-                      const duplicateCount = selectedItem
-                        ? safeResources.networks.filter(
-                            (n) =>
-                              (n.name ?? `Network (${n.id})`) ===
-                              (selectedItem?.name ??
-                                `Network (${selectedItem?.id})`),
-                          ).length
-                        : 0;
 
                       return (
                         <Select
@@ -441,50 +388,38 @@ export function CreateClusterDialog({
                           value={fromForm(field.value)}
                         >
                           <FormControl>
-                            <SelectTrigger className="w-full rounded-full cursor-pointer">
+                            <SelectTrigger
+                              className={cn(
+                                "w-full cursor-pointer",
+                                "rounded-full",
+                              )}
+                            >
                               <SelectValue>
                                 {field.value && selectedItem
-                                  ? `${selectedItem?.name ?? `Network (${selectedItem?.id})`}${duplicateCount > 1 ? ` (${safeResources.networks.findIndex((n) => n.id === field.value) + 1})` : ""}`
+                                  ? formatWithDuplicateCount(
+                                      selectedItem.name ??
+                                        `Network (${selectedItem.id})`,
+                                      safeResources.networks,
+                                      selectedItem,
+                                      (n) => n.name ?? n.id,
+                                    )
                                   : "Select a network"}
                               </SelectValue>
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {options.map((option) => {
-                              const optionDuplicates =
-                                safeResources.networks.filter((n) => {
-                                  if (
-                                    !option.original ||
-                                    !("name" in option.original) ||
-                                    !("id" in option.original)
-                                  )
-                                    return false;
-                                  return (
-                                    (n.name ?? `Network (${n.id})`) ===
-                                    (option.original.name ??
-                                      `Network (${option.original.id})`)
-                                  );
-                                }).length;
-
                               return (
                                 <SelectItem
                                   key={option.key}
                                   value={option.value}
                                 >
-                                  {optionDuplicates > 1
-                                    ? `${option.label} (${
-                                        safeResources.networks.findIndex(
-                                          (n) => {
-                                            if (
-                                              !option.original ||
-                                              !("id" in option.original)
-                                            )
-                                              return false;
-                                            return n.id === option.original.id;
-                                          },
-                                        ) + 1
-                                      })`
-                                    : option.label}
+                                  {formatWithDuplicateCount(
+                                    option.label,
+                                    safeResources.networks,
+                                    option.original,
+                                    (n) => n?.name ?? n?.id ?? "",
+                                  )}
                                 </SelectItem>
                               );
                             })}
@@ -515,11 +450,6 @@ export function CreateClusterDialog({
                         const selectedItem = safeResources.keypairs.find(
                           (kp) => kp.name === field.value,
                         );
-                        const duplicateCount = selectedItem
-                          ? safeResources.keypairs.filter(
-                              (kp) => kp.name === selectedItem.name,
-                            ).length
-                          : 0;
 
                         return (
                           <Select
@@ -527,47 +457,37 @@ export function CreateClusterDialog({
                             value={fromForm(field.value)}
                           >
                             <FormControl>
-                              <SelectTrigger className="w-full rounded-full cursor-pointer">
+                              <SelectTrigger
+                                className={cn(
+                                  "w-full cursor-pointer",
+                                  "rounded-full",
+                                )}
+                              >
                                 <SelectValue>
                                   {field.value && selectedItem
-                                    ? `${selectedItem?.name}${duplicateCount > 1 ? ` (${safeResources.keypairs.findIndex((kp) => kp.name === field.value) + 1})` : ""}`
+                                    ? formatWithDuplicateCount(
+                                        selectedItem.name,
+                                        safeResources.keypairs,
+                                        selectedItem,
+                                        (kp) => kp.name,
+                                      )
                                     : "Select a key pair"}
                                 </SelectValue>
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
                               {options.map((option) => {
-                                const optionDuplicates =
-                                  safeResources.keypairs.filter((kp) => {
-                                    if (
-                                      !option.original ||
-                                      !("name" in option.original)
-                                    )
-                                      return false;
-                                    return kp.name === option.original.name;
-                                  }).length;
-
                                 return (
                                   <SelectItem
                                     key={option.key}
                                     value={option.value}
                                   >
-                                    {optionDuplicates > 1
-                                      ? `${option.label} (${
-                                          safeResources.keypairs.findIndex(
-                                            (kp) => {
-                                              if (
-                                                !option.original ||
-                                                !("name" in option.original)
-                                              )
-                                                return false;
-                                              return (
-                                                kp.name === option.original.name
-                                              );
-                                            },
-                                          ) + 1
-                                        })`
-                                      : option.label}
+                                    {formatWithDuplicateCount(
+                                      option.label,
+                                      safeResources.keypairs,
+                                      option.original,
+                                      (kp) => kp?.name ?? "",
+                                    )}
                                   </SelectItem>
                                 );
                               })}
@@ -597,11 +517,6 @@ export function CreateClusterDialog({
                         const selectedItem = safeResources.security_groups.find(
                           (sg) => sg.name === field.value,
                         );
-                        const duplicateCount = selectedItem
-                          ? safeResources.security_groups.filter(
-                              (sg) => sg.name === selectedItem.name,
-                            ).length
-                          : 0;
 
                         return (
                           <Select
@@ -609,47 +524,37 @@ export function CreateClusterDialog({
                             value={fromForm(field.value)}
                           >
                             <FormControl>
-                              <SelectTrigger className="w-full rounded-full cursor-pointer">
+                              <SelectTrigger
+                                className={cn(
+                                  "w-full cursor-pointer",
+                                  "rounded-full",
+                                )}
+                              >
                                 <SelectValue>
                                   {field.value && selectedItem
-                                    ? `${selectedItem?.name}${duplicateCount > 1 ? ` (${safeResources.security_groups.findIndex((sg) => sg.name === field.value) + 1})` : ""}`
+                                    ? formatWithDuplicateCount(
+                                        selectedItem.name,
+                                        safeResources.security_groups,
+                                        selectedItem,
+                                        (sg) => sg.name,
+                                      )
                                     : "Select a security group"}
                                 </SelectValue>
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
                               {options.map((option) => {
-                                const optionDuplicates =
-                                  safeResources.security_groups.filter((sg) => {
-                                    if (
-                                      !option.original ||
-                                      !("name" in option.original)
-                                    )
-                                      return false;
-                                    return sg.name === option.original.name;
-                                  }).length;
-
                                 return (
                                   <SelectItem
                                     key={option.key}
                                     value={option.value}
                                   >
-                                    {optionDuplicates > 1
-                                      ? `${option.label} (${
-                                          safeResources.security_groups.findIndex(
-                                            (sg) => {
-                                              if (
-                                                !option.original ||
-                                                !("name" in option.original)
-                                              )
-                                                return false;
-                                              return (
-                                                sg.name === option.original.name
-                                              );
-                                            },
-                                          ) + 1
-                                        })`
-                                      : option.label}
+                                    {formatWithDuplicateCount(
+                                      option.label,
+                                      safeResources.security_groups,
+                                      option.original,
+                                      (sg) => sg?.name ?? "",
+                                    )}
                                   </SelectItem>
                                 );
                               })}

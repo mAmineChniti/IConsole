@@ -260,8 +260,6 @@ export function Sidebar() {
   });
 
   const handleProjectChange = (projectId: string) => {
-    setSelectedProject(projectId);
-    localStorage.setItem("selectedProject", projectId);
     switchProjectMutation.mutate(projectId);
   };
   const logoutMutation = useMutation({
@@ -312,8 +310,12 @@ export function Sidebar() {
   return (
     <ShadcnSidebar className="flex overflow-hidden flex-col w-64 h-full border-r bg-sidebar text-sidebar-foreground border-sidebar-border">
       <SidebarHeader className="p-3 border-b sm:p-4 border-sidebar-border bg-sidebar">
-        <div className="flex gap-2 justify-center items-center min-w-0">
-          <div className="relative">
+        <div className="flex justify-center items-center min-w-0">
+          <Link
+            href="/dashboard/overview"
+            aria-label="Go to Overview"
+            className="flex gap-2 items-center min-w-0"
+          >
             <div className="flex justify-center items-center w-7 h-7 bg-gradient-to-br rounded-full shadow-lg from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
               <Shield
                 className="w-4 h-4 text-white"
@@ -321,10 +323,10 @@ export function Sidebar() {
                 focusable="false"
               />
             </div>
-          </div>
-          <span className="font-sans text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br select-none truncate from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
-            IConsole
-          </span>
+            <span className="font-sans text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br select-none truncate from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+              IConsole
+            </span>
+          </Link>
         </div>
       </SidebarHeader>
 
@@ -346,15 +348,15 @@ export function Sidebar() {
                 <SidebarMenuButton
                   asChild
                   className={cn(
-                    "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                    "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                     selectedProject && "rounded-full",
                   )}
                 >
                   <ComboboxTrigger
                     className={cn(
-                      "w-full flex items-center justify-start cursor-pointer rounded-full text-sidebar-foreground border-0 bg-transparent shadow-none text-sm font-medium min-w-0 hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                      "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-full border-0 bg-transparent text-sm font-medium shadow-none transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                       switchProjectMutation.isPending &&
-                        "opacity-50 cursor-not-allowed",
+                        "cursor-not-allowed opacity-50",
                       selectedProject && "rounded-full",
                     )}
                   />
@@ -402,16 +404,16 @@ export function Sidebar() {
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                      "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                       isActive && "rounded-full",
                     )}
                   >
                     <Link
                       href={item.href}
                       className={cn(
-                        "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                        "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                         isActive
-                          ? "bg-accent text-accent-foreground font-bold rounded-full"
+                          ? "bg-accent text-accent-foreground rounded-full font-bold"
                           : "text-sidebar-foreground",
                       )}
                     >
@@ -429,7 +431,7 @@ export function Sidebar() {
               <SidebarMenuButton
                 asChild
                 className={cn(
-                  "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                  "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                   computeOpen && "rounded-full",
                 )}
               >
@@ -437,7 +439,7 @@ export function Sidebar() {
                   variant="ghost"
                   onClick={() => setComputeOpen(!computeOpen)}
                   className={cn(
-                    "w-full flex items-center justify-start cursor-pointer text-sidebar-foreground min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                    "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                     computeOpen && "rounded-full",
                   )}
                 >
@@ -447,7 +449,7 @@ export function Sidebar() {
                   </span>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform flex-shrink-0",
+                      "h-4 w-4 flex-shrink-0 transition-transform",
                       computeOpen && "rotate-180",
                     )}
                   />
@@ -463,16 +465,16 @@ export function Sidebar() {
                         <SidebarMenuButton
                           asChild
                           className={cn(
-                            "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                            "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                             isSubActive && "rounded-full",
                           )}
                         >
                           <Link
                             href={subItem.href}
                             className={cn(
-                              "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                              "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                               isSubActive
-                                ? "bg-accent text-accent-foreground font-bold rounded-full"
+                                ? "bg-accent text-accent-foreground rounded-full font-bold"
                                 : "text-sidebar-foreground",
                             )}
                           >
@@ -495,16 +497,16 @@ export function Sidebar() {
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                      "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                       isActive && "rounded-full",
                     )}
                   >
                     <Link
                       href={item.href}
                       className={cn(
-                        "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                        "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                         isActive
-                          ? "bg-accent text-accent-foreground font-bold rounded-full"
+                          ? "bg-accent text-accent-foreground rounded-full font-bold"
                           : "text-sidebar-foreground",
                       )}
                     >
@@ -521,7 +523,7 @@ export function Sidebar() {
               <SidebarMenuButton
                 asChild
                 className={cn(
-                  "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                  "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                   volumeOpen && "rounded-full",
                 )}
               >
@@ -529,7 +531,7 @@ export function Sidebar() {
                   variant="ghost"
                   onClick={() => setVolumeOpen(!volumeOpen)}
                   className={cn(
-                    "w-full flex items-center justify-start cursor-pointer text-sidebar-foreground min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                    "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                     volumeOpen && "rounded-full",
                   )}
                 >
@@ -539,7 +541,7 @@ export function Sidebar() {
                   </span>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform flex-shrink-0",
+                      "h-4 w-4 flex-shrink-0 transition-transform",
                       volumeOpen && "rotate-180",
                     )}
                   />
@@ -555,16 +557,16 @@ export function Sidebar() {
                         <SidebarMenuButton
                           asChild
                           className={cn(
-                            "w-full h-10 px-3 hover:bg-accent hover:text-accent-foreground rounded-md group hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                            "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                             isSubActive && "rounded-full",
                           )}
                         >
                           <Link
                             href={subItem.href}
                             className={cn(
-                              "w-full flex items-center justify-start cursor-pointer min-w-0 rounded-md hover:rounded-full focus:rounded-full active:rounded-full transition-all",
+                              "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
                               isSubActive
-                                ? "bg-accent text-accent-foreground font-bold rounded-full"
+                                ? "bg-accent text-accent-foreground rounded-full font-bold"
                                 : "text-sidebar-foreground",
                             )}
                           >
@@ -597,7 +599,7 @@ export function Sidebar() {
                   .slice(0, 2)}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-semibold truncate max-w-[140px]">
+            <span className="text-sm font-semibold max-w-[140px] truncate">
               {userName}
             </span>
           </div>
@@ -631,7 +633,7 @@ export function Sidebar() {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full flex items-center justify-start !text-destructive min-w-0 rounded-full transition-all"
+            className="!text-destructive flex w-full min-w-0 items-center justify-start rounded-full transition-all"
             style={{ color: "var(--color-destructive)" }}
           >
             <LogOut className="flex-shrink-0 mr-3 w-4 h-4" />

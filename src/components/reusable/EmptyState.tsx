@@ -67,7 +67,7 @@ export function EmptyState({
         <CardContent className={cn(padding, "flex flex-col")}>
           <div
             className={cn(
-              "flex flex-col items-center text-center gap-3 sm:gap-4",
+              "flex flex-col items-center gap-3 text-center sm:gap-4",
               minH,
             )}
           >
@@ -81,7 +81,7 @@ export function EmptyState({
               </h3>
             ) : undefined}
 
-            <p className="mx-auto max-w-xl leading-relaxed sm:text-base text-[15px] text-muted-foreground">
+            <p className="mx-auto max-w-xl leading-relaxed sm:text-base text-muted-foreground text-[15px]">
               {text}
             </p>
           </div>
@@ -126,7 +126,7 @@ export function EmptyState({
                   onClick={action.onClick}
                   disabled={action.disabled}
                   className={cn(
-                    "w-full h-9 sm:w-auto px-5 rounded-full cursor-pointer gap-2 hover:bg-primary hover:shadow-none",
+                    "hover:bg-primary h-9 w-full cursor-pointer gap-2 rounded-full px-5 hover:shadow-none sm:w-auto",
                     action.className,
                   )}
                 >

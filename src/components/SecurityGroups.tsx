@@ -1,9 +1,10 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { XSearch } from "@/components/reusable/XSearch";
 import { SecurityGroupCreateDialog } from "@/components/SecurityGroupCreateDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { XSearch } from "@/components/XSearch";
 import { SecurityGroupService } from "@/lib/requests";
 import type {
   SecurityGroupDeleteRequest,
@@ -101,7 +101,7 @@ export function SecurityGroups() {
   useEffect(() => {
     if (!ruleDeleteOpen) setRuleToDelete(undefined);
   }, [ruleDeleteOpen]);
-  // Reset pagination on search change
+
   useEffect(() => {
     setVisibleCount(6);
   }, [search]);
@@ -114,7 +114,6 @@ export function SecurityGroups() {
     });
   const groups = data ?? [];
 
-  // Client-side filtering by name/description
   const q = search.trim().toLowerCase();
   const filtered = q
     ? groups.filter((g) =>
@@ -126,8 +125,6 @@ export function SecurityGroups() {
   const totalItems = filtered.length;
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < totalItems;
-
-  // create dialog handled by SecurityGroupCreateDialog
 
   const editForm = useForm<SecurityGroupUpdateRequest>({
     resolver: zodResolver(SecurityGroupUpdateRequestSchema),
@@ -524,7 +521,7 @@ export function SecurityGroups() {
       )}
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+        <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               Edit Security Group
@@ -619,7 +616,7 @@ export function SecurityGroups() {
           }
         }}
       >
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-md bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+        <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               {selectedGroup ? `Add Rule • ${selectedGroup.Name}` : "Add Rule"}
@@ -827,7 +824,7 @@ export function SecurityGroups() {
           }
         }}
       >
-        <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+        <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold truncate">
               {selectedGroup ? `Rules • ${selectedGroup.Name}` : "Rules"}

@@ -1,9 +1,11 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoCard } from "@/components/reusable/InfoCard";
+import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +28,6 @@ import { VolumeCreateSnapshotDialog } from "@/components/VolumeCreateSnapshotDia
 import { VolumeDetailsDialog } from "@/components/VolumeDetailsDialog";
 import { VolumeExtendDialog } from "@/components/VolumeExtendDialog";
 import { VolumeUploadToImageDialog } from "@/components/VolumeUploadToImageDialog";
-import { XSearch } from "@/components/XSearch";
 import { VolumeService } from "@/lib/requests";
 import { cn, parseVolumeSizeGiB } from "@/lib/utils";
 import type { VolumeDeleteRequest } from "@/types/RequestInterfaces";
@@ -34,9 +35,10 @@ import type { VolumeDetails } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
-  Eye,
   HardDrive,
   Loader2,
+  MapPin,
+  MoreHorizontal,
   Plus,
   RefreshCw,
   Server,
@@ -314,39 +316,40 @@ export function Volumes() {
           No volumes match your search.
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {visibleData.map((volume, idx) => (
-            <Card
-              key={volume.ID || idx}
-              className="flex flex-col h-full rounded-xl border shadow-lg transition-all duration-200 bg-card text-card-foreground border-border/50 group"
-            >
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-lg font-semibold text-card-foreground truncate">
-                    {volume.Name ?? "Unnamed"}
-                  </CardTitle>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          {visibleData.map((volume) => (
+            <InfoCard
+              key={volume.ID}
+              title={volume.Name || volume.ID}
+              className="h-full"
+              onClick={() => {
+                setSelectedVolumeId(volume.ID);
+                setDetailsDialogOpen(true);
+              }}
+              badges={
+                <div className="flex items-center space-x-1">
                   <Badge
                     variant={
                       volume.Status === "Available"
                         ? "default"
                         : volume.Status === "In-use"
                           ? "secondary"
-                          : "secondary"
+                          : "outline"
                     }
                     className={cn(
                       "gap-1.5",
                       volume.Status === "Available"
-                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                         : volume.Status === "In-use"
-                          ? "bg-muted text-muted-foreground border border-border"
-                          : "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
+                          ? "bg-muted text-muted-foreground border-border border"
+                          : "border border-blue-200 bg-blue-100 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
                     )}
                   >
                     {volume.Status === "Available" ||
                     volume.Status === "In-use" ? (
                       <div
                         className={cn(
-                          "w-1.5 h-1.5 rounded-full animate-pulse",
+                          "h-1.5 w-1.5 animate-pulse rounded-full",
                           volume.Status === "Available"
                             ? "bg-green-500"
                             : "bg-muted-foreground",
@@ -357,209 +360,167 @@ export function Volumes() {
                     )}
                     {volume.Status}
                   </Badge>
+                  <Badge variant="outline" className="flex gap-1 items-center">
+                    <HardDrive className="w-3 h-3" />
+                    {volume.Size} GB
+                  </Badge>
                 </div>
-              </CardHeader>
-              <CardContent className="flex flex-col flex-1 pt-0">
-                <div className="flex-1 space-y-3">
-                  <div className="flex flex-col gap-3 mt-2">
-                    <div className="flex flex-row gap-3 items-center">
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex gap-2 items-center w-full">
-                          <span className="inline-flex justify-center items-center w-7 h-7 bg-blue-100 rounded-md dark:bg-blue-900/30">
-                            <HardDrive className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                          </span>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-medium text-muted-foreground">
-                              Size
-                            </span>
-                            <span className="text-sm font-semibold text-card-foreground truncate">
-                              {volume.Size}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex gap-2 items-center w-full">
-                          <span className="inline-flex justify-center items-center w-7 h-7 bg-purple-100 rounded-md dark:bg-purple-900/30">
-                            <Server className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-                          </span>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-medium text-muted-foreground">
-                              Type
-                            </span>
-                            <span className="text-sm font-semibold text-card-foreground truncate">
-                              {volume.Type ?? "-"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-row gap-3 items-center">
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs font-medium text-muted-foreground">
-                            Availability Zone
-                          </span>
-                          <span className="text-sm font-semibold text-card-foreground truncate">
-                            {volume["Availability Zone"] ?? "-"}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs font-medium text-muted-foreground">
-                            Bootable
-                          </span>
-                          <span className="text-sm font-semibold text-card-foreground truncate">
-                            {volume.Bootable ?? "-"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 mt-4">
-                  <div className="flex gap-2 justify-center w-full">
+              }
+              infoItems={[
+                [
+                  {
+                    label: "Size",
+                    value: volume.Size,
+                    icon: HardDrive,
+                    variant: "blue",
+                  },
+                  {
+                    label: "Type",
+                    value: volume.Type || "-",
+                    icon: Server,
+                    variant: "purple",
+                  },
+                ],
+                [
+                  {
+                    label: "Availability Zone",
+                    value: volume["Availability Zone"] || "-",
+                    icon: MapPin,
+                    variant: "emerald",
+                  },
+                  {
+                    label: "Bootable",
+                    value: volume.Bootable || "-",
+                    icon: HardDrive,
+                    variant: volume.Bootable === "true" ? "emerald" : "gray",
+                  },
+                ],
+              ]}
+              actionButtons={
+                <>
+                  <DropdownMenu>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-2 px-3 rounded-full cursor-pointer"
-                          aria-label="View details"
-                          onClick={() => {
-                            setSelectedVolumeId(volume.ID);
-                            setDetailsDialogOpen(true);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" /> View
-                        </Button>
+                        <span className="inline-flex">
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2 px-3 rounded-full cursor-pointer"
+                              onClick={(e) => e.stopPropagation()}
+                              aria-label="Actions"
+                            >
+                              <MoreHorizontal className="w-4 h-4" />
+                              Actions
+                            </Button>
+                          </DropdownMenuTrigger>
+                        </span>
                       </TooltipTrigger>
-                      <TooltipContent>View volume details</TooltipContent>
+                      <TooltipContent>Open volume actions</TooltipContent>
                     </Tooltip>
-
-                    <DropdownMenu>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="inline-flex">
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="gap-2 px-3 rounded-full cursor-pointer"
-                                onClick={(e) => e.stopPropagation()}
-                                aria-label="Actions"
-                              >
-                                Actions
-                              </Button>
-                            </DropdownMenuTrigger>
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent>Open volume actions</TooltipContent>
-                      </Tooltip>
-                      <DropdownMenuContent
-                        align="end"
-                        onClick={(e) => e.stopPropagation()}
+                    <DropdownMenuContent
+                      align="end"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setAttachmentsDialog({
+                            open: true,
+                            volumeId: volume.ID,
+                          });
+                        }}
                       >
+                        <Server className="w-4 h-4" /> Attachments
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setExtendDialog({
+                            open: true,
+                            volumeId: volume.ID,
+                            currentSize: parseVolumeSizeGiB(volume.Size),
+                          });
+                        }}
+                      >
+                        <Plus className="w-4 h-4" /> Extend
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setUploadDialog({
+                            open: true,
+                            volumeId: volume.ID,
+                          });
+                        }}
+                      >
+                        <HardDrive className="w-4 h-4" /> Upload to Image
+                      </DropdownMenuItem>
+                      {volume.Status !== "In-use" && (
                         <DropdownMenuItem
                           onSelect={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setAttachmentsDialog({
+                            setSnapshotDialog({
                               open: true,
                               volumeId: volume.ID,
                             });
                           }}
                         >
-                          <Server className="w-4 h-4" /> Attachments
+                          <Box className="w-4 h-4" /> Create Snapshot
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setExtendDialog({
-                              open: true,
-                              volumeId: volume.ID,
-                              currentSize: parseVolumeSizeGiB(volume.Size),
-                            });
-                          }}
-                        >
-                          <Plus className="w-4 h-4" /> Extend
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setUploadDialog({
-                              open: true,
-                              volumeId: volume.ID,
-                            });
-                          }}
-                        >
-                          <HardDrive className="w-4 h-4" /> Upload to Image
-                        </DropdownMenuItem>
-                        {volume.Status !== "In-use" && (
-                          <DropdownMenuItem
-                            onSelect={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setSnapshotDialog({
-                                open: true,
-                                volumeId: volume.ID,
-                              });
-                            }}
-                          >
-                            <Box className="w-4 h-4" /> Create Snapshot
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setChangeTypeDialog({
-                              open: true,
-                              volumeId: volume.ID,
-                            });
-                          }}
-                        >
-                          <RefreshCw className="w-4 h-4" /> Change Type
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setVolumeToDelete(volume);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="gap-2 px-3 rounded-full cursor-pointer"
-                          aria-label="Delete volume"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setVolumeToDelete(volume);
-                            setDeleteDialogOpen(true);
-                          }}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="w-4 h-4" /> Delete
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Delete this volume</TooltipContent>
-                    </Tooltip>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                      )}
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setChangeTypeDialog({
+                            open: true,
+                            volumeId: volume.ID,
+                          });
+                        }}
+                      >
+                        <RefreshCw className="w-4 h-4" /> Change Type
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setVolumeToDelete(volume);
+                          setDeleteDialogOpen(true);
+                        }}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="mr-2 w-4 h-4" /> Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="gap-2 px-3 rounded-full cursor-pointer"
+                        aria-label="Delete volume"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setVolumeToDelete(volume);
+                          setDeleteDialogOpen(true);
+                        }}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" /> Delete
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete this volume</TooltipContent>
+                  </Tooltip>
+                </>
+              }
+            />
           ))}
         </div>
       )}
@@ -646,7 +607,7 @@ export function Volumes() {
           onClick={handleShowMore}
           variant="outline"
           disabled={!hasMore}
-          className={`rounded-full transition-all duration-200 px-6 py-2 bg-background text-foreground border-border ${hasMore ? "hover:bg-accent hover:text-accent-foreground hover:scale-105" : "opacity-50 cursor-not-allowed"}`}
+          className={`bg-background text-foreground border-border rounded-full px-6 py-2 transition-all duration-200 ${hasMore ? "hover:bg-accent hover:text-accent-foreground hover:scale-105" : "cursor-not-allowed opacity-50"}`}
         >
           {hasMore
             ? `Show More (${Math.min(6, totalItems - visibleCount)} more)`

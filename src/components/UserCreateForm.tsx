@@ -245,7 +245,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                             }
                           >
                             <ComboboxTrigger
-                              className="flex-1 !h-10 rounded-full cursor-pointer"
+                              className="!h-10 flex-1 cursor-pointer rounded-full"
                               disabled={
                                 isProjectsLoading ||
                                 (availableProjects?.projects?.length ?? 0) === 0
@@ -334,7 +334,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                                       variant={selected ? "default" : "outline"}
                                       onClick={() => toggle(r.name)}
                                       className={
-                                        "cursor-pointer select-none hover:opacity-80 transition-opacity px-3 py-1 rounded-full text-sm font-medium" +
+                                        "cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-opacity select-none hover:opacity-80" +
                                         (selected
                                           ? " bg-primary text-primary-foreground"
                                           : "")
@@ -384,7 +384,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
             <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="rounded-full transition-all duration-200 cursor-pointer min-w-[120px] bg-primary text-primary-foreground"
+              className="rounded-full transition-all duration-200 cursor-pointer bg-primary text-primary-foreground min-w-[120px]"
             >
               {createMutation.isPending ? (
                 <>

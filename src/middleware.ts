@@ -1,5 +1,4 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -8,15 +7,21 @@ export function middleware(request: NextRequest) {
   const isLoggedIn = !!(user && token);
 
   const protectedRoutes = [
-    "/dashboard/overview",
-    "/dashboard/instances",
+    "/dashboard/clusters",
+    "/dashboard/flavors",
     "/dashboard/images",
-    "/dashboard/projects",
+    "/dashboard/instances",
+    "/dashboard/keypairs",
     "/dashboard/migrate-vm",
+    "/dashboard/networks",
+    "/dashboard/overview",
+    "/dashboard/projects",
+    "/dashboard/scale",
+    "/dashboard/security-groups",
+    "/dashboard/snapshots",
+    "/dashboard/users",
     "/dashboard/volume-types",
     "/dashboard/volumes",
-    "/dashboard/snapshots",
-    "/dashboard/clusters",
   ];
 
   if (pathname === "/") {

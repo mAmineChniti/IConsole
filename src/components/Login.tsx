@@ -179,9 +179,9 @@ export default function Login() {
                             autoCorrect="off"
                             spellCheck={false}
                             className={cn(
-                              "h-10 sm:h-12 pl-10 pr-4 text-sm transition-all duration-200 w-full",
-                              "border border-input bg-background text-foreground rounded-full font-sans",
-                              "focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+                              "h-10 w-full pr-4 pl-10 text-sm transition-all duration-200 sm:h-12",
+                              "border-input bg-background text-foreground rounded-full border font-sans",
+                              "focus:border-ring focus:ring-ring focus:ring-offset-background focus:ring-2 focus:ring-offset-2",
                               "placeholder:text-muted-foreground",
                             )}
                           />
@@ -213,9 +213,9 @@ export default function Login() {
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter your password"
                             className={cn(
-                              "h-10 sm:h-12 pl-10 pr-12 text-sm transition-all duration-200 w-full",
-                              "border border-input bg-background text-foreground rounded-full font-sans",
-                              "focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+                              "h-10 w-full pr-12 pl-10 text-sm transition-all duration-200 sm:h-12",
+                              "border-input bg-background text-foreground rounded-full border font-sans",
+                              "focus:border-ring focus:ring-ring focus:ring-offset-background focus:ring-2 focus:ring-offset-2",
                               "placeholder:text-muted-foreground",
                             )}
                           />
@@ -261,10 +261,10 @@ export default function Login() {
                   type="submit"
                   disabled={loginMutation.isPending}
                   className={cn(
-                    "w-full h-10 sm:h-12 text-sm font-medium transition-all duration-200 rounded-full cursor-pointer",
+                    "h-10 w-full cursor-pointer rounded-full text-sm font-medium transition-all duration-200 sm:h-12",
                     "bg-primary text-primary-foreground shadow-lg",
-                    "focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
-                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    "focus:ring-ring focus:ring-offset-background focus:ring-2 focus:ring-offset-2",
+                    "disabled:cursor-not-allowed disabled:opacity-50",
                   )}
                 >
                   <div className="flex gap-2 justify-center items-center">

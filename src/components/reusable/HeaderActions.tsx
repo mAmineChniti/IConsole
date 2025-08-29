@@ -46,7 +46,7 @@ export function HeaderActions({
   return (
     <div
       className={cn(
-        "flex gap-3 justify-end items-center w-full sm:w-auto",
+        "flex w-full items-center justify-end gap-3 sm:w-auto",
         className,
       )}
     >
@@ -58,7 +58,7 @@ export function HeaderActions({
             onClick={onRefresh}
             disabled={isRefreshing}
             className={cn(
-              "p-0 w-9 h-9 rounded-full border transition-all duration-200 cursor-pointer bg-card text-card-foreground border-border/50",
+              "bg-card text-card-foreground border-border/50 h-9 w-9 cursor-pointer rounded-full border p-0 transition-all duration-200",
               isRefreshing && "opacity-70",
               refreshButtonClassName,
             )}
@@ -85,7 +85,7 @@ export function HeaderActions({
               onClick={btn.onClick}
               disabled={btn.disabled}
               className={cn(
-                "gap-2 px-4 font-semibold rounded-full shadow-md transition-all duration-300 cursor-pointer bg-primary text-primary-foreground",
+                "bg-primary text-primary-foreground cursor-pointer gap-2 rounded-full px-4 font-semibold shadow-md transition-all duration-300",
                 btn.className,
               )}
             >

@@ -193,7 +193,7 @@ export function SummaryStep({
           <Button
             onClick={onCreateVM}
             disabled={isCreating}
-            className="order-1 w-full rounded-full transition-all duration-200 cursor-pointer sm:order-2 sm:w-auto min-w-[180px] bg-primary text-primary-foreground"
+            className="order-1 w-full rounded-full transition-all duration-200 cursor-pointer sm:order-2 sm:w-auto bg-primary text-primary-foreground min-w-[180px]"
           >
             {isCreating ? (
               <>
