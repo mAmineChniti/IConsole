@@ -3,11 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { UploadIcon } from "lucide-react";
-import type { ReactNode } from "react";
-import { createContext, useContext } from "react";
-import type { DropEvent, DropzoneOptions, FileRejection } from "react-dropzone";
-import { useDropzone } from "react-dropzone";
-
+import { type ReactNode, createContext, useContext } from "react";
+import {
+  type DropEvent,
+  type DropzoneOptions,
+  type FileRejection,
+  useDropzone,
+} from "react-dropzone";
 type DropzoneContextType = {
   src?: File[];
   accept?: DropzoneOptions["accept"];

@@ -1,10 +1,10 @@
 "use client";
 
 import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { GetDistroIcon } from "@/components/GetDistroIcon";
-import { HeaderActions } from "@/components/HeaderActions";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,7 +50,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { XSearch } from "@/components/XSearch";
+import { XSearch } from "@/components/reusable/XSearch";
 import { ImageService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
@@ -709,7 +709,6 @@ export function Images() {
     return fields.some((f) => f.includes(q));
   });
 
-  // Reset pagination when search changes
   useEffect(() => {
     setVisibleCount(6);
   }, [searchTerm]);

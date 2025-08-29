@@ -1,13 +1,14 @@
 "use client";
 
 import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoCard } from "@/components/reusable/InfoCard";
 import { NetworkCreate } from "@/components/NetworkCreate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { XSearch } from "@/components/XSearch";
+import { XSearch } from "@/components/reusable/XSearch";
 import { NetworkService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type { RouterCreateRequest } from "@/types/RequestInterfaces";
@@ -302,19 +303,13 @@ export function Networks() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                 {visibleData.map((n: NetworkListItem) => (
-                  <Card
+                  <InfoCard
                     key={n.id}
-                    className="overflow-hidden border shadow-sm bg-card border-border/50"
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex gap-2 justify-between items-start sm:items-center">
-                        <div className="flex flex-1 gap-2 items-center min-w-0">
-                          <CardTitle className="text-base font-semibold leading-tight break-words sm:text-lg">
-                            {n.name || n.id}
-                          </CardTitle>
-                        </div>
+                    title={n.name}
+                    badges={
+                      <>
                         <Badge
                           variant={
                             n.status === "ACTIVE" ? "default" : "destructive"
@@ -340,50 +335,56 @@ export function Networks() {
                               ? "Offline"
                               : (n.status?.toLowerCase() ?? "unknown")}
                         </Badge>
-                        <div className="flex flex-shrink-0 gap-1 sm:gap-2">
-                          <Badge
-                            variant={n.is_external ? "default" : "secondary"}
-                            className="py-1 px-2 text-xs rounded-full"
-                          >
-                            {n.is_external ? "Ext" : "Int"}
-                          </Badge>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className={cn(
-                              "h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0 rounded-full",
-                            )}
-                            onClick={() => {
-                              setSelectedNetworkId(n.id);
-                              setShowRouterDialog(true);
-                            }}
-                          >
-                            <Router className="w-3 h-3 sm:w-4 sm:h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className={cn(
-                              "h-7 w-7 sm:h-8 sm:w-8 p-0 cursor-pointer flex-shrink-0 rounded-full",
-                              deleteMutation.isPending && "opacity-70",
-                            )}
-                            onClick={() => {
-                              setNetworkToDelete(n);
-                              setDeleteDialogOpen(true);
-                            }}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-3">
-                      <div className="text-xs text-muted-foreground">
-                        Subnets: {n.subnets?.length ?? 0}
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <Badge
+                          variant={n.is_external ? "default" : "secondary"}
+                          className="py-1 px-2 text-xs rounded-full"
+                        >
+                          {n.is_external ? "External" : "Internal"}
+                        </Badge>
+                      </>
+                    }
+                    infoItems={[
+                      [
+                        {
+                          label: "Subnets",
+                          value: n.subnets?.length?.toString() || "0",
+                          icon: Network,
+                          variant: "purple",
+                        },
+                      ],
+                    ]}
+                    actionButtons={
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-full cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedNetworkId(n.id);
+                            setShowRouterDialog(true);
+                          }}
+                        >
+                          <Router className="w-3 h-3 sm:w-4 sm:h-4" />
+                          Add Router
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="rounded-full cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNetworkToDelete(n);
+                            setDeleteDialogOpen(true);
+                          }}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          Delete Network
+                        </Button>
+                      </>
+                    }
+                  />
                 ))}
               </div>
               <div className="flex justify-center mt-4">

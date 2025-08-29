@@ -1,6 +1,6 @@
 "use client";
 
-import { ErrorCard } from "@/components/ErrorCard";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { Button } from "@/components/ui/button";
 import {
   Card,

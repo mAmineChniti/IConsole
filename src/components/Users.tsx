@@ -1,11 +1,11 @@
 "use client";
 
 import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoCard } from "@/components/reusable/InfoCard";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/tooltip";
 import { UserCreateForm } from "@/components/UserCreateForm";
 import { UserEditForm } from "@/components/UserEditForm";
-import { XSearch } from "@/components/XSearch";
+import { XSearch } from "@/components/reusable/XSearch";
 import { UserService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
@@ -24,7 +24,17 @@ import type {
   UserListResponse,
 } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, Plus, RefreshCw, Trash2, User, UserCheck } from "lucide-react";
+import {
+  AtSign,
+  Check,
+  Edit,
+  Mail,
+  Plus,
+  RefreshCw,
+  Trash2,
+  User,
+  UserCheck,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -146,54 +156,26 @@ export function UsersManager() {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card
+            <div
               key={i}
-              className="flex overflow-hidden flex-col rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="p-6 rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
             >
-              <div className="absolute inset-0 bg-gradient-to-br to-transparent opacity-0 transition-opacity duration-300 pointer-events-none from-primary/[0.02]" />
-              <CardHeader className="relative pb-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-1 gap-4 items-center min-w-0">
-                    <div className="relative">
-                      <div className="flex justify-center items-center w-12 h-12 rounded-full ring-1 transition-all duration-300 bg-muted ring-border/50">
-                        <Skeleton className="w-6 h-6 rounded-md" />
-                      </div>
-                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-500 rounded-full border-2 animate-pulse border-card" />
-                    </div>
-                    <div className="flex-1 space-y-1 min-w-0">
-                      <Skeleton className="w-32 h-6" />
-                      <Skeleton className="w-24 h-4 rounded-full" />
-                    </div>
-                  </div>
-                  <div className="flex z-10 gap-1 ml-3">
-                    <Skeleton className="p-0 w-8 h-8 rounded-full" />
-                    <Skeleton className="p-0 w-8 h-8 rounded-full" />
-                  </div>
+              <div className="flex gap-4 items-center">
+                <Skeleton className="w-12 h-12 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="w-32 h-6" />
+                  <Skeleton className="w-24 h-4" />
                 </div>
-              </CardHeader>
-              <CardContent className="relative pt-0 space-y-4">
-                <div className="space-y-3">
-                  <div className="flex gap-3 items-center p-2 rounded-lg bg-muted/30">
-                    <div className="flex justify-center items-center w-8 h-8 rounded-full bg-muted">
-                      <Skeleton className="w-4 h-4 rounded" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <Skeleton className="mb-1 w-10 h-3" />
-                      <Skeleton className="w-32 h-4" />
-                    </div>
-                  </div>
-                  <div className="flex gap-3 items-center p-2 rounded-lg bg-muted/30">
-                    <div className="flex justify-center items-center w-8 h-8 rounded-full bg-muted">
-                      <Skeleton className="w-4 h-4 rounded" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <Skeleton className="mb-1 w-10 h-3" />
-                      <Skeleton className="w-24 h-4" />
-                    </div>
-                  </div>
+                <div className="flex gap-2">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="w-8 h-8 rounded-full" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="mt-4 space-y-3">
+                <Skeleton className="w-full h-4" />
+                <Skeleton className="w-3/4 h-4" />
+              </div>
+            </div>
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
@@ -288,74 +270,91 @@ export function UsersManager() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {visibleData.map((user) => (
-            <Card
+            <InfoCard
               key={user.id}
-              className="flex overflow-hidden relative flex-col rounded-xl border shadow-lg cursor-pointer bg-card text-card-foreground border-border/50 min-h-[120px]"
-              tabIndex={0}
-              role="button"
-              aria-label={`View details for user ${user.name}`}
-              onClick={async () => await handleCardClick(user.id)}
-              onKeyDown={async (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  await handleCardClick(user.id);
-                }
-              }}
-            >
-              <CardHeader className="flex relative items-center pb-4 min-h-[80px]">
-                <div className="flex flex-1 gap-4 items-center min-w-0">
-                  <div className="relative">
-                    <div className="flex justify-center items-center w-12 h-12 rounded-full ring-1 transition-all duration-300 bg-muted ring-border/50">
-                      <UserCheck className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-lg font-bold transition-colors duration-200 truncate">
-                      {user.name}
-                    </CardTitle>
-                  </div>
-                  <div className="flex z-10 gap-1 ml-3">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="rounded-full cursor-pointer"
-                          tabIndex={-1}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingUserId(user.id);
-                            setViewMode("edit");
-                          }}
-                          aria-label={`Edit user ${user.name}`}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Edit user</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="rounded-full cursor-pointer"
-                          tabIndex={-1}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setUserToDelete({ id: user.id, name: user.name });
-                            setDeleteDialogOpen(true);
-                          }}
-                          aria-label={`Delete user ${user.name}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Delete user</TooltipContent>
-                    </Tooltip>
+              title={user.name}
+              onClick={() => handleCardClick(user.id)}
+              className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              badges={
+                <div className="flex gap-2 items-center">
+                  <div className="flex justify-center items-center w-8 h-8 rounded-full bg-muted">
+                    <UserCheck className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </div>
-              </CardHeader>
-            </Card>
+              }
+              infoItems={[
+                [
+                  {
+                    label: "Email",
+                    value: user.email,
+                    icon: Mail,
+                    variant: "sky",
+                  },
+                  {
+                    label: "Projects",
+                    value: user.project.length,
+                    icon: User,
+                    variant: "green",
+                  },
+                ],
+                [
+                  {
+                    label: "Enabled",
+                    value: user.enabled ? "Yes" : "No",
+                    icon: Check,
+                    variant: "amber",
+                  },
+                  {
+                    label: "Domain",
+                    value: user.domain,
+                    icon: AtSign,
+                    variant: "rose",
+                  },
+                ],
+              ]}
+              actionButtons={
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-full cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingUserId(user.id);
+                          setViewMode("edit");
+                        }}
+                        aria-label={`Edit user ${user.name}`}
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit User
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Edit user</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="rounded-full cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setUserToDelete({ id: user.id, name: user.name });
+                          setDeleteDialogOpen(true);
+                        }}
+                        aria-label={`Delete user ${user.name}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete User
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete user</TooltipContent>
+                  </Tooltip>
+                </>
+              }
+            />
           ))}
 
           <Dialog

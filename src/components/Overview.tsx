@@ -1,8 +1,8 @@
 "use client";
 
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";

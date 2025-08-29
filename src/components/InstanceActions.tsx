@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { InfraService } from "@/lib/requests";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Power, PowerOff, RotateCcw, Trash2 } from "lucide-react";
+import { Camera, Power, PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function InstanceActions({
@@ -25,9 +25,10 @@ export function InstanceActions({
   const startMutation = useMutation({
     mutationFn: (id: string) => InfraService.startInstance({ server_id: id }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["instances", "details"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances", "details"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+      ]);
       toast.success("Instance started successfully");
     },
     onError: (err: unknown) => {
@@ -44,9 +45,10 @@ export function InstanceActions({
   const stopMutation = useMutation({
     mutationFn: (id: string) => InfraService.stopInstance({ server_id: id }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["instances", "details"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances", "details"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+      ]);
       toast.success("Instance stopped successfully");
     },
     onError: (err: unknown) => {
@@ -63,9 +65,10 @@ export function InstanceActions({
   const rebootMutation = useMutation({
     mutationFn: (id: string) => InfraService.rebootInstance({ server_id: id }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["instances", "details"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances", "details"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+      ]);
       toast.success("Instance rebooted successfully");
     },
     onError: (err: unknown) => {
@@ -82,9 +85,10 @@ export function InstanceActions({
   const deleteMutation = useMutation({
     mutationFn: (id: string) => InfraService.deleteInstance({ server_id: id }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["instances", "details"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances", "details"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+      ]);
       toast.success("Instance deleted successfully");
     },
     onError: (err: unknown) => {
@@ -98,13 +102,30 @@ export function InstanceActions({
     },
   });
 
+  const createSnapshotMutation = useMutation({
+    mutationFn: () =>
+      InfraService.createSnapshot({
+        instance_id: instanceId,
+        snapshot_name: `snapshot-${instanceId.slice(0, 8)}-${Date.now()}`,
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["snapshots", "list"] });
+      toast.success("Snapshot created successfully");
+    },
+    onError: (err: unknown) =>
+      toast.error(
+        err instanceof Error ? err.message : "Failed to create snapshot",
+      ),
+  });
+
   const isDisabled = disabled || status === "BUILD";
   const canStart = status === "SHUTOFF" && !isDisabled;
   const canStop = status === "ACTIVE" && !isDisabled;
   const canReboot = status === "ACTIVE" && !isDisabled;
+  const canSnapshot = !isDisabled;
 
   return (
-    <div className="flex overflow-x-auto flex-wrap gap-2 gap-y-2 justify-center pt-4 mt-4 w-full max-w-full border-t sm:flex-nowrap border-border">
+    <div className="flex flex-wrap gap-2">
       {canStart && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -171,6 +192,29 @@ export function InstanceActions({
             </Button>
           </TooltipTrigger>
           <TooltipContent>Reboot the instance</TooltipContent>
+        </Tooltip>
+      )}
+
+      {canSnapshot && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                createSnapshotMutation.mutate();
+              }}
+              disabled={createSnapshotMutation.isPending || isDisabled}
+              size="sm"
+              variant="outline"
+              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+            >
+              <Camera className="mr-1 w-4 h-4 transition-colors duration-200 group-hover:text-accent-foreground" />
+              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
+                Snapshot
+              </span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Create snapshot</TooltipContent>
         </Tooltip>
       )}
 

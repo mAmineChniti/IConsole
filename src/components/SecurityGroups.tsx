@@ -1,9 +1,9 @@
 "use client";
 
 import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { SecurityGroupCreateDialog } from "@/components/SecurityGroupCreateDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { XSearch } from "@/components/XSearch";
+import { XSearch } from "@/components/reusable/XSearch";
 import { SecurityGroupService } from "@/lib/requests";
 import type {
   SecurityGroupDeleteRequest,
@@ -101,7 +101,7 @@ export function SecurityGroups() {
   useEffect(() => {
     if (!ruleDeleteOpen) setRuleToDelete(undefined);
   }, [ruleDeleteOpen]);
-  // Reset pagination on search change
+
   useEffect(() => {
     setVisibleCount(6);
   }, [search]);
@@ -114,7 +114,6 @@ export function SecurityGroups() {
     });
   const groups = data ?? [];
 
-  // Client-side filtering by name/description
   const q = search.trim().toLowerCase();
   const filtered = q
     ? groups.filter((g) =>
@@ -126,8 +125,6 @@ export function SecurityGroups() {
   const totalItems = filtered.length;
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < totalItems;
-
-  // create dialog handled by SecurityGroupCreateDialog
 
   const editForm = useForm<SecurityGroupUpdateRequest>({
     resolver: zodResolver(SecurityGroupUpdateRequestSchema),

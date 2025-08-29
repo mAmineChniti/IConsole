@@ -2,7 +2,7 @@
 
 import { DescribeVMTab } from "@/components/DescribeVMTab";
 import { DetailsStep } from "@/components/DetailsStep";
-import { ErrorCard } from "@/components/ErrorCard";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { FlavorStep } from "@/components/FlavorStep";
 import { ImageStep } from "@/components/ImageStep";
 import { NetworkStep } from "@/components/NetworkStep";

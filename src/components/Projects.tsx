@@ -1,9 +1,9 @@
 "use client";
 
 import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { ProjectFormDialog } from "@/components/ProjectFormDialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UserManagementDialog } from "@/components/UserManagementDialog";
-import { XSearch } from "@/components/XSearch";
+import { XSearch } from "@/components/reusable/XSearch";
 import { ProjectService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
@@ -203,7 +203,6 @@ export function Projects() {
     });
   };
 
-  // Apply search filtering to projectData (after details fetched)
   const q = search.trim().toLowerCase();
   const filteredProjects = q
     ? projectData.filter(
@@ -221,7 +220,6 @@ export function Projects() {
   const handleShowMore = () => {
     setVisibleCount((prev) => prev + 6);
   };
-  // pagination reset handled by useEffect above
 
   if (isLoadingInitial) {
     return (
