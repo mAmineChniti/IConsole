@@ -24,10 +24,10 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
 
   if (imageErrorIndex >= candidates.length) {
     return (
-      <div className={cn("relative flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8")}>
+      <div className={cn("relative h-6 w-6 flex-shrink-0 sm:h-8 sm:w-8")}>
         {" "}
         <Server
-          className={cn("w-full h-full flex-shrink-0", "text-muted-foreground")}
+          className={cn("h-full w-full flex-shrink-0", "text-muted-foreground")}
           aria-hidden="true"
         />{" "}
       </div>
@@ -47,7 +47,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
           <div className="flex absolute inset-0 justify-center items-center w-full h-full">
             <Server
               className={cn(
-                "w-full h-full flex-shrink-0",
+                "h-full w-full flex-shrink-0",
                 "text-muted-foreground",
               )}
               aria-hidden="true"
@@ -60,7 +60,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
           alt="Windows"
           width={32}
           height={32}
-          className={cn(sizeClasses, "object-contain w-full h-full")}
+          className={cn(sizeClasses, "h-full w-full object-contain")}
           onError={() => {
             setImageErrorIndex((i) => i + 1);
             setLoading(true);
@@ -81,7 +81,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
       {loading && (
         <div className="flex absolute inset-0 justify-center items-center w-full h-full">
           <Server
-            className={cn("w-full h-full flex-shrink-0 text-muted-foreground")}
+            className={cn("text-muted-foreground h-full w-full flex-shrink-0")}
             aria-hidden="true"
           />
         </div>
@@ -92,7 +92,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
         alt={`${logoWord.charAt(0).toUpperCase() + logoWord.slice(1)} Logo`}
         width={32}
         height={32}
-        className={cn(sizeClasses, "object-contain w-full h-full")}
+        className={cn(sizeClasses, "h-full w-full object-contain")}
         onError={() => {
           setImageErrorIndex((i) => i + 1);
           setLoading(true);

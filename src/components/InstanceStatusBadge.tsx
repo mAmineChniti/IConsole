@@ -17,14 +17,14 @@ export function InstanceStatusBadge({ status }: { status: string }) {
       className={cn(
         "gap-1.5",
         status === "ACTIVE"
-          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
           : status === "SHUTOFF"
-            ? "bg-muted text-muted-foreground border border-border"
+            ? "bg-muted text-muted-foreground border-border border"
             : status === "ERROR"
-              ? "bg-destructive text-destructive-foreground border border-destructive"
+              ? "bg-destructive text-destructive-foreground border-destructive border"
               : status === "BUILD"
-                ? "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800"
-                : "bg-accent text-accent-foreground border border-accent",
+                ? "border border-blue-200 bg-blue-100 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+                : "bg-accent text-accent-foreground border-accent border",
       )}
     >
       {status === "BUILD" ? (
@@ -32,7 +32,7 @@ export function InstanceStatusBadge({ status }: { status: string }) {
       ) : (
         <div
           className={cn(
-            "w-1.5 h-1.5 rounded-full animate-pulse",
+            "h-1.5 w-1.5 animate-pulse rounded-full",
             status === "ACTIVE"
               ? "bg-green-500"
               : status === "SHUTOFF"

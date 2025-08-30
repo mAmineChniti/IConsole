@@ -2,28 +2,26 @@
 
 import { ClusterDetailsDialog } from "@/components/ClusterDetailsDialog";
 import { ClusterTokenDialog } from "@/components/ClusterTokenDialog";
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { CreateClusterDialog } from "@/components/CreateClusterDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoCard } from "@/components/reusable/InfoCard";
+import { XSearch } from "@/components/reusable/XSearch";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { XSearch } from "@/components/XSearch";
 import { ClusterService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type { ClusterActionRequest } from "@/types/RequestInterfaces";
-import type {
-  ClusterListResponse,
-  Clusters,
-  ResourcesResponse,
-} from "@/types/ResponseInterfaces";
+import type { ClusterListResponse, Clusters } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Clock,
@@ -39,29 +37,43 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+
 export const getStatusBadge = (status: string) => {
-  const statusMap: Record<string, { bg: string; text: string }> = {
-    ACTIVE: { bg: "bg-green-100", text: "text-green-800" },
-    CREATING: { bg: "bg-blue-100", text: "text-blue-800" },
-    UPDATING: { bg: "bg-blue-100", text: "text-blue-800" },
-    DELETING: { bg: "bg-yellow-100", text: "text-yellow-800" },
-    ERROR: { bg: "bg-red-100", text: "text-red-800" },
-    STOPPED: { bg: "bg-gray-100", text: "text-gray-800" },
+  const key = (status ?? "UNKNOWN").toUpperCase();
+  const statusMap: Record<string, { variant: BadgeVariant; colors: string }> = {
+    ACTIVE: {
+      variant: "secondary",
+      colors:
+        "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400",
+    },
+    CREATING: {
+      variant: "outline",
+      colors:
+        "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
+    },
+    UPDATING: {
+      variant: "outline",
+      colors:
+        "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
+    },
+    DELETING: { variant: "destructive", colors: "text-white" },
+    ERROR: { variant: "destructive", colors: "text-white" },
+    STOPPED: {
+      variant: "default",
+      colors: "bg-muted text-muted-foreground",
+    },
   };
 
-  const { bg = "bg-gray-100", text = "text-gray-800" } =
-    statusMap[status] ?? {};
+  const { variant, colors } = statusMap[key] ?? {
+    variant: "default" as const,
+    colors: "",
+  };
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-        bg,
-        text,
-      )}
-    >
-      {status ?? "UNKNOWN"}
-    </span>
+    <Badge variant={variant} className={cn("px-2 py-0.5", colors)}>
+      {key}
+    </Badge>
   );
 };
 
@@ -87,20 +99,7 @@ export function Clusters() {
   const [clusterToDelete, setClusterToDelete] = useState<
     { id: number; name?: string } | undefined
   >(undefined);
-  const [resources, setResources] = useState<ResourcesResponse>({
-    images: [],
-    keypairs: [],
-    flavors: [],
-    networks: [],
-    security_groups: [],
-  });
   const [visibleCount, setVisibleCount] = useState(6);
-
-  useEffect(() => {
-    if (resources) {
-      setResources(resources);
-    }
-  }, [resources]);
 
   const {
     data: clustersResponse,
@@ -150,7 +149,8 @@ export function Clusters() {
     },
   });
 
-  const handleClusterAction = (clusterId: number, action: string) => {
+  type ClusterAction = "start" | "stop" | "delete";
+  const handleClusterAction = (clusterId: number, action: ClusterAction) => {
     const cluster = clusters.find((c) => c.cluster_id === clusterId);
     if (!cluster) return;
 
@@ -168,6 +168,8 @@ export function Clusters() {
         });
         setIsDeleteDialogOpen(true);
         break;
+      default:
+        ((_: never) => _)(action);
     }
   };
 
@@ -176,8 +178,7 @@ export function Clusters() {
     setIsDetailsOpen(true);
   };
 
-  const handleTokenClick = (e: React.MouseEvent, clusterId: number) => {
-    e.stopPropagation();
+  const handleTokenClick = (clusterId: number) => {
     setSelectedClusterId(clusterId);
     setIsTokenDialogOpen(true);
   };
@@ -186,7 +187,7 @@ export function Clusters() {
 
   const filteredClusters = search.trim()
     ? clusters.filter((cluster) =>
-        cluster.cluster_name
+        (cluster.cluster_name ?? "")
           .toLowerCase()
           .includes(search.toLowerCase().trim()),
       )
@@ -245,7 +246,6 @@ export function Clusters() {
               </CardHeader>
               <CardContent className="p-4 pt-0">
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Master Nodes */}
                   <div className="flex p-2.5 rounded-lg bg-muted/60">
                     <div className="flex gap-3 items-center w-full">
                       <Skeleton className="w-8 h-8 rounded-md" />
@@ -256,7 +256,6 @@ export function Clusters() {
                     </div>
                   </div>
 
-                  {/* Worker Nodes */}
                   <div className="flex p-2.5 rounded-lg bg-muted/60">
                     <div className="flex gap-3 items-center w-full">
                       <Skeleton className="w-8 h-8 rounded-md" />
@@ -267,7 +266,6 @@ export function Clusters() {
                     </div>
                   </div>
 
-                  {/* Created */}
                   <div className="flex p-2.5 rounded-lg bg-muted/60">
                     <div className="flex gap-3 items-center w-full">
                       <Skeleton className="w-8 h-8 rounded-md" />
@@ -278,7 +276,6 @@ export function Clusters() {
                     </div>
                   </div>
 
-                  {/* Status */}
                   <div className="flex p-2.5 rounded-lg bg-muted/60">
                     <div className="flex gap-3 items-center w-full">
                       <Skeleton className="w-8 h-8 rounded-md" />
@@ -290,7 +287,6 @@ export function Clusters() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex gap-2 justify-center items-center pt-4 mt-4 border-t border-border">
                   <Skeleton className="w-16 h-8 rounded-full" />
                   <Skeleton className="w-16 h-8 rounded-full" />
@@ -351,7 +347,8 @@ export function Clusters() {
           {totalItems} cluster{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
-              {" • "} Showing {filteredClusters?.length ?? 0} of {totalItems}
+              {" • "} Showing {Math.min(visibleCount, totalItems)} of{" "}
+              {totalItems}
             </>
           )}
         </div>
@@ -394,191 +391,140 @@ export function Clusters() {
             No clusters match your search.
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 w-full sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {visibleData.map((cluster) => {
               const status = cluster.overall_status?.toLowerCase() ?? "";
               const showStart = canStart(status);
               const showStop = canStop(status);
 
               return (
-                <Card
+                <InfoCard
                   key={cluster.cluster_id}
-                  className="flex flex-col w-full h-full rounded-xl border shadow-lg cursor-pointer bg-card text-card-foreground border-border/50"
+                  title={cluster.cluster_name ?? "Unnamed Cluster"}
                   onClick={() => handleCardClick(cluster.cluster_id)}
-                >
-                  <CardHeader className="px-4 pt-4 pb-3">
-                    <div className="flex gap-2 justify-between items-center">
-                      <CardTitle className="flex-1 text-base font-semibold text-card-foreground truncate">
-                        {cluster.cluster_name ?? "Unnamed Cluster"}
-                      </CardTitle>
-                      {getStatusBadge(cluster.overall_status)}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col flex-1 p-4 pt-0">
-                    <div className="flex-1 space-y-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="flex p-2.5 rounded-lg bg-muted/60">
-                          <div className="flex gap-3 items-center w-full">
-                            <span className="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 bg-blue-100 rounded-md dark:bg-blue-900/30">
-                              <Cpu className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                            </span>
-                            <div className="overflow-hidden">
-                              <span className="block text-xs font-medium text-muted-foreground truncate">
-                                Master Nodes
-                              </span>
-                              <span className="block text-sm font-semibold text-card-foreground truncate">
-                                {cluster.master_count ?? 0}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex p-2.5 rounded-lg bg-muted/60">
-                          <div className="flex gap-3 items-center w-full">
-                            <span className="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 bg-purple-100 rounded-md dark:bg-purple-900/30">
-                              <Server className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-                            </span>
-                            <div className="overflow-hidden">
-                              <span className="block text-xs font-medium text-muted-foreground truncate">
-                                Worker Nodes
-                              </span>
-                              <span className="block text-sm font-semibold text-card-foreground truncate">
-                                {cluster.worker_count ?? 0}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex p-2.5 rounded-lg bg-muted/60">
-                          <div className="flex gap-3 items-center w-full">
-                            <span className="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 bg-green-100 rounded-md dark:bg-green-900/30">
-                              <Clock className="w-4 h-4 text-green-500 dark:text-green-400" />
-                            </span>
-                            <div className="overflow-hidden">
-                              <span className="block text-xs font-medium text-muted-foreground truncate">
-                                Created
-                              </span>
-                              <span className="block text-sm font-semibold text-card-foreground truncate">
-                                {cluster.created_at
-                                  ? new Date(
-                                      cluster.created_at,
-                                    ).toLocaleDateString()
-                                  : "N/A"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex p-2.5 rounded-lg bg-muted/60">
-                          <div className="flex gap-3 items-center w-full">
-                            <span className="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 bg-amber-100 rounded-md dark:bg-amber-900/30">
-                              <Info className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-                            </span>
-                            <div className="overflow-hidden">
-                              <span className="block text-xs font-medium text-muted-foreground truncate">
-                                Status
-                              </span>
-                              <span className="block text-sm font-semibold capitalize text-card-foreground truncate">
-                                {status}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 justify-center items-center pt-4 mt-4 border-t border-border">
-                      <div className="flex gap-2">
-                        {showStart && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleClusterAction(
-                                    cluster.cluster_id,
-                                    "start",
-                                  );
-                                }}
-                                disabled={startCluster.isPending}
-                              >
-                                <Power className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
-                                <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
-                                  Start
-                                </span>
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Start the cluster</TooltipContent>
-                          </Tooltip>
-                        )}
-                        {showStop && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleClusterAction(
-                                    cluster.cluster_id,
-                                    "stop",
-                                  );
-                                }}
-                                disabled={stopCluster.isPending}
-                              >
-                                <PowerOff className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
-                                <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
-                                  Stop
-                                </span>
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Stop the cluster</TooltipContent>
-                          </Tooltip>
-                        )}
+                  badges={getStatusBadge(cluster.overall_status)}
+                  infoItems={[
+                    [
+                      {
+                        label: "Master Nodes",
+                        value: cluster.master_count?.toString() ?? "0",
+                        icon: Cpu,
+                        variant: "blue",
+                      },
+                      {
+                        label: "Worker Nodes",
+                        value: cluster.worker_count?.toString() ?? "0",
+                        icon: Server,
+                        variant: "purple",
+                      },
+                    ],
+                    [
+                      {
+                        label: "Created",
+                        value: cluster.created_at
+                          ? new Date(cluster.created_at).toLocaleDateString()
+                          : "N/A",
+                        icon: Clock,
+                        variant: "green",
+                      },
+                      {
+                        label: "Status",
+                        value: status,
+                        icon: Info,
+                        variant: "amber",
+                      },
+                    ],
+                  ]}
+                  actionButtons={
+                    <div className="flex gap-2">
+                      {showStart && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant="outline"
                               size="sm"
                               className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
-                              onClick={(e) =>
-                                handleTokenClick(e, cluster.cluster_id)
-                              }
-                              title="Get Dashboard Token"
-                            >
-                              <Key className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
-                              <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
-                                Token
-                              </span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Get Dashboard Token</TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="gap-1.5 px-3 h-8 text-xs font-medium rounded-full cursor-pointer"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleClusterAction(
                                   cluster.cluster_id,
-                                  "delete",
+                                  "start",
                                 );
                               }}
-                              disabled={deleteCluster.isPending}
+                              disabled={startCluster.isPending}
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              <span>Delete</span>
+                              <Power className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
+                              <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
+                                Start
+                              </span>
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>Delete this cluster</TooltipContent>
+                          <TooltipContent>Start the cluster</TooltipContent>
                         </Tooltip>
-                      </div>
+                      )}
+                      {showStop && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleClusterAction(cluster.cluster_id, "stop");
+                              }}
+                              disabled={stopCluster.isPending}
+                            >
+                              <PowerOff className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
+                              <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
+                                Stop
+                              </span>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Stop the cluster</TooltipContent>
+                        </Tooltip>
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTokenClick(cluster.cluster_id);
+                            }}
+                            title="Get Dashboard Token"
+                          >
+                            <Key className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
+                            <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
+                              Token
+                            </span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Get Dashboard Token</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="gap-1.5 px-3 h-8 text-xs font-medium rounded-full cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleClusterAction(cluster.cluster_id, "delete");
+                            }}
+                            disabled={deleteCluster.isPending}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Delete this cluster</TooltipContent>
+                      </Tooltip>
                     </div>
-                  </CardContent>
-                </Card>
+                  }
+                />
               );
             })}
           </div>
@@ -591,8 +537,8 @@ export function Clusters() {
             variant="outline"
             disabled={!hasMore}
             className={cn(
-              "rounded-full transition-all duration-200 px-4 sm:px-6 py-2 w-full sm:w-auto max-w-xs bg-background text-foreground border border-border/50 cursor-pointer",
-              hasMore ? "" : "opacity-50 cursor-not-allowed",
+              "bg-background text-foreground border-border/50 w-full max-w-xs cursor-pointer rounded-full border px-4 py-2 transition-all duration-200 sm:w-auto sm:px-6",
+              hasMore ? "" : "cursor-not-allowed opacity-50",
             )}
           >
             <span className="truncate">

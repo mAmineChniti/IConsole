@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ClusterService } from "@/lib/requests";
+import { cn } from "@/lib/utils";
 import type { ClusterDetails, NodeInfo } from "@/types/ResponseInterfaces";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -44,10 +45,14 @@ export function ClusterDetailsDialog({
   }, [copiedIp]);
 
   const handleIpCopy = async (ip: string) => {
-    if (ip) {
-      await navigator.clipboard.writeText(ip);
-      setCopiedIp(ip);
-      toast.success("IP copied to clipboard");
+    try {
+      if (ip) {
+        await navigator.clipboard.writeText(ip);
+        setCopiedIp(ip);
+        toast.success("IP copied to clipboard");
+      }
+    } catch {
+      toast.error("Failed to copy IP to clipboard. Please copy it manually.");
     }
   };
 
@@ -70,7 +75,13 @@ export function ClusterDetailsDialog({
   });
   return (
     <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-      <DialogContent className="mx-4 sm:mx-0 max-w-[calc(100vw-2rem)] sm:max-w-2xl bg-card text-card-foreground border border-border/50 shadow-lg left-1/2 translate-x-[-50%] rounded-2xl">
+      <DialogContent
+        className={cn(
+          "mx-4 max-w-[calc(100vw-2rem)] sm:mx-0 sm:max-w-2xl",
+          "bg-card text-card-foreground border-border/50 border shadow-lg",
+          "left-1/2 translate-x-[-50%] rounded-2xl",
+        )}
+      >
         <DialogHeader>
           <DialogTitle className="flex gap-2 items-center text-lg font-semibold">
             <Server className="w-5 h-5 text-primary" />
@@ -143,7 +154,10 @@ export function ClusterDetailsDialog({
                   {clusterDetails?.nodes?.map((node: NodeInfo) => (
                     <div
                       key={node.id}
-                      className="p-4 rounded-lg border transition-colors hover:bg-muted/20"
+                      className={cn(
+                        "rounded-lg border p-4 transition-colors",
+                        "hover:bg-muted/20",
+                      )}
                     >
                       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start">
                         <div className="space-y-2">
@@ -164,11 +178,12 @@ export function ClusterDetailsDialog({
                           <div className="flex flex-wrap gap-3 items-center text-sm">
                             <div className="flex gap-1.5 items-center">
                               <div
-                                className={`w-2 h-2 rounded-full ${
+                                className={cn(
+                                  "h-2 w-2 rounded-full",
                                   node?.status === "ACTIVE"
                                     ? "bg-green-500"
-                                    : "bg-red-500"
-                                }`}
+                                    : "bg-red-500",
+                                )}
                               />
                               <span className="capitalize">
                                 {node?.status

@@ -179,7 +179,7 @@ export function NetworkCreate({
                         <Input
                           placeholder="network-name"
                           className={cn(
-                            "h-10 w-full rounded-full bg-input text-foreground",
+                            "bg-input text-foreground h-10 w-full rounded-full",
                             form.formState.errors.name && "border-destructive",
                           )}
                           {...field}
@@ -205,7 +205,7 @@ export function NetworkCreate({
                           type="number"
                           placeholder="1500"
                           className={cn(
-                            "h-10 w-full rounded-full bg-input text-foreground",
+                            "bg-input text-foreground h-10 w-full rounded-full",
                             form.formState.errors.mtu && "border-destructive",
                           )}
                           {...field}
@@ -233,7 +233,7 @@ export function NetworkCreate({
                         <Textarea
                           placeholder="Network description"
                           className={cn(
-                            "w-full min-h-24 bg-input text-foreground",
+                            "bg-input text-foreground min-h-24 w-full",
                             form.formState.errors.description &&
                               "border-destructive",
                           )}
@@ -313,7 +313,7 @@ export function NetworkCreate({
                           <Input
                             placeholder="zone1,zone2"
                             className={cn(
-                              "h-10 w-full rounded-full bg-input text-foreground",
+                              "bg-input text-foreground h-10 w-full rounded-full",
                               form.formState.errors.availability_zone_hints &&
                                 "border-destructive",
                             )}
@@ -353,7 +353,7 @@ export function NetworkCreate({
                         <Input
                           placeholder="subnet-name (auto-generated if empty)"
                           className={cn(
-                            "h-10 w-full rounded-full bg-input text-foreground",
+                            "bg-input text-foreground h-10 w-full rounded-full",
                             form.formState.errors.subnet?.name &&
                               "border-destructive",
                           )}
@@ -434,7 +434,7 @@ export function NetworkCreate({
                         <Input
                           placeholder="10.10.10.0/24"
                           className={cn(
-                            "h-10 w-full rounded-full bg-input text-foreground",
+                            "bg-input text-foreground h-10 w-full rounded-full",
                             form.formState.errors.subnet?.cidr &&
                               "border-destructive",
                           )}
@@ -460,7 +460,7 @@ export function NetworkCreate({
                         <Input
                           placeholder="10.10.10.1"
                           className={cn(
-                            "h-10 w-full rounded-full bg-input text-foreground",
+                            "bg-input text-foreground h-10 w-full rounded-full",
                             form.formState.errors.subnet?.gateway_ip &&
                               "border-destructive",
                           )}
@@ -490,7 +490,7 @@ export function NetworkCreate({
                           <Input
                             placeholder="1.1.1.1,8.8.8.8"
                             className={cn(
-                              "h-10 w-full rounded-full bg-input text-foreground",
+                              "bg-input text-foreground h-10 w-full rounded-full",
                               form.formState.errors.subnet?.dns_nameservers &&
                                 "border-destructive",
                             )}
@@ -589,7 +589,7 @@ export function NetworkCreate({
                           <Input
                             placeholder="10.0.0.0/24,192.168.0.0/24"
                             className={cn(
-                              "h-10 w-full rounded-full bg-input text-foreground",
+                              "bg-input text-foreground h-10 w-full rounded-full",
                               form.formState.errors.subnet?.host_routes &&
                                 "border-destructive",
                             )}
@@ -624,7 +624,7 @@ export function NetworkCreate({
                   type="submit"
                   disabled={createMutation.isPending}
                   className={cn(
-                    "min-w-[100px] rounded-full bg-primary text-primary-foreground cursor-pointer",
+                    "bg-primary text-primary-foreground min-w-[100px] cursor-pointer rounded-full",
                     createMutation.isPending && "opacity-70",
                   )}
                 >

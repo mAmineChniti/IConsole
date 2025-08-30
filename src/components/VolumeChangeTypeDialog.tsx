@@ -36,7 +36,7 @@ export function VolumeChangeTypeDialog({
     isLoading,
     error,
   } = useQuery<VolumeType[]>({
-    queryKey: ["volume-types"],
+    queryKey: ["volume-types", "list"],
     queryFn: () => VolumeService.listVolumeTypes(),
   });
   const [selectedType, setSelectedType] = useState<string | undefined>();

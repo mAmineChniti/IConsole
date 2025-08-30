@@ -2,10 +2,10 @@
 
 import { DescribeVMTab } from "@/components/DescribeVMTab";
 import { DetailsStep } from "@/components/DetailsStep";
-import { ErrorCard } from "@/components/ErrorCard";
 import { FlavorStep } from "@/components/FlavorStep";
 import { ImageStep } from "@/components/ImageStep";
 import { NetworkStep } from "@/components/NetworkStep";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { SummaryStep } from "@/components/SummaryStep";
 import { Button } from "@/components/ui/button";
 import {
@@ -156,7 +156,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
       networkForm.reset();
       vmDetailsForm.reset();
       await queryClient.invalidateQueries({
-        queryKey: ["instances", "details"],
+        queryKey: ["instances"],
       });
       await queryClient.invalidateQueries({ queryKey: ["vm-resources"] });
     },
@@ -190,7 +190,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
         description: `VM \"${response.server_name}\" is being deployed`,
       });
       await queryClient.invalidateQueries({
-        queryKey: ["instances", "details"],
+        queryKey: ["instances"],
       });
       await queryClient.invalidateQueries({ queryKey: ["vm-resources"] });
     },
@@ -243,7 +243,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
         <Button
           variant={activeTab === "create" ? "default" : "ghost"}
           className={cn(
-            "flex-1 h-10 min-w-0 rounded-full cursor-pointer",
+            "h-10 min-w-0 flex-1 cursor-pointer rounded-full",
             activeTab === "create"
               ? "bg-primary text-primary-foreground shadow-sm"
               : "",
@@ -260,7 +260,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
         <Button
           variant={activeTab === "describe" ? "default" : "ghost"}
           className={cn(
-            "flex-1 h-10 min-w-0 rounded-full cursor-pointer",
+            "h-10 min-w-0 flex-1 cursor-pointer rounded-full",
             activeTab === "describe"
               ? "bg-primary text-primary-foreground shadow-sm"
               : "",
@@ -304,11 +304,11 @@ export function VM({ onBack }: { onBack?: () => void }) {
                       <div className="flex flex-col items-center">
                         <div
                           className={cn(
-                            "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all",
+                            "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all sm:h-10 sm:w-10",
                             isActive
                               ? "bg-primary border-primary text-primary-foreground"
                               : isCompleted
-                                ? "bg-green-500 border-green-500 text-white"
+                                ? "border-green-500 bg-green-500 text-white"
                                 : "bg-muted border-border text-muted-foreground",
                           )}
                         >
@@ -320,7 +320,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
                         </div>
                         <span
                           className={cn(
-                            "mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-center max-w-[100px] leading-tight",
+                            "mt-1 max-w-[100px] text-center text-xs leading-tight font-medium sm:mt-2 sm:text-sm",
                             isActive
                               ? "text-primary"
                               : isCompleted
@@ -334,7 +334,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
                       {index < steps.length - 1 && (
                         <div
                           className={cn(
-                            "flex-1 h-0.5 mx-2 sm:mx-4 transition-all min-w-[40px] sm:min-w-[60px]",
+                            "mx-2 h-0.5 min-w-[40px] flex-1 transition-all sm:mx-4 sm:min-w-[60px]",
                             index < currentStepIndex
                               ? "bg-green-600"
                               : "bg-muted-foreground/30",

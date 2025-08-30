@@ -1,10 +1,11 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { ProjectFormDialog } from "@/components/ProjectFormDialog";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { XSearch } from "@/components/reusable/XSearch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UserManagementDialog } from "@/components/UserManagementDialog";
-import { XSearch } from "@/components/XSearch";
 import { ProjectService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
@@ -203,7 +203,6 @@ export function Projects() {
     });
   };
 
-  // Apply search filtering to projectData (after details fetched)
   const q = search.trim().toLowerCase();
   const filteredProjects = q
     ? projectData.filter(
@@ -221,7 +220,6 @@ export function Projects() {
   const handleShowMore = () => {
     setVisibleCount((prev) => prev + 6);
   };
-  // pagination reset handled by useEffect above
 
   if (isLoadingInitial) {
     return (
@@ -241,7 +239,7 @@ export function Projects() {
             <Card
               key={i}
               className={cn(
-                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden",
+                "bg-card text-card-foreground border-border/50 flex flex-col overflow-hidden rounded-xl border shadow-lg",
               )}
             >
               <CardHeader className="pb-3">
@@ -277,7 +275,7 @@ export function Projects() {
                           <Skeleton className="w-6 h-6 rounded-full" />
                           <Skeleton className="w-24 h-4" />
                         </div>
-                        <div className="flex flex-wrap gap-1 max-w-[40%]">
+                        <div className="flex max-w-[40%] flex-wrap gap-1">
                           <Skeleton className="w-12 h-5 rounded-full" />
                           <Skeleton className="w-12 h-5 rounded-full" />
                         </div>
@@ -396,7 +394,7 @@ export function Projects() {
             <Card
               key={project.id}
               className={cn(
-                "bg-card text-card-foreground border border-border/50 shadow-lg rounded-xl flex flex-col overflow-hidden",
+                "bg-card text-card-foreground border-border/50 flex flex-col overflow-hidden rounded-xl border shadow-lg",
               )}
             >
               <CardHeader className="pb-3">
@@ -410,15 +408,15 @@ export function Projects() {
                     <Badge
                       variant={project.enabled ? "default" : "secondary"}
                       className={cn(
-                        "text-xs px-2 py-0.5 gap-1.5 flex items-center",
+                        "flex items-center gap-1.5 px-2 py-0.5 text-xs",
                         project.enabled
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                           : "bg-muted text-muted-foreground",
                       )}
                     >
                       <span
                         className={cn(
-                          "w-1.5 h-1.5 rounded-full animate-pulse inline-block",
+                          "inline-block h-1.5 w-1.5 animate-pulse rounded-full",
                           project.enabled
                             ? "bg-green-500"
                             : "bg-muted-foreground/40",
@@ -485,7 +483,7 @@ export function Projects() {
                                     {assignment.user_name ?? "Unknown"}
                                   </span>
                                 </div>
-                                <div className="flex flex-wrap gap-1 max-w-[40%]">
+                                <div className="flex max-w-[40%] flex-wrap gap-1">
                                   {(assignment.roles ?? [])
                                     .slice(0, 2)
                                     .map((role: UserRole) => (
@@ -552,8 +550,8 @@ export function Projects() {
           onClick={handleShowMore}
           disabled={!hasMore || isRefetching}
           className={cn(
-            "rounded-full px-6 py-2 w-full sm:w-auto max-w-sm cursor-pointer",
-            hasMore ? "" : "opacity-50 cursor-not-allowed",
+            "w-full max-w-sm cursor-pointer rounded-full px-6 py-2 sm:w-auto",
+            hasMore ? "" : "cursor-not-allowed opacity-50",
           )}
         >
           <span className="truncate">

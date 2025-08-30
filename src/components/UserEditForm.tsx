@@ -464,7 +464,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                         <ComboboxTrigger
                           id={`project-select-${index}`}
                           aria-labelledby={`project-label-${index}`}
-                          className="w-full mt-1 text-sm !h-9 rounded-full bg-muted/40 border border-border/50 cursor-pointer"
+                          className="bg-muted/40 border-border/50 mt-1 !h-9 w-full cursor-pointer rounded-full border text-sm"
                           disabled={
                             isProjectsLoading ||
                             (availableProjects?.projects?.length ?? 0) === 0
@@ -534,8 +534,8 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                                   }}
                                   className={
                                     isSelected
-                                      ? "cursor-pointer select-none text-xs rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 gap-1.5 flex items-center"
-                                      : "cursor-pointer select-none text-xs rounded-full border border-border/50 px-2 py-0.5 hover:bg-muted/40 transition-opacity"
+                                      ? "flex cursor-pointer items-center gap-1.5 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 select-none dark:bg-green-900/30 dark:text-green-400"
+                                      : "border-border/50 hover:bg-muted/40 cursor-pointer rounded-full border px-2 py-0.5 text-xs transition-opacity select-none"
                                   }
                                 >
                                   {role.name}
@@ -601,7 +601,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           type="submit"
           form="user-edit-form"
           disabled={updateMutation.isPending}
-          className="rounded-full transition-all duration-200 cursor-pointer min-w-[120px] bg-primary text-primary-foreground"
+          className="rounded-full transition-all duration-200 cursor-pointer bg-primary text-primary-foreground min-w-[120px]"
         >
           {updateMutation.isPending ? (
             <>

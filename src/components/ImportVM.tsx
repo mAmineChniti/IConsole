@@ -1,6 +1,6 @@
 "use client";
 
-import { ErrorCard } from "@/components/ErrorCard";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -329,16 +329,16 @@ export function ImportVM() {
                   >
                     <DropzoneEmptyState>
                       <div className="flex flex-col justify-center items-center">
-                        <div className="flex justify-center items-center rounded-md size-8 bg-muted text-muted-foreground">
+                        <div className="flex justify-center items-center rounded-md bg-muted text-muted-foreground size-8">
                           <Upload size={16} />
                         </div>
                         <p className="my-2 w-full text-sm font-medium truncate text-wrap">
                           Upload a file
                         </p>
-                        <p className="w-full text-xs truncate text-wrap text-muted-foreground">
+                        <p className="w-full text-xs text-muted-foreground truncate text-wrap">
                           Drag and drop or click to upload
                         </p>
-                        <p className="text-xs text-wrap text-muted-foreground">
+                        <p className="text-xs text-muted-foreground text-wrap">
                           Accepts .vmdk
                         </p>
                       </div>

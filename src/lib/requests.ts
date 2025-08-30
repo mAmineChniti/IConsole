@@ -64,21 +64,24 @@ import type {
 } from "@/types/RequestInterfaces";
 import type {
   AssignUserResponse,
+  AttachedVolumesResponse,
+  AvailableVolumesResponse,
   ClusterActionResponse,
   ClusterDashboardTokenResponse,
   ClusterDetails,
   ClusterListResponse,
+  ConsoleResponse,
   CreateFromDescriptionResponse,
   DashboardOverviewResponse,
   DebugRoleAssignmentsResponse,
   FlavorActionResponse,
   FlavorDetails,
+  GetLogsResponse,
   ImageDeleteResponse,
   ImageDetails,
   ImageImportFromNameResponse,
   ImageImportFromUploadResponse,
   ImageImportFromUrlResponse,
-  InstanceDetailsResponse,
   InstanceListResponse,
   KeyPairCreateResponse,
   KeyPairDeleteResponse,
@@ -309,199 +312,6 @@ export const AuthService = {
     const result = await client.post<LogoutResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.AUTH.LOGOUT,
       { type: "json", data: {} },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-  async createSnapshot(
-    data: CreateSnapshotRequest,
-  ): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SNAPSHOT,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-  async resize(data: ResizeRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.RESIZE,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error)
-      throw new Error(`Error resizing instance: ${result.error.message}`);
-    if (!result.data) throw new Error("No data received from resize endpoint");
-    return result.data;
-  },
-
-  async pause(data: IdRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.PAUSE,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async suspend(data: IdRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SUSPEND,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async shelve(data: IdRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SHELVE,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async rescue(data: IdRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.RESCUE,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async getConsole(data: IdRequest): Promise<unknown> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<unknown>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.CONSOLE,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async getLogs(data: IdRequest): Promise<unknown> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<unknown>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.LOGS,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async attachFloatingIp(data: FloatingIPRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.FLOATING_ATTACH,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async detachFloatingIp(data: FloatingIPRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.FLOATING_DETACH,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async attachInterface(data: InterfaceRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.INTERFACE_ATTACH,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async detachInterface(data: InterfaceRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.INTERFACE_DETACH,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async listAvailableVolumes(): Promise<unknown> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.get<unknown>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUMES_AVAILABLE,
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async listAttachedVolumes(data: IdRequest): Promise<unknown> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<unknown>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUMES_ATTACHED,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async attachVolume(data: VolumeRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUME_ATTACH,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-
-  async detachVolume(data: VolumeRequest): Promise<NovaActionResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<NovaActionResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUME_DETACH,
-      { type: "json", data },
-      { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
@@ -905,21 +715,8 @@ export const NetworkService = {
     return result.data!;
   },
 };
-export const InfraService = {
-  async listDetails(): Promise<InstanceDetailsResponse[]> {
-    const instanceList = await this.listInstances();
 
-    if (!Array.isArray(instanceList) || instanceList.length === 0) return [];
-    const settled = await Promise.allSettled(
-      instanceList.map((i) => this.getInstanceDetails(i.id)),
-    );
-    return settled
-      .filter(
-        (r): r is PromiseFulfilledResult<InstanceDetailsResponse> =>
-          r.status === "fulfilled",
-      )
-      .map((r) => r.value);
-  },
+export const InfraService = {
   async listInstances(): Promise<InstanceListResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
@@ -932,28 +729,6 @@ export const InfraService = {
     }
     if (!result.data) {
       throw new Error("No data received from instances endpoint");
-    }
-    return result.data;
-  },
-
-  async getInstanceDetails(
-    instanceId: string,
-  ): Promise<InstanceDetailsResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.get<InstanceDetailsResponse>(
-      API_CONFIG.BASE_URL +
-        API_CONFIG.INFRA.INSTANCE_DETAILS +
-        `/${instanceId}`,
-      { headers: token },
-    );
-    if (result.error) {
-      throw new Error(
-        `Error fetching instance details: ${result.error.message}`,
-      );
-    }
-    if (!result.data) {
-      throw new Error("No data received from instance details endpoint");
     }
     return result.data;
   },
@@ -1153,6 +928,200 @@ export const InfraService = {
       throw new Error("No data received from overview endpoint");
     }
     return result.data;
+  },
+  async createSnapshot(
+    data: CreateSnapshotRequest,
+  ): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SNAPSHOT,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async resize(data: ResizeRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.RESIZE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error)
+      throw new Error(`Error resizing instance: ${result.error.message}`);
+    if (!result.data) throw new Error("No data received from resize endpoint");
+    return result.data;
+  },
+
+  async pause(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.PAUSE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async suspend(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SUSPEND,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async shelve(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.SHELVE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async rescue(data: IdRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.RESCUE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async getConsole(data: IdRequest): Promise<ConsoleResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<ConsoleResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.CONSOLE,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    if (!result.data?.url) throw new Error("No console URL returned");
+    return result.data;
+  },
+
+  async getLogs(data: IdRequest): Promise<GetLogsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<GetLogsResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.LOGS,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async attachFloatingIp(data: FloatingIPRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.FLOATING_ATTACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async detachFloatingIp(data: FloatingIPRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.FLOATING_DETACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async attachInterface(data: InterfaceRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.INTERFACE_ATTACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async detachInterface(data: InterfaceRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.INTERFACE_DETACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async listAvailableVolumes(): Promise<AvailableVolumesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<AvailableVolumesResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUMES_AVAILABLE,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async listAttachedVolumes(data: IdRequest): Promise<AttachedVolumesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<AttachedVolumesResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUMES_ATTACHED,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async attachVolume(data: VolumeRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUME_ATTACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+
+  async detachVolume(data: VolumeRequest): Promise<NovaActionResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<NovaActionResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.INFRA.VOLUME_DETACH,
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
   },
 };
 
@@ -1723,19 +1692,6 @@ export const ClusterService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
-
-  /*async removeSshKey(data: SSHHostPassword): Promise<RemoveSshKeyResponse> {
-    const token = authHeaders();
-    if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<RemoveSshKeyResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.REMOVE_SSH_KEY,
-      { type: "json", data },
-      { headers: token },
-    );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
-  },
-  */
 
   async getDashboardToken(
     data: ClusterTokenRequest,

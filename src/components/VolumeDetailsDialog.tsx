@@ -32,7 +32,7 @@ export function VolumeDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-y-auto p-0 max-w-2xl rounded-2xl border shadow-xl max-h-[90vh] bg-card text-card-foreground border-border/50">
+      <DialogContent className="overflow-y-auto p-0 max-w-2xl rounded-2xl border shadow-xl bg-card text-card-foreground border-border/50 max-h-[90vh]">
         <DialogTitle asChild>
           <div className="flex gap-3 items-center px-8 pt-8 pb-2">
             <span className="inline-flex justify-center items-center w-10 h-10 rounded-full bg-primary/10">

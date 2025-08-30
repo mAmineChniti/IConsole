@@ -1,9 +1,10 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +32,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { XSearch } from "@/components/XSearch";
 import { VolumeService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
@@ -386,7 +386,7 @@ export function Snapshots() {
                         <div className="min-w-0">
                           <button
                             type="button"
-                            className="inline-flex items-center max-w-full font-medium text-left underline cursor-pointer underline-offset-2 decoration-muted-foreground/50 truncate hover:decoration-current"
+                            className="inline-flex items-center max-w-full font-medium text-left underline cursor-pointer decoration-muted-foreground/50 truncate underline-offset-2 hover:decoration-current"
                             onClick={() => handleCardClick(s.ID)}
                             title={s.Name || s.ID}
                           >
@@ -617,7 +617,7 @@ export function Snapshots() {
               </Label>
               <Input
                 id="update-name"
-                className="py-2 px-3 !h-10 w-full rounded-full border bg-background text-foreground"
+                className="bg-background text-foreground !h-10 w-full rounded-full border px-3 py-2"
                 value={updateName}
                 onChange={(e) => setUpdateName(e.target.value)}
                 disabled={updateLoading || updateMutation.isPending}

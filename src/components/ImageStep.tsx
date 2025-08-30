@@ -61,9 +61,9 @@ export function ImageStep({
                   <Card
                     key={image.id}
                     className={cn(
-                      "cursor-pointer transition-colors hover:bg-accent",
+                      "hover:bg-accent cursor-pointer transition-colors",
                       field.value === image.id
-                        ? "ring-2 ring-primary"
+                        ? "ring-primary ring-2"
                         : "border-border",
                     )}
                     onClick={() => field.onChange(image.id)}

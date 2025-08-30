@@ -200,7 +200,7 @@ export function UserManagementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-y-auto mx-4 max-w-4xl rounded-xl border shadow-lg sm:mx-auto max-h-[90vh] bg-card text-card-foreground border-border">
+      <DialogContent className="overflow-y-auto mx-4 max-w-4xl rounded-xl border shadow-lg sm:mx-auto bg-card text-card-foreground border-border max-h-[90vh]">
         <DialogHeader className="space-y-3">
           <DialogTitle className="flex gap-2 items-center text-lg">
             <Users className="flex-shrink-0 w-5 h-5" />

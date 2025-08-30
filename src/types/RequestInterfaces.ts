@@ -384,7 +384,6 @@ export interface KeyPairDeleteRequest {
   name: string;
 }
 
-// Cluster requests
 export interface ClusterNodeConfig {
   name_prefix: string;
   image_id: string;
@@ -415,7 +414,6 @@ export interface SSHHostPassword {
   password: string;
 }
 
-// Nova (Infra) requests from OpenAPI components
 export interface ResizeRequest {
   instance_id: string;
   new_flavor: string;

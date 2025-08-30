@@ -1,11 +1,13 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
-import { HeaderActions } from "@/components/HeaderActions";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { KeyPairCreateDialog } from "@/components/KeyPairCreateDialog";
 import { KeyPairImportDialog } from "@/components/KeyPairImportDialog";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoCard } from "@/components/reusable/InfoCard";
+import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,9 +18,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { XSearch } from "@/components/XSearch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { KeyPairService } from "@/lib/requests";
-import type { KeyPairDeleteRequest } from "@/types/RequestInterfaces";
 import type {
   KeyPairCreateResponse,
   KeyPairDetails,
@@ -26,7 +31,6 @@ import type {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Download,
-  Eye,
   Key as KeyIcon,
   KeyRound,
   Plus,
@@ -46,19 +50,37 @@ export function KeyPairs() {
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(6);
 
+  const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined);
+  const [generatedPrivateKey, setGeneratedPrivateKey] = useState<string>();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [keyToDelete, setKeyToDelete] = useState<{ name: string } | undefined>(
+    undefined,
+  );
 
-  const [selected, setSelected] = useState<KeyPairDetails | undefined>();
-  const [keyToDelete, setKeyToDelete] = useState<
-    KeyPairDeleteRequest | undefined
-  >();
-
-  const [generatedPrivateKey, setGeneratedPrivateKey] = useState<
-    string | undefined
-  >();
+  const {
+    data: selected,
+    error: detailsError,
+    isLoading: isLoadingDetails,
+  } = useQuery<KeyPairDetails, Error>({
+    queryKey: ["keypair", selectedKey],
+    queryFn: async () => {
+      return await KeyPairService.get(selectedKey!);
+    },
+    enabled: !!selectedKey,
+  });
+  useEffect(() => {
+    if (detailsError) {
+      toast.error(detailsError.message);
+    }
+  }, [detailsError]);
+  const openDetails = (name: string) => {
+    setSelectedKey(name);
+    setGeneratedPrivateKey(undefined);
+    setDetailsOpen(true);
+  };
 
   useEffect(() => {
     if (!deleteDialogOpen) setKeyToDelete(undefined);
@@ -73,20 +95,16 @@ export function KeyPairs() {
     queryFn: () => KeyPairService.list(),
   });
 
-  // create/import handled in dedicated dialog components
-
   const list = data ?? [];
   const q = search.trim().toLowerCase();
   const filtered = q
     ? list.filter((k) =>
-        [k.name, k.type].some((v) => v?.toLowerCase().includes(q)),
+        [k.name, k.type].some((v) => (v ?? "").toLowerCase().includes(q)),
       )
     : list;
   const totalItems = filtered.length;
   const visible = filtered.slice(0, limit);
   const hasMore = limit < totalItems;
-
-  // mutations moved into dialog components
 
   const deleteMutation = useMutation({
     mutationFn: (payload: { name: string }) => KeyPairService.delete(payload),
@@ -101,19 +119,6 @@ export function KeyPairs() {
       toast.error(message);
     },
   });
-
-  const openDetails = async (name: string) => {
-    try {
-      const details = await KeyPairService.get(name);
-      setSelected(details);
-      setGeneratedPrivateKey(undefined);
-      setDetailsOpen(true);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load key pair details";
-      toast.error(message);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -268,18 +273,13 @@ export function KeyPairs() {
               No key pairs match your search.
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {visible.map((k) => (
-                <div
+                <InfoCard
                   key={k.name}
-                  className="flex flex-col gap-2 p-2 text-sm text-center rounded-md border"
-                >
-                  <div className="min-w-0">
-                    <div className="font-medium truncate" title={k.name}>
-                      {k.name}
-                    </div>
-                  </div>
-                  <div>
+                  title={k.name}
+                  onClick={() => openDetails(k.name)}
+                  badges={
                     <Badge
                       variant="secondary"
                       className="inline-flex gap-1 items-center py-0.5 px-2 text-xs"
@@ -293,31 +293,30 @@ export function KeyPairs() {
                       )}
                       <span className="capitalize">{k.type}</span>
                     </Badge>
-                  </div>
-                  <div className="flex gap-2 justify-center items-center mt-auto">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="rounded-full cursor-pointer"
-                      onClick={() => openDetails(k.name)}
-                    >
-                      <Eye className="mr-1.5 w-4 h-4" /> View
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="text-white rounded-full cursor-pointer"
-                      onClick={() => {
-                        setKeyToDelete({ name: k.name });
-                        setDeleteDialogOpen(true);
-                      }}
-                      disabled={deleteMutation.isPending}
-                      aria-label={`Delete ${k.name}`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+                  }
+                  actionButtons={
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="text-white rounded-full cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setKeyToDelete({ name: k.name });
+                            setDeleteDialogOpen(true);
+                          }}
+                          disabled={deleteMutation.isPending}
+                          aria-label={`Delete ${k.name}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete Keypair
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete the key pair</TooltipContent>
+                    </Tooltip>
+                  }
+                />
               ))}
             </div>
           )}
@@ -326,7 +325,7 @@ export function KeyPairs() {
               onClick={() => setLimit((l) => l + 6)}
               variant="outline"
               disabled={!hasMore}
-              className={`rounded-full ${hasMore ? "" : "opacity-60 cursor-not-allowed"}`}
+              className={`rounded-full ${hasMore ? "" : "cursor-not-allowed opacity-60"}`}
             >
               {hasMore
                 ? `Show More (${Math.min(6, totalItems - visible.length)} more)`
@@ -393,19 +392,27 @@ export function KeyPairs() {
                 </SyntaxHighlighter>
               </div>
             </div>
-          ) : selected ? (
+          ) : selected || isLoadingDetails ? (
             <div className="space-y-4 text-sm">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <div className="text-xs text-muted-foreground">Name</div>
                   <div className="mt-1 font-medium break-words">
-                    {selected.name}
+                    {isLoadingDetails ? (
+                      <Skeleton className="w-32 h-5" />
+                    ) : (
+                      selected?.name
+                    )}
                   </div>
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">Type</div>
                   <div className="mt-1 font-medium break-words">
-                    {selected.type}
+                    {isLoadingDetails ? (
+                      <Skeleton className="w-24 h-5" />
+                    ) : (
+                      selected?.type
+                    )}
                   </div>
                 </div>
                 <div className="sm:col-span-2">
@@ -413,7 +420,11 @@ export function KeyPairs() {
                     Fingerprint
                   </div>
                   <div className="mt-1 font-mono text-xs break-all">
-                    {selected.fingerprint}
+                    {isLoadingDetails ? (
+                      <Skeleton className="w-48 h-4" />
+                    ) : (
+                      selected?.fingerprint
+                    )}
                   </div>
                 </div>
               </div>
@@ -421,28 +432,36 @@ export function KeyPairs() {
                 <div className="mb-1 text-xs text-muted-foreground">
                   Public Key
                 </div>
-                <SyntaxHighlighter
-                  language="bash"
-                  style={atomDark}
-                  wrapLongLines
-                  customStyle={{
-                    margin: 0,
-                    borderRadius: "0.75rem",
-                    background: "#0a0a0a",
-                    padding: "0.75rem",
-                    maxHeight: "12rem",
-                    overflow: "auto",
-                  }}
-                  codeTagProps={{
-                    style: {
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-word",
-                      overflowWrap: "anywhere",
-                    },
-                  }}
-                >
-                  {selected.public_key}
-                </SyntaxHighlighter>
+                {isLoadingDetails ? (
+                  <div className="p-4 space-y-2 rounded-md bg-muted">
+                    <Skeleton className="w-full h-4" />
+                    <Skeleton className="w-5/6 h-4" />
+                    <Skeleton className="w-4/5 h-4" />
+                  </div>
+                ) : (
+                  <SyntaxHighlighter
+                    language="bash"
+                    style={atomDark}
+                    wrapLongLines
+                    customStyle={{
+                      margin: 0,
+                      borderRadius: "0.75rem",
+                      background: "#0a0a0a",
+                      padding: "0.75rem",
+                      maxHeight: "12rem",
+                      overflow: "auto",
+                    }}
+                    codeTagProps={{
+                      style: {
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        overflowWrap: "anywhere",
+                      },
+                    }}
+                  >
+                    {selected?.public_key ?? ""}
+                  </SyntaxHighlighter>
+                )}
               </div>
             </div>
           ) : undefined}
@@ -471,8 +490,8 @@ export function KeyPairs() {
                 className="gap-1.5 rounded-full cursor-pointer"
               >
                 <Link
-                  href={`data:text/plain;charset=utf-8,${encodeURIComponent(selected.public_key.trim() + "\n")}`}
-                  download={`${selected.name ?? "key"}.pub`}
+                  href={`data:text/plain;charset=utf-8,${encodeURIComponent(selected?.public_key?.trim() + "\n")}`}
+                  download={`${selected?.name || "key"}.pub`}
                   aria-label="Download public key"
                 >
                   <Download className="w-4 h-4" />

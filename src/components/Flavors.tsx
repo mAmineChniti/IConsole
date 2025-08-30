@@ -1,10 +1,11 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorCard } from "@/components/ErrorCard";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { FlavorCreateDialog } from "@/components/FlavorCreateDialog";
-import { HeaderActions } from "@/components/HeaderActions";
+import { EmptyState } from "@/components/reusable/EmptyState";
+import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +33,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { XSearch } from "@/components/XSearch";
 import { FlavorService } from "@/lib/requests";
 import type {
   FlavorDeleteRequest,
@@ -54,6 +54,7 @@ import {
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { InfoCard } from "./reusable/InfoCard";
 
 export function Flavors() {
   const qc = useQueryClient();
@@ -70,7 +71,9 @@ export function Flavors() {
 
   useEffect(() => setLimit(6), [search]);
 
-  const { data, isLoading, error, isFetching, refetch } = useQuery({
+  const { data, isLoading, error, isFetching, refetch } = useQuery<
+    FlavorDetails[]
+  >({
     queryKey: ["flavors"],
     queryFn: () => FlavorService.list(),
   });
@@ -93,7 +96,7 @@ export function Flavors() {
       disk: undefined,
       ephemeral: undefined,
       swap: undefined,
-      is_public: undefined,
+      is_public: false,
       description: undefined,
     },
   });
@@ -105,9 +108,9 @@ export function Flavors() {
         vcpus: selected.vcpus,
         ram: selected.ram,
         disk: selected.disk,
-        ephemeral: selected.ephemeral_disk,
+        ephemeral: selected.ephemeral,
         swap: selected.swap,
-        is_public: selected.public,
+        is_public: selected.is_public,
       });
     }
   }, [editOpen, selected, updateForm]);
@@ -142,6 +145,14 @@ export function Flavors() {
   });
 
   const openEdit = async (flavorId: string) => {
+    const existingFlavor = list.find((f) => f.id === flavorId);
+
+    if (existingFlavor) {
+      setSelected(existingFlavor);
+      setEditOpen(true);
+      return;
+    }
+
     try {
       const details = await FlavorService.get(flavorId);
       setSelected(details);
@@ -290,95 +301,59 @@ export function Flavors() {
               No flavors match your search.
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {visible.map((flavor) => (
-                <Card
+                <InfoCard
                   key={flavor.id}
-                  className="rounded-md border-2 transition-all hover:shadow-md bg-card text-card-foreground"
-                >
-                  <CardContent className="p-2">
-                    <div className="flex items-center mb-1">
-                      <div className="flex gap-3 items-center">
-                        <div className="flex justify-center items-center w-8 h-8 rounded-full bg-primary/10">
-                          <Cpu className="w-4 h-4 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="text-base font-semibold leading-none">
-                            {flavor.name}
-                          </h3>
-                          {!flavor.public && (
-                            <Badge
-                              variant="secondary"
-                              className="mt-0.5 text-xs"
-                            >
-                              Private
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1 text-sm">
-                      <div className="flex gap-2 items-center">
-                        <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
-                          <Cpu className="w-3 h-3 text-muted-foreground" />
-                        </div>
-                        <div className="flex-1">
-                          <span className="font-medium">
-                            {flavor.vcpus} vCPU{flavor.vcpus !== 1 ? "s" : ""}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 items-center">
-                        <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
-                          <MemoryStick className="w-3 h-3 text-muted-foreground/60" />
-                        </div>
-                        <div className="flex-1">
-                          <span className="font-medium">
-                            {flavor.ram >= 1024
-                              ? `${(flavor.ram / 1024).toFixed(1)} GB`
-                              : `${flavor.ram} MB`}{" "}
-                            RAM
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 items-center">
-                        <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
-                          <HardDrive className="w-3 h-3 text-muted-foreground/60" />
-                        </div>
-                        <div className="flex-1">
-                          <span className="font-medium">
-                            {flavor.disk} GB Storage
-                          </span>
-                        </div>
-                      </div>
-                      {flavor.ephemeral_disk > 0 && (
-                        <div className="flex gap-2 items-center">
-                          <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
-                            <HardDrive className="w-3 h-3 text-muted-foreground/60" />
-                          </div>
-                          <div className="flex-1">
-                            <span className="text-muted-foreground">
-                              {flavor.ephemeral_disk} GB Ephemeral
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      {flavor.swap > 0 && (
-                        <div className="flex gap-2 items-center">
-                          <div className="flex justify-center items-center w-6 h-6 rounded-full bg-muted">
-                            <MemoryStick className="w-3 h-3 text-muted-foreground/60" />
-                          </div>
-                          <div className="flex-1">
-                            <span className="text-muted-foreground">
-                              {flavor.swap} MB Swap
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2 justify-center pt-1">
+                  title={flavor.name}
+                  badges={
+                    <Badge
+                      variant={flavor.is_public ? "default" : "secondary"}
+                      className="text-xs"
+                    >
+                      {flavor.is_public ? "Public" : "Private"}
+                    </Badge>
+                  }
+                  infoItems={[
+                    [
+                      {
+                        label: "vCPUs",
+                        value: flavor.vcpus.toString(),
+                        icon: Cpu,
+                        variant: "blue",
+                      },
+                      {
+                        label: "RAM",
+                        value: flavor.ram,
+                        icon: MemoryStick,
+                        variant: "green",
+                      },
+                    ],
+                    [
+                      {
+                        label: "Storage",
+                        value: flavor.disk,
+                        icon: HardDrive,
+                        variant: "purple",
+                      },
+                      {
+                        label: "Ephemeral",
+                        value: flavor.ephemeral,
+                        icon: HardDrive,
+                        variant: "amber",
+                      },
+                    ],
+                    [
+                      {
+                        label: "Swap",
+                        value: flavor.swap,
+                        icon: MemoryStick,
+                        variant: "purple",
+                      },
+                    ],
+                  ]}
+                  actionButtons={
+                    <div className="flex gap-2">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -397,10 +372,10 @@ export function Flavors() {
                           <Button
                             variant="destructive"
                             size="sm"
-                            className="gap-1.5 py-1 px-3 text-sm text-white rounded-full cursor-pointer"
+                            className="gap-1.5 py-1 px-3 text-sm rounded-full cursor-pointer"
                             onClick={() => {
-                              setToDelete({ flavor_id: flavor.id });
                               setDeleteOpen(true);
+                              setToDelete({ flavor_id: flavor.id });
                             }}
                             disabled={deleteMutation.isPending}
                             aria-label={`Delete ${flavor.name}`}
@@ -412,8 +387,8 @@ export function Flavors() {
                         <TooltipContent>Delete flavor</TooltipContent>
                       </Tooltip>
                     </div>
-                  </CardContent>
-                </Card>
+                  }
+                />
               ))}
             </div>
           )}
@@ -422,7 +397,7 @@ export function Flavors() {
               onClick={() => setLimit((l) => l + 6)}
               variant="outline"
               disabled={!hasMore}
-              className={`rounded-full ${hasMore ? "" : "opacity-60 cursor-not-allowed"}`}
+              className={`rounded-full ${hasMore ? "" : "cursor-not-allowed opacity-60"}`}
             >
               {hasMore
                 ? `Show More (${Math.min(6, totalItems - visible.length)} more)`
@@ -627,7 +602,7 @@ export function Flavors() {
                       <FormLabel>Public</FormLabel>
                       <FormControl>
                         <Switch
-                          checked={field.value}
+                          checked={!!field.value}
                           onCheckedChange={field.onChange}
                           className="cursor-pointer"
                         />

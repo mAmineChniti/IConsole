@@ -54,7 +54,7 @@ export function ConfirmDeleteDialog({
             onClick={onConfirm}
             disabled={confirming}
             className={cn(
-              "flex-1 gap-2 rounded-full cursor-pointer text-white",
+              "flex-1 cursor-pointer gap-2 rounded-full text-white",
             )}
           >
             {confirming ? (

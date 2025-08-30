@@ -148,12 +148,12 @@ export interface FlavorDetails {
   ram: number;
   vcpus: number;
   disk: number;
-  ephemeral_disk: number;
+  ephemeral: number;
   swap: number;
-  rxtx_factor: number;
-  public: boolean;
-  disabled: boolean;
+  is_public: boolean;
 }
+
+export type FlavorListResponse = FlavorDetails[];
 
 export interface FlavorGetDetails {
   id: string;
@@ -167,8 +167,6 @@ export interface FlavorGetDetails {
   public: boolean;
   disabled: boolean;
 }
-
-export type FlavorListResponse = FlavorDetails[];
 
 export interface FlavorActionResponse {
   message: string;
@@ -215,6 +213,7 @@ export interface InstanceListItem {
   id: string;
   instance_name: string;
   image_name: string;
+  has_volume: boolean;
   ip_address: string;
   flavor: string;
   key_pair: string;
@@ -224,7 +223,6 @@ export interface InstanceListItem {
   power_state: string;
   age: string;
   floating_ip: string;
-  has_volume: boolean;
 }
 
 export type InstanceListResponse = InstanceListItem[];
@@ -233,22 +231,6 @@ export interface NetworkDetails {
   network: string;
   ip: string;
   type: string;
-}
-
-export interface InstanceDetailsResponse {
-  id: string;
-  name: string;
-  status: string;
-  locked: boolean;
-  project_id: string;
-  created_at: string;
-  host: string;
-  flavor: FlavorDetails;
-  image: ImageDetails;
-  networks: NetworkDetails[];
-  security_groups: string[];
-  volumes: VolumeDetails[];
-  floating_ips: string[];
 }
 
 export interface VMCreateResponse {
@@ -294,6 +276,25 @@ export interface VMwareImportResponse {
 export interface NovaActionResponse {
   message: string;
 }
+
+export interface ConsoleResponse {
+  url: string;
+}
+
+export interface GetLogsResponse {
+  logs: {
+    output: string;
+  };
+}
+
+export interface VolumeListItem {
+  id: string;
+  name: string;
+}
+
+export type AvailableVolumesResponse = VolumeListItem[];
+
+export type AttachedVolumesResponse = VolumeListItem[];
 
 interface ResourceFlavor {
   id: string;
@@ -625,7 +626,6 @@ export interface KeyPairDeleteResponse {
   status: string;
 }
 
-// Cluster responses (schemas not explicitly defined in OpenAPI; keep generic)
 export interface ClusterActionResponse {
   message?: string;
   [key: string]: unknown;

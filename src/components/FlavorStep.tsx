@@ -103,7 +103,7 @@ export function FlavorStep({
                       <Card
                         key={flavor.id}
                         className={cn(
-                          "cursor-pointer transition-all hover:shadow-md border-2 rounded-md bg-card text-card-foreground",
+                          "bg-card text-card-foreground cursor-pointer rounded-md border-2 transition-all hover:shadow-md",
                           field.value === flavor.id
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-border/80",

@@ -48,16 +48,22 @@ export function ClusterTokenDialog({
   }, [copiedToken]);
 
   const handleTokenCopy = async (token: string) => {
-    if (token) {
-      await navigator.clipboard.writeText(token);
-      setCopiedToken(token);
-      toast.success("Token copied to clipboard");
+    try {
+      if (token) {
+        await navigator.clipboard.writeText(token);
+        setCopiedToken(token);
+        toast.success("Token copied to clipboard");
+      }
+    } catch {
+      toast.error(
+        "Failed to copy token to clipboard. Please copy it manually.",
+      );
     }
   };
   if (isLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="overflow-y-auto max-w-4xl md:max-w-2xl lg:max-w-4xl max-h-[90vh] w-[95vw] sm:max-w-[90vw]">
           <DialogHeader>
             <DialogTitle className="flex gap-2 items-center">
               <Server className="w-5 h-5" />
@@ -106,7 +112,7 @@ export function ClusterTokenDialog({
   }
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="overflow-y-auto max-w-4xl md:max-w-2xl lg:max-w-4xl max-h-[90vh] w-[95vw] sm:max-w-[90vw]">
         <DialogHeader>
           <DialogTitle className="flex gap-2 items-center">
             <Server className="w-5 h-5" />
@@ -117,45 +123,6 @@ export function ClusterTokenDialog({
             cluster.
           </DialogDescription>
         </DialogHeader>
-        {isLoading ? (
-          <div className="space-y-4">
-            {/* Master IP Skeleton */}
-            <div>
-              <Skeleton className="mb-1.5 w-16 h-4" />
-              <Skeleton className="w-full h-10 rounded-md" />
-            </div>
-
-            {/* Dashboard URL Skeleton */}
-            <div>
-              <Skeleton className="mb-1.5 w-24 h-4" />
-              <div className="relative">
-                <Skeleton className="w-full h-20 rounded-md" />
-                <Skeleton className="absolute top-2 right-2 w-8 h-8 rounded-full" />
-              </div>
-            </div>
-
-            {/* Token Skeleton */}
-            <div>
-              <Skeleton className="mb-1.5 w-14 h-4" />
-              <div className="relative">
-                <Skeleton className="w-full h-32 rounded-lg" />
-                <Skeleton className="absolute top-2 right-2 w-8 h-8 rounded-full" />
-              </div>
-            </div>
-
-            {/* Kubeconfig Skeleton */}
-            <div>
-              <Skeleton className="mb-1.5 w-24 h-4" />
-              <Skeleton className="w-full h-32 rounded-md" />
-            </div>
-
-            {/* Footer Buttons Skeleton */}
-            <div className="flex justify-between pt-2">
-              <Skeleton className="w-40 h-9 rounded-full" />
-              <Skeleton className="w-20 h-9 rounded-full" />
-            </div>
-          </div>
-        ) : undefined}
         <div className="space-y-4">
           {error ? (
             <div className="p-3 mb-4 text-sm rounded-md text-destructive bg-destructive/10">
@@ -166,28 +133,31 @@ export function ClusterTokenDialog({
               <div>
                 <h4 className="mb-1 text-sm font-medium">Master IP</h4>
                 <div className="relative">
-                  <SyntaxHighlighter
-                    language="bash"
-                    style={atomDark}
-                    wrapLongLines
-                    customStyle={{
-                      margin: 0,
-                      borderRadius: "0.5rem",
-                      background: "#0a0a0a",
-                      padding: "0.5rem 0.75rem",
-                      fontSize: "0.875rem",
-                      lineHeight: "1.25rem",
-                    }}
-                    codeTagProps={{
-                      style: {
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                        overflowWrap: "anywhere",
-                      },
-                    }}
-                  >
-                    {data?.master_ip ?? "Unknown"}
-                  </SyntaxHighlighter>
+                  <div className="overflow-x-auto">
+                    <SyntaxHighlighter
+                      language="bash"
+                      style={atomDark}
+                      wrapLongLines
+                      customStyle={{
+                        margin: 0,
+                        borderRadius: "0.5rem",
+                        background: "#0a0a0a",
+                        padding: "0.5rem 0.75rem",
+                        fontSize: "0.875rem",
+                        lineHeight: "1.25rem",
+                        minWidth: "min(100%, 20rem)",
+                      }}
+                      codeTagProps={{
+                        style: {
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                          overflowWrap: "anywhere",
+                        },
+                      }}
+                    >
+                      {data?.master_ip ?? "Unknown"}
+                    </SyntaxHighlighter>
+                  </div>
                 </div>
               </div>
 
@@ -214,6 +184,7 @@ export function ClusterTokenDialog({
                         fontSize: "0.875rem",
                         lineHeight: "1.25rem",
                         cursor: "pointer",
+                        minWidth: "min(100%, 20rem)",
                       }}
                       codeTagProps={{
                         style: {
@@ -230,7 +201,7 @@ export function ClusterTokenDialog({
                     href={data?.dashboard_path ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute right-2 top-1/2 p-1.5 transition-colors -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-2 top-1/2 z-10 p-1.5 transition-colors -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </Link>
@@ -251,6 +222,7 @@ export function ClusterTokenDialog({
                       padding: "0.75rem",
                       maxHeight: "12rem",
                       overflow: "auto",
+                      minWidth: "min(100%, 20rem)",
                     }}
                     codeTagProps={{
                       style: {
@@ -265,7 +237,7 @@ export function ClusterTokenDialog({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2 right-2 w-8 h-8 rounded-full cursor-pointer bg-background/80 group hover:bg-background/60"
+                    className="flex absolute top-2 right-2 justify-center items-center w-7 h-7 rounded-full cursor-pointer sm:w-8 sm:h-8 bg-background/80 group hover:bg-background/60"
                     onClick={() => data?.token && handleTokenCopy(data.token)}
                     disabled={!data?.token}
                   >
@@ -296,6 +268,7 @@ export function ClusterTokenDialog({
                         overflow: "auto",
                         fontSize: "0.75rem",
                         lineHeight: "1.1",
+                        minWidth: "min(100%, 20rem)",
                       }}
                       codeTagProps={{
                         style: {
@@ -313,29 +286,27 @@ export function ClusterTokenDialog({
             </div>
           )}
         </div>
-        <DialogFooter className="flex justify-between">
-          <div>
-            {data?.kubeconfig && (
-              <Button
-                asChild
-                variant="default"
-                size="sm"
-                className="gap-1.5 rounded-full cursor-pointer"
+        <DialogFooter className="flex flex-col gap-3 justify-end sm:flex-row sm:items-center">
+          {data?.kubeconfig && (
+            <Button
+              asChild
+              variant="default"
+              size="sm"
+              className="gap-1.5 w-full rounded-full cursor-pointer sm:w-auto"
+            >
+              <Link
+                href={`data:application/yaml;charset=utf-8,${encodeURIComponent(data.kubeconfig.trim() + "\n")}`}
+                download={`kubeconfig-${clusterName ?? "cluster"}.yaml`}
+                aria-label="Download kubeconfig"
               >
-                <Link
-                  href={`data:application/yaml;charset=utf-8,${encodeURIComponent(data.kubeconfig.trim() + "\n")}`}
-                  download={`kubeconfig-${clusterName ?? "cluster"}.yaml`}
-                  aria-label="Download kubeconfig"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download Kubeconfig</span>
-                </Link>
-              </Button>
-            )}
-          </div>
+                <Download className="w-4 h-4" />
+                <span>Download Kubeconfig</span>
+              </Link>
+            </Button>
+          )}
           <Button
-            className="rounded-full cursor-pointer"
             variant="outline"
+            className="w-full rounded-full cursor-pointer sm:w-auto"
             onClick={() => onOpenChange(false)}
           >
             Close
