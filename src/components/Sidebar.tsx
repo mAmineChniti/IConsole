@@ -315,16 +315,20 @@ export function Sidebar() {
         <div className="flex gap-2 justify-center items-center min-w-0">
           <div className="relative">
             <div className="flex justify-center items-center w-7 h-7 bg-gradient-to-br rounded-full shadow-lg from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
-              <Shield
-                className="w-4 h-4 text-white"
-                aria-hidden="true"
-                focusable="false"
-              />
+              <Link href="/dashboard/overview">
+                <Shield
+                  className="w-4 h-4 text-white"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              </Link>
             </div>
           </div>
-          <span className="font-sans text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br select-none truncate from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
-            IConsole
-          </span>
+          <Link href="/dashboard/overview">
+            <span className="font-sans text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br select-none truncate from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+              IConsole
+            </span>
+          </Link>
         </div>
       </SidebarHeader>
 

@@ -36,8 +36,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-// Type removed as it's not used
-
 interface CreateClusterDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -63,7 +61,6 @@ export function CreateClusterDialog({
     } as ResourcesResponse,
   });
 
-  // Ensure resources is never undefined
   const safeResources = resources ?? {
     images: [],
     flavors: [],
@@ -298,7 +295,7 @@ export function CreateClusterDialog({
                                   value={option.value}
                                 >
                                   {optionDuplicates > 1
-                                    ? `${option.label} (${
+                                    ? `${option.label} ($ {
                                         safeResources.images.findIndex(
                                           (img) => {
                                             if (
@@ -472,7 +469,7 @@ export function CreateClusterDialog({
                                   value={option.value}
                                 >
                                   {optionDuplicates > 1
-                                    ? `${option.label} (${
+                                    ? `${option.label} ($ {
                                         safeResources.networks.findIndex(
                                           (n) => {
                                             if (
@@ -553,7 +550,7 @@ export function CreateClusterDialog({
                                     value={option.value}
                                   >
                                     {optionDuplicates > 1
-                                      ? `${option.label} (${
+                                      ? `${option.label} ($ {
                                           safeResources.keypairs.findIndex(
                                             (kp) => {
                                               if (
@@ -635,7 +632,7 @@ export function CreateClusterDialog({
                                     value={option.value}
                                   >
                                     {optionDuplicates > 1
-                                      ? `${option.label} (${
+                                      ? `${option.label} ($ {
                                           safeResources.security_groups.findIndex(
                                             (sg) => {
                                               if (

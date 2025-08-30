@@ -3,6 +3,7 @@ const prettierConfig = {
   plugins: [
     "prettier-plugin-tailwindcss",
     "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-unused-imports-configurable",
   ],
   semi: true,
   singleQuote: false,

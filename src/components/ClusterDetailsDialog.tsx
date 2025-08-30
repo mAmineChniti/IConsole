@@ -44,10 +44,14 @@ export function ClusterDetailsDialog({
   }, [copiedIp]);
 
   const handleIpCopy = async (ip: string) => {
-    if (ip) {
-      await navigator.clipboard.writeText(ip);
-      setCopiedIp(ip);
-      toast.success("IP copied to clipboard");
+    try {
+      if (ip) {
+        await navigator.clipboard.writeText(ip);
+        setCopiedIp(ip);
+        toast.success("IP copied to clipboard");
+      }
+    } catch {
+      toast.error("Failed to copy IP to clipboard. Please copy it manually.");
     }
   };
 
@@ -164,7 +168,7 @@ export function ClusterDetailsDialog({
                           <div className="flex flex-wrap gap-3 items-center text-sm">
                             <div className="flex gap-1.5 items-center">
                               <div
-                                className={`w-2 h-2 rounded-full ${
+                                className={`w-2 h-2 rounded-full $ {
                                   node?.status === "ACTIVE"
                                     ? "bg-green-500"
                                     : "bg-red-500"
