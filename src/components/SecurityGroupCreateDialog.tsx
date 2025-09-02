@@ -66,7 +66,7 @@ export function SecurityGroupCreateDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold truncate">
+          <DialogTitle className="truncate text-lg font-semibold">
             Create Security Group
           </DialogTitle>
         </DialogHeader>
@@ -84,7 +84,7 @@ export function SecurityGroupCreateDialog({
                   <FormControl>
                     <Input
                       placeholder="web-sg"
-                      className="w-full h-10 rounded-full"
+                      className="h-10 w-full rounded-full"
                       {...field}
                     />
                   </FormControl>
@@ -101,7 +101,7 @@ export function SecurityGroupCreateDialog({
                   <FormControl>
                     <Input
                       placeholder="Optional description"
-                      className="w-full h-10 rounded-full"
+                      className="h-10 w-full rounded-full"
                       {...field}
                     />
                   </FormControl>
@@ -113,27 +113,27 @@ export function SecurityGroupCreateDialog({
               <Button
                 type="button"
                 variant="outline"
-                className="gap-2 rounded-full cursor-pointer"
+                className="cursor-pointer gap-2 rounded-full"
                 onClick={() => onOpenChange(false)}
                 disabled={createMutation.isPending}
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
                 <span>Cancel</span>
               </Button>
               <Button
                 type="submit"
                 variant="default"
-                className="gap-2 rounded-full cursor-pointer min-w-[120px]"
+                className="min-w-[120px] cursor-pointer gap-2 rounded-full"
                 disabled={createMutation.isPending}
               >
                 {createMutation.isPending ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Create...</span>
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4" />
+                    <Plus className="h-4 w-4" />
                     <span>Create</span>
                   </>
                 )}

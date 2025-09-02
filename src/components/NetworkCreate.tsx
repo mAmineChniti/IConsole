@@ -78,10 +78,23 @@ export function NetworkCreate({
     },
   });
 
-  const [allocationPoolsText, setAllocationPoolsText] = useState("");
+  const [allocationPoolsText, setAllocationPoolsText] = useState(
+    JSON.stringify(
+      form.getValues("subnet.allocation_pools") ?? [],
+      undefined,
+      2,
+    ),
+  );
+
   useEffect(() => {
-    const pools = form.getValues("subnet.allocation_pools") ?? [];
-    setAllocationPoolsText(JSON.stringify(pools));
+    const sub = form.watch((value, { name }) => {
+      if (name === "subnet.allocation_pools") {
+        setAllocationPoolsText(
+          JSON.stringify(value?.subnet?.allocation_pools ?? [], undefined, 2),
+        );
+      }
+    });
+    return () => sub?.unsubscribe?.();
   }, [form]);
 
   const createMutation = useMutation({
@@ -129,25 +142,25 @@ export function NetworkCreate({
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-4 items-center mb-2">
+      <div className="mb-2 flex items-center gap-4">
         {onBack && (
           <Button
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="flex gap-2 items-center rounded-full border transition-all duration-200 cursor-pointer text-muted-foreground bg-card border-border/50 hover:text-foreground"
+            className="text-muted-foreground bg-card border-border/50 hover:text-foreground flex cursor-pointer items-center gap-2 rounded-full border transition-all duration-200"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="h-4 w-4" />
             Back to Networks
           </Button>
         )}
       </div>
 
-      <Card className="overflow-hidden rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+      <Card className="bg-card text-card-foreground border-border/50 overflow-hidden rounded-xl border shadow-lg">
         <CardHeader className="space-y-3">
-          <CardTitle className="flex gap-2 items-center text-lg">
-            <div className="flex-shrink-0 p-2 rounded-full bg-primary/10">
-              <Cpu className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <div className="bg-primary/10 flex-shrink-0 rounded-full p-2">
+              <Cpu className="text-primary h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <span className="truncate">Create Network</span>
           </CardTitle>
@@ -169,9 +182,9 @@ export function NetworkCreate({
                   name="name"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <NetworkIcon className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <NetworkIcon className="text-muted-foreground h-4 w-4" />
                         </span>
                         Network Name
                       </FormLabel>
@@ -194,9 +207,9 @@ export function NetworkCreate({
                   name="mtu"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <Gauge className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <Gauge className="text-muted-foreground h-4 w-4" />
                         </span>
                         MTU
                       </FormLabel>
@@ -223,9 +236,9 @@ export function NetworkCreate({
                   name="description"
                   render={({ field }) => (
                     <div className="space-y-2 md:col-span-2">
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <FileText className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <FileText className="text-muted-foreground h-4 w-4" />
                         </span>
                         Description
                       </FormLabel>
@@ -249,7 +262,7 @@ export function NetworkCreate({
                     control={form.control}
                     name="shared"
                     render={({ field }) => (
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <Checkbox
                           id="shared"
                           checked={!!field.value}
@@ -258,10 +271,10 @@ export function NetworkCreate({
                         />
                         <FormLabel
                           htmlFor="shared"
-                          className="flex gap-2 items-center text-sm font-medium"
+                          className="flex items-center gap-2 text-sm font-medium"
                         >
-                          <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                            <Share2 className="w-4 h-4 text-muted-foreground" />
+                          <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                            <Share2 className="text-muted-foreground h-4 w-4" />
                           </span>
                           Shared
                         </FormLabel>
@@ -273,7 +286,7 @@ export function NetworkCreate({
                     control={form.control}
                     name="port_security_enabled"
                     render={({ field }) => (
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <Checkbox
                           id="port_security"
                           checked={!!field.value}
@@ -282,10 +295,10 @@ export function NetworkCreate({
                         />
                         <FormLabel
                           htmlFor="port_security"
-                          className="flex gap-2 items-center text-sm font-medium"
+                          className="flex items-center gap-2 text-sm font-medium"
                         >
-                          <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                            <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+                          <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                            <ShieldCheck className="text-muted-foreground h-4 w-4" />
                           </span>
                           Port Security
                         </FormLabel>
@@ -303,9 +316,9 @@ export function NetworkCreate({
                       : "";
                     return (
                       <div className="space-y-2 md:col-span-2">
-                        <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                          <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                            <MapIcon className="w-4 h-4 text-muted-foreground" />
+                        <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                          <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                            <MapIcon className="text-muted-foreground h-4 w-4" />
                           </span>
                           Availability Zone Hints (comma separated)
                         </FormLabel>
@@ -343,9 +356,9 @@ export function NetworkCreate({
                   name="subnet.name"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <SquareStack className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <SquareStack className="text-muted-foreground h-4 w-4" />
                         </span>
                         Subnet Name
                       </FormLabel>
@@ -369,9 +382,9 @@ export function NetworkCreate({
                   name="subnet.ip_version"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <Globe className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <Globe className="text-muted-foreground h-4 w-4" />
                         </span>
                         IP Version
                       </FormLabel>
@@ -382,7 +395,7 @@ export function NetworkCreate({
                         }
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full h-10 rounded-full cursor-pointer">
+                          <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
                             <SelectValue placeholder="Select IP Version" />
                           </SelectTrigger>
                         </FormControl>
@@ -399,7 +412,7 @@ export function NetworkCreate({
                   control={form.control}
                   name="subnet.enable_dhcp"
                   render={({ field }) => (
-                    <div className="flex gap-2 items-center pt-7">
+                    <div className="flex items-center gap-2 pt-7">
                       <Checkbox
                         id="enable_dhcp"
                         checked={!!field.value}
@@ -408,10 +421,10 @@ export function NetworkCreate({
                       />
                       <FormLabel
                         htmlFor="enable_dhcp"
-                        className="flex gap-2 items-center text-sm font-medium"
+                        className="flex items-center gap-2 text-sm font-medium"
                       >
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <Router className="w-4 h-4 text-muted-foreground" />
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <Router className="text-muted-foreground h-4 w-4" />
                         </span>
                         Enable DHCP
                       </FormLabel>
@@ -424,9 +437,9 @@ export function NetworkCreate({
                   name="subnet.cidr"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <Route className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <Route className="text-muted-foreground h-4 w-4" />
                         </span>
                         CIDR
                       </FormLabel>
@@ -450,9 +463,9 @@ export function NetworkCreate({
                   name="subnet.gateway_ip"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <DoorOpen className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <DoorOpen className="text-muted-foreground h-4 w-4" />
                         </span>
                         Gateway IP
                       </FormLabel>
@@ -480,9 +493,9 @@ export function NetworkCreate({
                       : "";
                     return (
                       <div className="space-y-2 md:col-span-2">
-                        <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                          <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                            <Server className="w-4 h-4 text-muted-foreground" />
+                        <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                          <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                            <Server className="text-muted-foreground h-4 w-4" />
                           </span>
                           DNS Nameservers (comma separated)
                         </FormLabel>
@@ -516,30 +529,29 @@ export function NetworkCreate({
                   render={({ field }) => {
                     return (
                       <div className="space-y-2 md:col-span-2">
-                        <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                          <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                            <GitBranch className="w-4 h-4 text-muted-foreground" />
+                        <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                          <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                            <GitBranch className="text-muted-foreground h-4 w-4" />
                           </span>
                           Allocation Pools (optional, JSON array)
                         </FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder='[{"start": "10.10.10.10", "end": "10.10.10.100"}]'
-                            className="w-full font-mono text-xs min-h-[88px]"
+                            className="min-h-[88px] w-full font-mono text-xs"
                             value={allocationPoolsText}
-                            onChange={(e) =>
-                              setAllocationPoolsText(e.target.value)
-                            }
-                            onBlur={() => {
-                              const raw = allocationPoolsText.trim();
-                              if (!raw) {
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              setAllocationPoolsText(raw);
+                              const trimmed = raw.trim();
+                              if (!trimmed) {
                                 field.onChange([]);
                                 form.clearErrors("subnet.allocation_pools");
                                 return;
                               }
                               try {
                                 const parsed = JSON.parse(
-                                  raw,
+                                  trimmed,
                                 ) as AllocationPool[];
                                 if (
                                   Array.isArray(parsed) &&
@@ -549,9 +561,7 @@ export function NetworkCreate({
                                       typeof p?.end === "string",
                                   )
                                 ) {
-                                  field.onChange(
-                                    parsed as { start: string; end: string }[],
-                                  );
+                                  field.onChange(parsed);
                                   form.clearErrors("subnet.allocation_pools");
                                 } else {
                                   throw new Error("Invalid structure");
@@ -579,9 +589,9 @@ export function NetworkCreate({
                       : "";
                     return (
                       <div className="space-y-2 md:col-span-2">
-                        <FormLabel className="flex gap-2 items-center text-sm font-medium">
-                          <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                            <Route className="w-4 h-4 text-muted-foreground" />
+                        <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                          <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                            <Route className="text-muted-foreground h-4 w-4" />
                           </span>
                           Host Routes (optional, comma separated CIDR)
                         </FormLabel>
@@ -611,12 +621,12 @@ export function NetworkCreate({
                 />
               </div>
 
-              <div className="flex gap-2 justify-end pt-4">
+              <div className="flex justify-end gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => onBack?.()}
-                  className="rounded-full cursor-pointer"
+                  className="cursor-pointer rounded-full"
                 >
                   Cancel
                 </Button>

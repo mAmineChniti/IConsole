@@ -2,14 +2,14 @@
 
 import { ClusterDetailsDialog } from "@/components/ClusterDetailsDialog";
 import { ClusterTokenDialog } from "@/components/ClusterTokenDialog";
-import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { CreateClusterDialog } from "@/components/CreateClusterDialog";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,45 +37,15 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-
-export const getStatusBadge = (status: string) => {
-  const key = (status ?? "UNKNOWN").toUpperCase();
-  const statusMap: Record<string, { variant: BadgeVariant; colors: string }> = {
-    ACTIVE: {
-      variant: "secondary",
-      colors:
-        "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400",
-    },
-    CREATING: {
-      variant: "outline",
-      colors:
-        "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
-    },
-    UPDATING: {
-      variant: "outline",
-      colors:
-        "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
-    },
-    DELETING: { variant: "destructive", colors: "text-white" },
-    ERROR: { variant: "destructive", colors: "text-white" },
-    STOPPED: {
-      variant: "default",
-      colors: "bg-muted text-muted-foreground",
-    },
-  };
-
-  const { variant, colors } = statusMap[key] ?? {
-    variant: "default" as const,
-    colors: "",
-  };
-
-  return (
-    <Badge variant={variant} className={cn("px-2 py-0.5", colors)}>
-      {key}
-    </Badge>
-  );
-};
+const clusterStatusMap = {
+  ACTIVE: "ACTIVE",
+  CREATING: "BUILD",
+  UPDATING: "UPDATING",
+  DELETING: "PENDING",
+  ERROR: "ERROR",
+  STOPPED: "STOPPED",
+  FAILED: "FAILED",
+} as const;
 
 const canStart = (status: string) => {
   return ["stopped", "failed", "error"].includes(status?.toLowerCase());
@@ -216,20 +186,20 @@ export function Clusters() {
 
   if (isLoading) {
     return (
-      <div className="px-2 space-y-6 sm:px-0">
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
-          <Skeleton className="w-40 h-8" />
-          <div className="flex gap-2 items-center">
-            <Skeleton className="w-32 h-9 rounded-full" />
-            <Skeleton className="w-9 h-9 rounded-full" />
+      <div className="space-y-6 px-2 sm:px-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <Skeleton className="h-8 w-40" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-9 w-32 rounded-full" />
+            <Skeleton className="h-9 w-9 rounded-full" />
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full max-w-md">
-            <Skeleton className="w-full h-10 rounded-full" />
+            <Skeleton className="h-10 w-full rounded-full" />
           </div>
-          <Skeleton className="w-full h-10 rounded-full sm:w-auto sm:min-w-[140px]" />
+          <Skeleton className="h-10 w-full rounded-full sm:w-auto sm:min-w-[140px]" />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -239,58 +209,58 @@ export function Clusters() {
               className="overflow-hidden transition-shadow hover:shadow-md"
             >
               <CardHeader className="px-4 pt-4 pb-3">
-                <div className="flex gap-2 justify-between items-center">
-                  <Skeleton className="w-32 h-6 rounded-md" />
-                  <Skeleton className="w-20 h-6 rounded-full" />
+                <div className="flex items-center justify-between gap-2">
+                  <Skeleton className="h-6 w-32 rounded-md" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
                 </div>
               </CardHeader>
               <CardContent className="p-4 pt-0">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="flex p-2.5 rounded-lg bg-muted/60">
-                    <div className="flex gap-3 items-center w-full">
-                      <Skeleton className="w-8 h-8 rounded-md" />
+                  <div className="bg-muted/60 flex rounded-lg p-2.5">
+                    <div className="flex w-full items-center gap-3">
+                      <Skeleton className="h-8 w-8 rounded-md" />
                       <div className="overflow-hidden">
-                        <Skeleton className="mb-1 w-16 h-3" />
-                        <Skeleton className="w-8 h-4" />
+                        <Skeleton className="mb-1 h-3 w-16" />
+                        <Skeleton className="h-4 w-8" />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex p-2.5 rounded-lg bg-muted/60">
-                    <div className="flex gap-3 items-center w-full">
-                      <Skeleton className="w-8 h-8 rounded-md" />
+                  <div className="bg-muted/60 flex rounded-lg p-2.5">
+                    <div className="flex w-full items-center gap-3">
+                      <Skeleton className="h-8 w-8 rounded-md" />
                       <div className="overflow-hidden">
-                        <Skeleton className="mb-1 w-16 h-3" />
-                        <Skeleton className="w-8 h-4" />
+                        <Skeleton className="mb-1 h-3 w-16" />
+                        <Skeleton className="h-4 w-8" />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex p-2.5 rounded-lg bg-muted/60">
-                    <div className="flex gap-3 items-center w-full">
-                      <Skeleton className="w-8 h-8 rounded-md" />
+                  <div className="bg-muted/60 flex rounded-lg p-2.5">
+                    <div className="flex w-full items-center gap-3">
+                      <Skeleton className="h-8 w-8 rounded-md" />
                       <div className="overflow-hidden">
-                        <Skeleton className="mb-1 w-16 h-3" />
-                        <Skeleton className="w-20 h-4" />
+                        <Skeleton className="mb-1 h-3 w-16" />
+                        <Skeleton className="h-4 w-20" />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex p-2.5 rounded-lg bg-muted/60">
-                    <div className="flex gap-3 items-center w-full">
-                      <Skeleton className="w-8 h-8 rounded-md" />
+                  <div className="bg-muted/60 flex rounded-lg p-2.5">
+                    <div className="flex w-full items-center gap-3">
+                      <Skeleton className="h-8 w-8 rounded-md" />
                       <div className="overflow-hidden">
-                        <Skeleton className="mb-1 w-16 h-3" />
-                        <Skeleton className="w-24 h-4" />
+                        <Skeleton className="mb-1 h-3 w-16" />
+                        <Skeleton className="h-4 w-24" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-2 justify-center items-center pt-4 mt-4 border-t border-border">
-                  <Skeleton className="w-16 h-8 rounded-full" />
-                  <Skeleton className="w-16 h-8 rounded-full" />
-                  <Skeleton className="w-16 h-8 rounded-full" />
+                <div className="border-border mt-4 flex items-center justify-center gap-2 border-t pt-4">
+                  <Skeleton className="h-8 w-16 rounded-full" />
+                  <Skeleton className="h-8 w-16 rounded-full" />
+                  <Skeleton className="h-8 w-16 rounded-full" />
                 </div>
               </CardContent>
             </Card>
@@ -341,9 +311,9 @@ export function Clusters() {
   }
 
   return (
-    <div className="px-2 space-y-6 sm:px-0">
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-        <div className="text-sm leading-relaxed text-muted-foreground">
+    <div className="space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="text-muted-foreground text-sm leading-relaxed">
           {totalItems} cluster{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -352,7 +322,7 @@ export function Clusters() {
             </>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 self-end ml-auto sm:flex-nowrap sm:self-auto">
+        <div className="ml-auto flex flex-wrap gap-2 self-end sm:flex-nowrap sm:self-auto">
           <HeaderActions
             onRefresh={() => refetch()}
             isRefreshing={isRefetching}
@@ -374,8 +344,8 @@ export function Clusters() {
           queryClient.invalidateQueries({ queryKey: ["clusters"] })
         }
       />
-      <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:justify-between sm:items-center">
-        <div className="flex-1 max-w-full sm:max-w-md">
+      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-full flex-1 sm:max-w-md">
           <XSearch
             value={search}
             onChange={setSearch}
@@ -387,7 +357,7 @@ export function Clusters() {
 
       <div className="w-full">
         {filteredClusters?.length === 0 ? (
-          <div className="flex col-span-full justify-center items-center p-8 text-center rounded-2xl border text-muted-foreground min-h-32">
+          <div className="text-muted-foreground col-span-full flex min-h-32 items-center justify-center rounded-2xl border p-8 text-center">
             No clusters match your search.
           </div>
         ) : (
@@ -402,7 +372,13 @@ export function Clusters() {
                   key={cluster.cluster_id}
                   title={cluster.cluster_name ?? "Unnamed Cluster"}
                   onClick={() => handleCardClick(cluster.cluster_id)}
-                  badges={getStatusBadge(cluster.overall_status)}
+                  badges={
+                    <StatusBadge
+                      status={cluster.overall_status}
+                      statusTextMap={clusterStatusMap}
+                      className="px-2 py-0.5"
+                    />
+                  }
                   infoItems={[
                     [
                       {
@@ -421,9 +397,7 @@ export function Clusters() {
                     [
                       {
                         label: "Created",
-                        value: cluster.created_at
-                          ? new Date(cluster.created_at).toLocaleDateString()
-                          : "N/A",
+                        value: cluster.created_at,
                         icon: Clock,
                         variant: "green",
                       },
@@ -443,7 +417,7 @@ export function Clusters() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                              className="group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground h-8 cursor-pointer rounded-full px-3 transition-all duration-200"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleClusterAction(
@@ -453,8 +427,8 @@ export function Clusters() {
                               }}
                               disabled={startCluster.isPending}
                             >
-                              <Power className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
-                              <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
+                              <Power className="group-hover:text-accent-foreground mr-1.5 h-3.5 w-3.5 transition-colors duration-200" />
+                              <span className="group-hover:text-accent-foreground text-xs font-medium transition-colors duration-200">
                                 Start
                               </span>
                             </Button>
@@ -468,15 +442,15 @@ export function Clusters() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                              className="group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground h-8 cursor-pointer rounded-full px-3 transition-all duration-200"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleClusterAction(cluster.cluster_id, "stop");
                               }}
                               disabled={stopCluster.isPending}
                             >
-                              <PowerOff className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
-                              <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
+                              <PowerOff className="group-hover:text-accent-foreground mr-1.5 h-3.5 w-3.5 transition-colors duration-200" />
+                              <span className="group-hover:text-accent-foreground text-xs font-medium transition-colors duration-200">
                                 Stop
                               </span>
                             </Button>
@@ -489,15 +463,15 @@ export function Clusters() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="px-3 h-8 rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                            className="group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground h-8 cursor-pointer rounded-full px-3 transition-all duration-200"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleTokenClick(cluster.cluster_id);
                             }}
                             title="Get Dashboard Token"
                           >
-                            <Key className="mr-1.5 w-3.5 h-3.5 transition-colors duration-200 group-hover:text-accent-foreground" />
-                            <span className="text-xs font-medium transition-colors duration-200 group-hover:text-accent-foreground">
+                            <Key className="group-hover:text-accent-foreground mr-1.5 h-3.5 w-3.5 transition-colors duration-200" />
+                            <span className="group-hover:text-accent-foreground text-xs font-medium transition-colors duration-200">
                               Token
                             </span>
                           </Button>
@@ -509,14 +483,14 @@ export function Clusters() {
                           <Button
                             variant="destructive"
                             size="sm"
-                            className="gap-1.5 px-3 h-8 text-xs font-medium rounded-full cursor-pointer"
+                            className="h-8 cursor-pointer gap-1.5 rounded-full px-3 text-xs font-medium"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleClusterAction(cluster.cluster_id, "delete");
                             }}
                             disabled={deleteCluster.isPending}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="h-3.5 w-3.5" />
                             <span>Delete</span>
                           </Button>
                         </TooltipTrigger>

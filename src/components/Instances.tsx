@@ -1,13 +1,13 @@
 "use client";
 
-import { ExtendedInstanceActions } from "@/components/ExtendedInstanceActions";
 import { InstanceActions } from "@/components/InstanceActions";
-import { InstanceDialog } from "@/components/InstanceDialog";
 import InstanceLogs from "@/components/InstanceLogs";
-import { InstanceStatusBadge } from "@/components/InstanceStatusBadge";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoCard } from "@/components/reusable/InfoCard";
+import { InfoDialog } from "@/components/reusable/InfoDialog";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,18 @@ import type {
   InstanceListResponse,
 } from "@/types/ResponseInterfaces";
 import { useQuery } from "@tanstack/react-query";
-import { Cpu, HardDrive, Network, Server } from "lucide-react";
+import {
+  Bolt,
+  ClipboardList,
+  Cpu,
+  HardDrive,
+  MapPin,
+  MemoryStick,
+  Network,
+  Server,
+  Timer,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { InfoCard } from "./reusable/InfoCard";
 
 export function Instances() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -99,67 +108,67 @@ export function Instances() {
 
   if (isLoading) {
     return (
-      <div className="px-2 space-y-6 sm:px-0">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <Skeleton className="w-40 h-4" />
-          <div className="flex gap-3 justify-end items-center w-full sm:w-auto">
-            <Skeleton className="w-9 h-9 rounded-full" />
-            <Skeleton className="w-40 h-10 rounded-full" />
+      <div className="space-y-6 px-2 sm:px-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <Skeleton className="h-4 w-40" />
+          <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
+            <Skeleton className="h-9 w-9 rounded-full" />
+            <Skeleton className="h-10 w-40 rounded-full" />
           </div>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="rounded-xl border shadow-lg cursor-pointer bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 cursor-pointer rounded-xl border shadow-lg"
             >
               <CardHeader className="pb-3">
-                <div className="flex justify-between items-center">
-                  <Skeleton className="w-32 h-6 rounded" />
-                  <div className="flex gap-2 items-center">
-                    <Skeleton className="w-20 h-6 rounded-full" />
-                    <Skeleton className="w-12 h-6 rounded-full" />
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-32 rounded" />
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-12 rounded-full" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="flex flex-col gap-3 mt-2">
-                  <div className="flex flex-row gap-3 items-center">
-                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                      <div className="flex gap-2 items-center w-full">
-                        <Skeleton className="w-7 h-7 rounded-md" />
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <Skeleton className="mb-1 w-12 h-3" />
-                          <Skeleton className="w-24 h-4" />
+                <div className="mt-2 flex flex-col gap-3">
+                  <div className="flex flex-row items-center gap-3">
+                    <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                      <div className="flex w-full items-center gap-2">
+                        <Skeleton className="h-7 w-7 rounded-md" />
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <Skeleton className="mb-1 h-3 w-12" />
+                          <Skeleton className="h-4 w-24" />
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                      <div className="flex gap-2 items-center w-full">
-                        <Skeleton className="w-7 h-7 rounded-md" />
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <Skeleton className="mb-1 w-12 h-3" />
-                          <Skeleton className="w-20 h-4" />
+                    <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                      <div className="flex w-full items-center gap-2">
+                        <Skeleton className="h-7 w-7 rounded-md" />
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <Skeleton className="mb-1 h-3 w-12" />
+                          <Skeleton className="h-4 w-20" />
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row gap-3 items-center">
-                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                      <div className="flex gap-2 items-center w-full">
-                        <Skeleton className="w-7 h-7 rounded-md" />
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <Skeleton className="mb-1 w-8 h-3" />
-                          <Skeleton className="w-28 h-4" />
+                  <div className="flex flex-row items-center gap-3">
+                    <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                      <div className="flex w-full items-center gap-2">
+                        <Skeleton className="h-7 w-7 rounded-md" />
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <Skeleton className="mb-1 h-3 w-8" />
+                          <Skeleton className="h-4 w-28" />
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                      <div className="flex gap-2 items-center w-full">
-                        <Skeleton className="w-7 h-7 rounded-md" />
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <Skeleton className="mb-1 w-12 h-3" />
-                          <Skeleton className="w-16 h-4" />
+                    <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                      <div className="flex w-full items-center gap-2">
+                        <Skeleton className="h-7 w-7 rounded-md" />
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <Skeleton className="mb-1 h-3 w-12" />
+                          <Skeleton className="h-4 w-16" />
                         </div>
                       </div>
                     </div>
@@ -170,7 +179,7 @@ export function Instances() {
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="w-40 h-9 rounded-full" />
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -198,7 +207,7 @@ export function Instances() {
         refreshing={isFetching}
         primaryLabel="Create Instance"
         onPrimary={() => setShowVM(true)}
-        icon={<Server className="w-7 h-7 text-muted-foreground" />}
+        icon={<Server className="text-muted-foreground h-7 w-7" />}
         variant="dashed"
       />
     );
@@ -211,8 +220,8 @@ export function Instances() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-        <div className="text-sm leading-relaxed text-muted-foreground">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="text-muted-foreground text-sm leading-relaxed">
           {totalItems} instance{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -235,7 +244,7 @@ export function Instances() {
         />
       </div>
 
-      <div className="flex-1 max-w-full sm:max-w-md">
+      <div className="max-w-full flex-1 sm:max-w-md">
         <XSearch
           value={search}
           onChange={setSearch}
@@ -245,7 +254,7 @@ export function Instances() {
       </div>
 
       {totalItems === 0 ? (
-        <div className="flex justify-center items-center p-8 text-center rounded-2xl border text-muted-foreground min-h-32">
+        <div className="text-muted-foreground flex min-h-32 items-center justify-center rounded-2xl border p-8 text-center">
           No instances match your search.
         </div>
       ) : (
@@ -254,12 +263,12 @@ export function Instances() {
             <InfoCard
               key={instance.id}
               title={instance.instance_name}
-              className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg"
               onClick={() => handleCardClick(instance)}
               badges={
                 <>
-                  <InstanceStatusBadge status={instance.status} />
-                  {instance.power_state === "locked" && (
+                  <StatusBadge status={instance.status} />
+                  {instance.power_state?.toUpperCase() === "LOCKED" && (
                     <Badge variant="outline" className="text-muted-foreground">
                       Locked
                     </Badge>
@@ -299,11 +308,6 @@ export function Instances() {
               actionButtons={
                 <>
                   <InstanceActions
-                    instanceId={instance.id}
-                    status={instance.status}
-                    disabled={instance.status === "BUILD"}
-                  />
-                  <ExtendedInstanceActions
                     instance={instance}
                     status={instance.status}
                     disabled={instance.status === "BUILD"}
@@ -334,10 +338,86 @@ export function Instances() {
         </Button>
       </div>
 
-      <InstanceDialog
+      <InfoDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        instance={dialogInstance}
+        title={dialogInstance?.instance_name ?? "Instance Details"}
+        badges={
+          <StatusBadge
+            key="status"
+            status={dialogInstance?.status ?? "unknown"}
+          />
+        }
+        infoItems={[
+          [
+            {
+              label: "Image",
+              value: dialogInstance?.image_name ?? "Unknown",
+              icon: HardDrive,
+              variant: "blue",
+            },
+            {
+              label: "Flavor",
+              value: dialogInstance?.flavor ?? "N/A",
+              icon: MemoryStick,
+              variant: "pink",
+            },
+            {
+              label: "IP Address",
+              value: dialogInstance?.ip_address,
+              icon: Network,
+              variant: "teal",
+            },
+            {
+              label: "Availability Zone",
+              value: dialogInstance?.availability_zone ?? "N/A",
+              icon: MapPin,
+              variant: "sky",
+            },
+
+            {
+              label: "Key Pair",
+              value: dialogInstance?.key_pair ?? "N/A",
+              icon: Cpu,
+              variant: "indigo",
+            },
+            {
+              label: "Age",
+              value: dialogInstance?.age ?? "Unknown",
+              icon: Timer,
+              variant: "orange",
+            },
+
+            {
+              label: "Power State",
+              value: dialogInstance?.power_state ?? "N/A",
+              icon: Bolt,
+              variant: "violet",
+            },
+            {
+              label: "Task",
+              value: dialogInstance?.task ?? "N/A",
+              icon: ClipboardList,
+              variant: "purple",
+            },
+            {
+              label: "Has Volume",
+              value: dialogInstance?.has_volume ? "Yes" : "No",
+              icon: HardDrive,
+              variant: dialogInstance?.has_volume ? "emerald" : "red",
+            },
+          ],
+        ]}
+        actionButtons={
+          dialogInstance && (
+            <InstanceActions
+              instance={dialogInstance}
+              status={dialogInstance?.status}
+              disabled={dialogInstance?.status === "BUILD"}
+              onViewLogs={() => setViewingLogsFor(dialogInstance)}
+            />
+          )
+        }
       />
     </div>
   );

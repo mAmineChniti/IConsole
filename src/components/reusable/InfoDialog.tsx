@@ -1,9 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
-import type { MouseEventHandler, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 const iconVariants = {
   gray: {
@@ -83,69 +91,69 @@ type InfoItem = {
   variant?: IconVariant;
 };
 
-type InstanceCardProps = {
+type InfoDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  isLoading?: boolean;
   title: string;
   description?: string;
-  onClick?: MouseEventHandler<HTMLDivElement>;
   badges?: ReactNode;
   infoItems?: InfoItem[][];
   actionButtons?: ReactNode;
-  isLoading?: boolean;
   className?: string;
 };
 
-export function InfoCard({
+export function InfoDialog({
+  open,
+  onOpenChange,
+  isLoading,
   title,
   description,
-  onClick,
   badges,
-  infoItems,
+  infoItems = [],
   actionButtons,
-  isLoading = false,
   className,
-}: InstanceCardProps) {
+}: InfoDialogProps) {
   return (
-    <Card
-      className={cn(
-        "flex h-full flex-col",
-        onClick && "cursor-pointer",
-        className,
-      )}
-      onClick={onClick}
-    >
-      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-        <div className="space-y-1">
-          <CardTitle className="text-base font-medium">
-            {isLoading ? <Skeleton className="h-5 w-32" /> : title}
-          </CardTitle>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className={cn(
+          "flex h-auto max-h-[90vh] max-w-2xl flex-col p-0",
+          className,
+        )}
+      >
+        <DialogHeader className="p-6 pb-4">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl">
+              {isLoading ? <Skeleton className="h-4 w-20" /> : title}
+            </DialogTitle>
+            {isLoading ? (
+              <Skeleton className="h-4 w-20" />
+            ) : (
+              badges && <div className="mr-5 flex gap-2">{badges}</div>
+            )}
+          </div>
           {isLoading ? (
-            <Skeleton className="h-4 w-24" />
-          ) : description ? (
-            <p className="text-muted-foreground line-clamp-1 text-sm">
-              {description}
-            </p>
-          ) : undefined}
-        </div>
-        {isLoading ? (
-          <Skeleton className="h-5 w-16" />
-        ) : badges ? (
-          <div className="flex gap-2">{badges}</div>
-        ) : undefined}
-      </CardHeader>
+            <Skeleton className="h-4 w-20" />
+          ) : (
+            description && (
+              <p className="text-muted-foreground text-sm">{description}</p>
+            )
+          )}
+        </DialogHeader>
 
-      <CardContent className="flex flex-1 flex-col pt-0">
-        <div className="flex-1 space-y-3">
+        <div className="max-h-[calc(90vh-180px)] space-y-4 overflow-y-auto px-6 pb-6">
           {isLoading ? (
-            <div className="flex flex-row items-center gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
-                  className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2"
+                  className="bg-muted/60 flex min-w-0 rounded-lg p-3"
                 >
-                  <div className="flex w-full items-center gap-2">
+                  <div className="flex w-full items-center gap-3">
                     <span
                       className={cn(
-                        "inline-flex h-7 w-7 items-center justify-center rounded-md",
+                        "inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md",
                         iconVariants.gray.bg,
                         iconVariants.gray.text,
                       )}
@@ -154,10 +162,10 @@ export function InfoCard({
                     </span>
                     <div className="flex min-w-0 flex-col">
                       <span className="text-muted-foreground text-xs font-medium">
-                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-4 w-24" />
                       </span>
-                      <span className="text-card-foreground truncate text-sm font-semibold">
-                        <Skeleton className="mt-1 h-4 w-24" />
+                      <span className="text-foreground text-sm font-medium break-words">
+                        <Skeleton className="mt-1 h-4 w-32" />
                       </span>
                     </div>
                   </div>
@@ -166,16 +174,19 @@ export function InfoCard({
             </div>
           ) : (
             infoItems?.map((row, rowIndex) => (
-              <div key={rowIndex} className="flex flex-row items-center gap-3">
+              <div
+                key={rowIndex}
+                className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+              >
                 {row.map((item, itemIndex) => (
                   <div
                     key={itemIndex}
-                    className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2"
+                    className="bg-muted/60 flex min-w-0 rounded-lg p-3"
                   >
-                    <div className="flex w-full items-center gap-2">
+                    <div className="flex w-full items-center gap-3">
                       <span
                         className={cn(
-                          "inline-flex h-7 w-7 items-center justify-center rounded-md",
+                          "inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md",
                           iconVariants[item.variant ?? DEFAULT_VARIANT].bg,
                           iconVariants[item.variant ?? DEFAULT_VARIANT].text,
                         )}
@@ -186,7 +197,7 @@ export function InfoCard({
                         <span className="text-muted-foreground text-xs font-medium">
                           {item.label}
                         </span>
-                        <span className="text-card-foreground truncate text-sm font-semibold">
+                        <span className="text-foreground text-sm font-medium break-words">
                           {item.value}
                         </span>
                       </div>
@@ -198,16 +209,16 @@ export function InfoCard({
           )}
         </div>
         {actionButtons && (
-          <div className="relative mt-4 w-full pt-0">
-            <div className="absolute top-0 right-0 left-0">
-              <Separator className="m-0" />
-            </div>
-            <div className="flex w-full flex-wrap items-center justify-center gap-2 pt-4">
-              {actionButtons}
-            </div>
+          <div className="mt-auto">
+            <Separator className="w-full" />
+            <DialogFooter className="px-6 py-4">
+              <div className="flex w-full items-center justify-end gap-2">
+                {actionButtons}
+              </div>
+            </DialogFooter>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

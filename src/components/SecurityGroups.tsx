@@ -299,35 +299,35 @@ export function SecurityGroups() {
 
   if (isLoading) {
     return (
-      <div className="px-2 space-y-6 sm:px-0">
-        <div className="flex justify-between items-center">
-          <Skeleton className="w-40 h-4" />
-          <Skeleton className="w-40 h-9 rounded-full" />
+      <div className="space-y-6 px-2 sm:px-0">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
-        <div className="overflow-x-auto w-full">
+        <div className="w-full overflow-x-auto">
           <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow>
                 <TableHead className="py-3">Name</TableHead>
                 <TableHead className="py-3">Description</TableHead>
-                <TableHead className="py-3 w-32">Rules</TableHead>
-                <TableHead className="py-3 w-40">Actions</TableHead>
+                <TableHead className="w-32 py-3">Rules</TableHead>
+                <TableHead className="w-40 py-3">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {Array.from({ length: 6 }).map((_, i) => (
                 <TableRow key={i}>
                   <TableCell className="py-3">
-                    <Skeleton className="w-24 h-4" />
+                    <Skeleton className="h-4 w-24" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="w-48 h-4" />
+                    <Skeleton className="h-4 w-48" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="w-10 h-4" />
+                    <Skeleton className="h-4 w-10" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="w-24 h-8" />
+                    <Skeleton className="h-8 w-24" />
                   </TableCell>
                 </TableRow>
               ))}
@@ -346,7 +346,7 @@ export function SecurityGroups() {
           text="Create a new security group to define inbound/outbound rules."
           onRefresh={() => refetch()}
           refreshing={isFetching}
-          icon={<ShieldCheck className="w-7 h-7 text-muted-foreground" />}
+          icon={<ShieldCheck className="text-muted-foreground h-7 w-7" />}
           variant="dashed"
           primaryActions={[
             {
@@ -376,9 +376,9 @@ export function SecurityGroups() {
   }
 
   return (
-    <div className="px-2 space-y-6 sm:px-0">
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-        <div className="text-sm leading-relaxed text-muted-foreground">
+    <div className="space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="text-muted-foreground text-sm leading-relaxed">
           {totalItems} group{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -402,8 +402,8 @@ export function SecurityGroups() {
           />
         </div>
       </div>
-      <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:items-center">
-        <div className="flex-1 max-w-full sm:max-w-md">
+      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+        <div className="max-w-full flex-1 sm:max-w-md">
           <XSearch
             value={search}
             onChange={setSearch}
@@ -418,25 +418,25 @@ export function SecurityGroups() {
       />
 
       {totalItems === 0 ? (
-        <div className="p-8 text-center rounded-2xl border text-muted-foreground">
+        <div className="text-muted-foreground rounded-2xl border p-8 text-center">
           No security groups match your search.
         </div>
       ) : (
-        <div className="overflow-x-auto w-full">
+        <div className="w-full overflow-x-auto">
           <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="py-3 w-1/5">Name</TableHead>
+                <TableHead className="w-1/5 py-3">Name</TableHead>
                 <TableHead className="py-3">Description</TableHead>
-                <TableHead className="py-3 w-24">Rules</TableHead>
-                <TableHead className="py-3 w-1/4">Actions</TableHead>
+                <TableHead className="w-24 py-3">Rules</TableHead>
+                <TableHead className="w-1/4 py-3">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {visible.map((g) => (
                 <TableRow key={g["Security Group ID"]}>
                   <TableCell className="py-3 font-medium">{g.Name}</TableCell>
-                  <TableCell className="py-3 text-muted-foreground">
+                  <TableCell className="text-muted-foreground py-3">
                     {g.Description || "—"}
                   </TableCell>
                   <TableCell className="py-3">
@@ -447,7 +447,7 @@ export function SecurityGroups() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full"
                         onClick={() => {
                           setSelectedGroup(g);
                           setRulesOpen(true);
@@ -458,7 +458,7 @@ export function SecurityGroups() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full"
                         onClick={() => {
                           setSelectedGroup(g);
 
@@ -479,22 +479,22 @@ export function SecurityGroups() {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full"
                         onClick={() => openEdit(g)}
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="destructive"
                         size="icon"
-                        className="text-white rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full text-white"
                         onClick={() => {
                           setGroupToDelete(g);
                           setDeleteDialogOpen(true);
                         }}
                         disabled={deleteMutation.isPending}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -509,7 +509,7 @@ export function SecurityGroups() {
         <div className="flex justify-center px-4 sm:px-0">
           <Button
             variant="outline"
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
             disabled={!hasMore}
             onClick={() => setVisibleCount((p) => p + 6)}
           >
@@ -523,7 +523,7 @@ export function SecurityGroups() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold truncate">
+            <DialogTitle className="truncate text-lg font-semibold">
               Edit Security Group
             </DialogTitle>
           </DialogHeader>
@@ -538,7 +538,7 @@ export function SecurityGroups() {
                     <FormControl>
                       <Input
                         placeholder="web-sg"
-                        className="w-full h-10 rounded-full"
+                        className="h-10 w-full rounded-full"
                         {...field}
                       />
                     </FormControl>
@@ -555,7 +555,7 @@ export function SecurityGroups() {
                     <FormControl>
                       <Input
                         placeholder="Optional description"
-                        className="w-full h-10 rounded-full"
+                        className="h-10 w-full rounded-full"
                         {...field}
                       />
                     </FormControl>
@@ -567,27 +567,27 @@ export function SecurityGroups() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="gap-2 rounded-full cursor-pointer"
+                  className="cursor-pointer gap-2 rounded-full"
                   onClick={() => setEditOpen(false)}
                   disabled={updateMutation.isPending}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="h-4 w-4" />
                   <span>Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   variant="default"
-                  className="gap-2 rounded-full cursor-pointer min-w-[120px]"
+                  className="min-w-[120px] cursor-pointer gap-2 rounded-full"
                   disabled={updateMutation.isPending}
                 >
                   {updateMutation.isPending ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Saving...</span>
                     </>
                   ) : (
                     <>
-                      <Save className="w-4 h-4" />
+                      <Save className="h-4 w-4" />
                       <span>Save</span>
                     </>
                   )}
@@ -618,16 +618,16 @@ export function SecurityGroups() {
       >
         <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold truncate">
+            <DialogTitle className="truncate text-lg font-semibold">
               {selectedGroup ? `Add Rule • ${selectedGroup.Name}` : "Add Rule"}
             </DialogTitle>
           </DialogHeader>
           <Card className="border-border/50">
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className="space-y-4 pt-6">
               <Form {...ruleForm}>
                 <form
                   onSubmit={handleAddRule}
-                  className="grid grid-cols-1 gap-3 items-end sm:grid-cols-2"
+                  className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2"
                 >
                   <FormField
                     control={ruleForm.control}
@@ -640,7 +640,7 @@ export function SecurityGroups() {
                             value={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger className="w-full h-10 rounded-full cursor-pointer">
+                            <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
                               <SelectValue placeholder="Direction" />
                             </SelectTrigger>
                             <SelectContent>
@@ -664,7 +664,7 @@ export function SecurityGroups() {
                             value={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger className="w-full h-10 rounded-full cursor-pointer">
+                            <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
                               <SelectValue placeholder="IP Version" />
                             </SelectTrigger>
                             <SelectContent>
@@ -688,7 +688,7 @@ export function SecurityGroups() {
                             value={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger className="w-full h-10 rounded-full cursor-pointer">
+                            <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
                               <SelectValue placeholder="Select protocol" />
                             </SelectTrigger>
                             <SelectContent>
@@ -738,7 +738,7 @@ export function SecurityGroups() {
                         <FormControl>
                           <Input
                             type="number"
-                            className="w-full h-10 rounded-full"
+                            className="h-10 w-full rounded-full"
                             value={field.value ?? ""}
                             onChange={(e) => {
                               const v = e.target.value;
@@ -759,7 +759,7 @@ export function SecurityGroups() {
                         <FormControl>
                           <Input
                             type="number"
-                            className="w-full h-10 rounded-full"
+                            className="h-10 w-full rounded-full"
                             value={field.value ?? ""}
                             onChange={(e) => {
                               const v = e.target.value;
@@ -779,7 +779,7 @@ export function SecurityGroups() {
                         <FormLabel>Remote CIDR</FormLabel>
                         <FormControl>
                           <Input
-                            className="w-full h-10 rounded-full"
+                            className="h-10 w-full rounded-full"
                             placeholder="0.0.0.0/0"
                             {...field}
                           />
@@ -792,17 +792,17 @@ export function SecurityGroups() {
                     <Button
                       type="submit"
                       variant="default"
-                      className="gap-2 rounded-full cursor-pointer min-w-[120px]"
+                      className="min-w-[120px] cursor-pointer gap-2 rounded-full"
                       disabled={addRuleMutation.isPending}
                     >
                       {addRuleMutation.isPending ? (
                         <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="h-4 w-4 animate-spin" />
                           <span>Adding...</span>
                         </>
                       ) : (
                         <>
-                          <Plus className="w-4 h-4" />
+                          <Plus className="h-4 w-4" />
                           <span>Add Rule</span>
                         </>
                       )}
@@ -826,12 +826,12 @@ export function SecurityGroups() {
       >
         <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold truncate">
+            <DialogTitle className="truncate text-lg font-semibold">
               {selectedGroup ? `Rules • ${selectedGroup.Name}` : "Rules"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="overflow-x-auto w-full">
+          <div className="w-full overflow-x-auto">
             <Table className="mt-4 w-full table-fixed">
               <TableHeader>
                 <TableRow>
@@ -840,7 +840,7 @@ export function SecurityGroups() {
                   <TableHead className="py-3">Protocol</TableHead>
                   <TableHead className="py-3">Port Range</TableHead>
                   <TableHead className="py-3">CIDR</TableHead>
-                  <TableHead className="py-3 w-24">Actions</TableHead>
+                  <TableHead className="w-24 py-3">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -857,14 +857,14 @@ export function SecurityGroups() {
                       <Button
                         variant="destructive"
                         size="icon"
-                        className="text-white rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full text-white"
                         onClick={() => {
                           setRuleToDelete(r.ID);
                           setRuleDeleteOpen(true);
                         }}
                         disabled={deleteRuleMutation.isPending}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -872,8 +872,8 @@ export function SecurityGroups() {
                 {rulesLoading && (
                   <TableRow>
                     <TableCell colSpan={6}>
-                      <div className="flex gap-2 items-center text-sm text-muted-foreground">
-                        <Loader2 className="w-4 h-4 animate-spin" /> Loading
+                      <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Loading
                         rules...
                       </div>
                     </TableCell>
@@ -892,7 +892,7 @@ export function SecurityGroups() {
         description={
           <>
             Are you sure you want to delete this security group{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {groupToDelete?.Name}
             </span>
             ? This action cannot be undone.

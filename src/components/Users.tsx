@@ -5,9 +5,9 @@ import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
+import { InfoDialog } from "@/components/reusable/InfoDialog";
 import { XSearch } from "@/components/reusable/XSearch";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -25,15 +25,15 @@ import type {
 } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  AtSign,
-  Check,
+  CheckCircle,
   Edit,
+  Folder,
+  List,
   Mail,
-  Plus,
-  RefreshCw,
   Trash2,
   User,
   UserCheck,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -58,21 +58,17 @@ export function UsersManager() {
     UserDetailsResponse | undefined
   >(undefined);
   const [detailsLoading, setDetailsLoading] = useState(false);
-  const [detailsError, setDetailsError] = useState<string | undefined>(
-    undefined,
-  );
   const [search, setSearch] = useState("");
   useEffect(() => setVisibleCount(6), [search]);
 
   const handleCardClick = async (userId: string) => {
     setDetailsDialogOpen(true);
     setDetailsLoading(true);
-    setDetailsError(undefined);
     try {
       const user = await UserService.get(userId);
       setSelectedUser(user);
     } catch (err) {
-      setDetailsError(
+      toast.error(
         err instanceof Error ? err.message : "Failed to load user details",
       );
       setSelectedUser(undefined);
@@ -144,13 +140,13 @@ export function UsersManager() {
     return (
       <div className="space-y-8">
         <div className="space-y-4">
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-            <div className="text-sm leading-relaxed text-muted-foreground">
-              <Skeleton className="inline-block w-40 h-4 align-middle" />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+            <div className="text-muted-foreground text-sm leading-relaxed">
+              <Skeleton className="inline-block h-4 w-40 align-middle" />
             </div>
             <div className="flex gap-3">
-              <Skeleton className="p-0 w-9 h-9 rounded-full" />
-              <Skeleton className="w-32 h-9 rounded-full" />
+              <Skeleton className="h-9 w-9 rounded-full p-0" />
+              <Skeleton className="h-9 w-32 rounded-full" />
             </div>
           </div>
         </div>
@@ -158,28 +154,28 @@ export function UsersManager() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="p-6 rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 rounded-xl border p-6 shadow-lg"
             >
-              <div className="flex gap-4 items-center">
-                <Skeleton className="w-12 h-12 rounded-full" />
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="w-32 h-6" />
-                  <Skeleton className="w-24 h-4" />
+                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className="h-4 w-24" />
                 </div>
                 <div className="flex gap-2">
-                  <Skeleton className="w-8 h-8 rounded-full" />
-                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
                 </div>
               </div>
               <div className="mt-4 space-y-3">
-                <Skeleton className="w-full h-4" />
-                <Skeleton className="w-3/4 h-4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
               </div>
             </div>
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="w-40 h-9 rounded-full" />
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -208,7 +204,7 @@ export function UsersManager() {
         refreshing={isFetching}
         primaryLabel="Create First User"
         onPrimary={() => setViewMode("create")}
-        icon={<User className="w-7 h-7 text-muted-foreground" />}
+        icon={<User className="text-muted-foreground h-7 w-7" />}
         variant="dashed"
       />
     );
@@ -232,8 +228,8 @@ export function UsersManager() {
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <div className="text-sm leading-relaxed text-muted-foreground">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <div className="text-muted-foreground text-sm leading-relaxed">
             {totalItems} user{totalItems !== 1 ? "s" : ""} total
             {totalItems > 0 && (
               <>
@@ -255,7 +251,7 @@ export function UsersManager() {
             }}
           />
         </div>
-        <div className="flex-1 max-w-full sm:max-w-md">
+        <div className="max-w-full flex-1 sm:max-w-md">
           <XSearch
             value={search}
             onChange={setSearch}
@@ -266,7 +262,7 @@ export function UsersManager() {
       </div>
 
       {totalItems === 0 ? (
-        <div className="flex justify-center items-center p-8 text-center rounded-2xl border text-muted-foreground min-h-32">
+        <div className="text-muted-foreground flex min-h-32 items-center justify-center rounded-2xl border p-8 text-center">
           No users match your search.
         </div>
       ) : (
@@ -276,38 +272,14 @@ export function UsersManager() {
               key={user.id}
               title={user.name}
               onClick={() => handleCardClick(user.id)}
-              className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg"
               badges={
-                <div className="flex gap-2 items-center">
-                  <div className="flex justify-center items-center w-8 h-8 rounded-full bg-muted">
-                    <UserCheck className="w-4 h-4 text-muted-foreground" />
+                <div className="flex items-center gap-2">
+                  <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
+                    <UserCheck className="text-muted-foreground h-4 w-4" />
                   </div>
                 </div>
               }
-              infoItems={[
-                [
-                  {
-                    label: "Email",
-                    value: user.email,
-                    icon: Mail,
-                    variant: "sky",
-                  },
-                ],
-                [
-                  {
-                    label: "Enabled",
-                    value: user.enabled ? "Yes" : "No",
-                    icon: Check,
-                    variant: "amber",
-                  },
-                  {
-                    label: "Domain",
-                    value: user.domain,
-                    icon: AtSign,
-                    variant: "rose",
-                  },
-                ],
-              ]}
               actionButtons={
                 <>
                   <Tooltip>
@@ -315,7 +287,7 @@ export function UsersManager() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full"
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingUserId(user.id);
@@ -323,7 +295,7 @@ export function UsersManager() {
                         }}
                         aria-label={`Edit user ${user.name}`}
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="h-4 w-4" />
                         Edit User
                       </Button>
                     </TooltipTrigger>
@@ -334,7 +306,7 @@ export function UsersManager() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        className="rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full"
                         onClick={(e) => {
                           e.stopPropagation();
                           setUserToDelete({ id: user.id, name: user.name });
@@ -342,7 +314,7 @@ export function UsersManager() {
                         }}
                         aria-label={`Delete user ${user.name}`}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                         Delete User
                       </Button>
                     </TooltipTrigger>
@@ -353,119 +325,66 @@ export function UsersManager() {
             />
           ))}
 
-          <Dialog
+          <InfoDialog
             open={detailsDialogOpen}
+            isLoading={detailsLoading}
             onOpenChange={(open) => {
               setDetailsDialogOpen(open);
               if (!open) {
                 setSelectedUser(undefined);
-                setDetailsError(undefined);
               }
             }}
-          >
-            <DialogContent className="overflow-hidden p-0 max-w-lg">
-              <div className="flex flex-col gap-3 items-center p-6 rounded-t-lg border-b bg-card border-border">
-                <div className="flex justify-center items-center mb-2 w-16 h-16 rounded-full ring-2 bg-muted ring-primary/30">
-                  <UserCheck className="w-8 h-8 text-primary" />
-                </div>
-                <div className="flex gap-2 items-center text-2xl font-bold text-center text-foreground">
-                  {selectedUser?.name ?? (
-                    <span className="text-muted-foreground">User</span>
-                  )}
-                </div>
-                <div className="py-1 px-3 font-mono text-xs rounded-full text-muted-foreground bg-muted/60 w-fit">
-                  {selectedUser?.id}
-                </div>
-              </div>
-              <div className="p-6">
-                {detailsLoading ? (
-                  <div className="py-8 text-center text-muted-foreground">
-                    <RefreshCw className="mx-auto mb-2 w-6 h-6 animate-spin text-primary" />
-                    Loading user details...
-                  </div>
-                ) : detailsError ? (
-                  <div className="py-8 text-center text-destructive">
-                    <Trash2 className="mx-auto mb-2 w-6 h-6 text-destructive" />
-                    {detailsError}
-                  </div>
-                ) : selectedUser ? (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                      <div className="flex gap-3 items-center">
-                        <User className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <div className="mb-1 text-xs font-medium text-muted-foreground">
-                            Email
-                          </div>
-                          <div className="text-sm font-medium break-all">
-                            {selectedUser.email || (
-                              <span className="italic text-muted-foreground">
-                                No email provided
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3 items-center">
-                        <Edit className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <div className="mb-1 text-xs font-medium text-muted-foreground">
-                            Enabled
-                          </div>
-                          <div className="text-sm font-medium">
-                            {selectedUser.enabled ? (
-                              <span className="font-semibold text-green-600">
-                                Yes
-                              </span>
-                            ) : (
-                              <span className="font-semibold text-destructive">
-                                No
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3 items-center">
-                        <UserCheck className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <div className="mb-1 text-xs font-medium text-muted-foreground">
-                            Default Project
-                          </div>
-                          <div className="text-sm font-medium break-all">
-                            {selectedUser.default_project_id || (
-                              <span className="italic text-muted-foreground">
-                                -
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3 items-center">
-                        <Plus className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <div className="mb-1 text-xs font-medium text-muted-foreground">
-                            Projects
-                          </div>
-                          <div className="text-sm font-medium break-all">
-                            {selectedUser.projects &&
-                            selectedUser.projects.length > 0 ? (
-                              selectedUser.projects
+            title={selectedUser?.name ?? "User Details"}
+            infoItems={
+              selectedUser
+                ? [
+                    [
+                      {
+                        label: "Email",
+                        value: selectedUser.email || "No email provided",
+                        icon: Mail,
+                        variant: "blue",
+                      },
+                      {
+                        label: "Status",
+                        value: selectedUser.enabled ? "Enabled" : "Disabled",
+                        icon: selectedUser.enabled ? CheckCircle : XCircle,
+                        variant: selectedUser.enabled ? "green" : "red",
+                      },
+                    ],
+                    [
+                      {
+                        label: "Default Project",
+                        value: selectedUser.default_project_id,
+                        icon: Folder,
+                        variant: "indigo",
+                      },
+                      {
+                        label: "Projects",
+                        value:
+                          selectedUser.projects?.length > 0
+                            ? selectedUser.projects
                                 .map((p) => p.project_name)
                                 .join(", ")
-                            ) : (
-                              <span className="italic text-muted-foreground">
-                                None assigned
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : undefined}
-              </div>
-            </DialogContent>
-          </Dialog>
+                            : "None assigned",
+                        icon: List,
+                        variant: "purple",
+                      },
+                    ],
+                  ]
+                : []
+            }
+            className="max-w-2xl"
+            actionButtons={
+              <Button
+                variant="outline"
+                className="cursor-pointer rounded-full"
+                onClick={() => setDetailsDialogOpen(false)}
+              >
+                Close
+              </Button>
+            }
+          ></InfoDialog>
         </div>
       )}
 
@@ -494,7 +413,7 @@ export function UsersManager() {
         description={
           <>
             Are you sure you want to delete this user{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {userToDelete?.name}
             </span>
             ? This action cannot be undone.

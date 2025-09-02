@@ -117,7 +117,7 @@ export function KeyPairCreateDialog({
                     }}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full h-10 rounded-full cursor-pointer">
+                      <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
                         <SelectValue placeholder="Default (provider)" />
                       </SelectTrigger>
                     </FormControl>
@@ -134,27 +134,27 @@ export function KeyPairCreateDialog({
               <Button
                 type="button"
                 variant="outline"
-                className="gap-2 rounded-full cursor-pointer"
+                className="cursor-pointer gap-2 rounded-full"
                 onClick={() => onOpenChange(false)}
                 disabled={createMutation.isPending}
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
                 <span>Cancel</span>
               </Button>
               <Button
                 type="submit"
                 variant="default"
-                className="gap-2 rounded-full cursor-pointer min-w-[120px]"
+                className="min-w-[120px] cursor-pointer gap-2 rounded-full"
                 disabled={createMutation.isPending}
               >
                 {createMutation.isPending ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Creating...</span>
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4" />
+                    <Plus className="h-4 w-4" />
                     <span>Create</span>
                   </>
                 )}

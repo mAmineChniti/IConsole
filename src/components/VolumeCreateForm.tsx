@@ -66,7 +66,7 @@ export function VolumeCreateForm({
       size: 1,
       description: undefined,
       volume_type: undefined,
-      availability_zone: undefined,
+      availability_zone: "nova",
       source_vol_id: undefined,
       group_id: undefined,
     },
@@ -120,7 +120,7 @@ export function VolumeCreateForm({
       ...values,
       description: values.description?.trim() ?? undefined,
       volume_type: values.volume_type ?? undefined,
-      availability_zone: values.availability_zone?.trim() ?? undefined,
+      availability_zone: (values.availability_zone?.trim() ?? "") || "nova",
       source_vol_id: values.source_vol_id ?? undefined,
       group_id: values.group_id ?? undefined,
     });
@@ -128,23 +128,23 @@ export function VolumeCreateForm({
 
   return (
     <div className="w-full">
-      <div className="flex px-2 pt-4 pb-0 mx-auto">
+      <div className="mx-auto flex px-2 pt-4 pb-0">
         <Button
           type="button"
           variant="outline"
           size="sm"
           onClick={onCancel}
-          className="gap-2 px-4 mb-2 rounded-full cursor-pointer"
+          className="mb-2 cursor-pointer gap-2 rounded-full px-4"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
           Back to Volumes
         </Button>
       </div>
-      <Card className="mx-auto w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+      <Card className="bg-card text-card-foreground border-border/50 mx-auto w-full rounded-xl border shadow-lg">
         <CardHeader>
-          <CardTitle className="flex gap-2 items-center">
-            <div className="p-2 rounded-full bg-muted">
-              <HardDrive className="w-5 h-5 text-primary" />
+          <CardTitle className="flex items-center gap-2">
+            <div className="bg-muted rounded-full p-2">
+              <HardDrive className="text-primary h-5 w-5" />
             </div>
             Create New Volume
           </CardTitle>
@@ -162,15 +162,15 @@ export function VolumeCreateForm({
                   name="name"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="flex gap-2 items-center font-semibold">
-                        <Server className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 font-semibold">
+                        <Server className="text-muted-foreground h-4 w-4" />
                         Name *
                       </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Volume name"
                           {...field}
-                          className="rounded-full bg-input text-foreground"
+                          className="bg-input text-foreground rounded-full"
                         />
                       </FormControl>
                       <FormMessage />
@@ -182,8 +182,8 @@ export function VolumeCreateForm({
                   name="size"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="flex gap-2 items-center font-semibold">
-                        <Layers className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 font-semibold">
+                        <Layers className="text-muted-foreground h-4 w-4" />
                         Size (GB) *
                       </FormLabel>
                       <FormControl>
@@ -198,7 +198,7 @@ export function VolumeCreateForm({
                                 : e.currentTarget.valueAsNumber,
                             )
                           }
-                          className="rounded-full bg-input text-foreground"
+                          className="bg-input text-foreground rounded-full"
                         />
                       </FormControl>
                       <FormDescription>Minimum size is 1 GB.</FormDescription>
@@ -211,15 +211,15 @@ export function VolumeCreateForm({
                   name="description"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="flex gap-2 items-center font-semibold">
-                        <FileText className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 font-semibold">
+                        <FileText className="text-muted-foreground h-4 w-4" />
                         Description
                       </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Optional description"
                           {...field}
-                          className="rounded-full bg-input text-foreground"
+                          className="bg-input text-foreground rounded-full"
                         />
                       </FormControl>
                       <FormMessage />
@@ -231,8 +231,8 @@ export function VolumeCreateForm({
                   name="source_vol_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="flex gap-2 items-center font-semibold">
-                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 font-semibold">
+                        <Copy className="text-muted-foreground h-4 w-4" />
                         Source Volume
                       </FormLabel>
                       <FormControl>
@@ -244,10 +244,10 @@ export function VolumeCreateForm({
                             }
                             disabled={isLoadingVolumes}
                           >
-                            <SelectTrigger className="w-full rounded-full cursor-pointer bg-input text-foreground">
+                            <SelectTrigger className="bg-input text-foreground w-full cursor-pointer rounded-full">
                               {isLoadingVolumes ? (
-                                <span className="flex gap-2 items-center">
-                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                <span className="flex items-center gap-2">
+                                  <Loader2 className="h-4 w-4 animate-spin" />
                                   Loading volumes...
                                 </span>
                               ) : isErrorVolumes ? (
@@ -272,16 +272,17 @@ export function VolumeCreateForm({
                           {field.value &&
                             !isLoadingVolumes &&
                             !isErrorVolumes && (
-                              <button
+                              <Button
+                                variant="outline"
                                 type="button"
-                                className="absolute right-10 top-1/2 p-1 rounded-full -translate-y-1/2 hover:bg-accent"
-                                onClick={(e: React.MouseEvent) => {
+                                className="hover:bg-accent absolute top-1/2 right-10 -translate-y-1/2 rounded-full p-1"
+                                onClick={(e) => {
                                   e.stopPropagation();
                                   field.onChange(undefined);
                                 }}
                               >
-                                <X className="w-4 h-4 opacity-50 hover:opacity-100" />
-                              </button>
+                                <X className="h-4 w-4 opacity-50 hover:opacity-100" />
+                              </Button>
                             )}
                         </div>
                       </FormControl>
@@ -294,8 +295,8 @@ export function VolumeCreateForm({
                   name="group_id"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="flex gap-2 items-center font-semibold">
-                        <Users className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 font-semibold">
+                        <Users className="text-muted-foreground h-4 w-4" />
                         Group ID
                       </FormLabel>
                       <FormControl>
@@ -307,7 +308,7 @@ export function VolumeCreateForm({
                               e.currentTarget.value.trim() || undefined,
                             )
                           }
-                          className="rounded-full bg-input text-foreground"
+                          className="bg-input text-foreground rounded-full"
                         />
                       </FormControl>
                       <FormMessage />
@@ -319,8 +320,8 @@ export function VolumeCreateForm({
                   name="volume_type"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="flex gap-2 items-center font-semibold">
-                        <Layers className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 font-semibold">
+                        <Layers className="text-muted-foreground h-4 w-4" />
                         Volume Type
                       </FormLabel>
                       <FormControl>
@@ -331,7 +332,7 @@ export function VolumeCreateForm({
                           }
                           disabled={isLoadingTypes || isErrorTypes}
                         >
-                          <SelectTrigger className="w-full rounded-full cursor-pointer bg-input text-foreground">
+                          <SelectTrigger className="bg-input text-foreground w-full cursor-pointer rounded-full">
                             {isLoadingTypes
                               ? "Loading..."
                               : isErrorTypes
@@ -368,20 +369,15 @@ export function VolumeCreateForm({
                   name="availability_zone"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="flex gap-2 items-center font-semibold">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2 font-semibold">
+                        <MapPin className="text-muted-foreground h-4 w-4" />
                         Availability Zone
                       </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="nova"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.currentTarget.value.trim() || undefined,
-                            )
-                          }
-                          className="rounded-full bg-input text-foreground"
+                          {...field}
+                          className="bg-input text-foreground rounded-full"
                         />
                       </FormControl>
                       <FormDescription>Default: nova</FormDescription>
@@ -391,27 +387,27 @@ export function VolumeCreateForm({
                 />
               </div>
               <Separator />
-              <div className="flex gap-3 justify-center pt-2 sm:justify-end">
+              <div className="flex justify-center gap-3 pt-2 sm:justify-end">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onCancel}
-                  className="py-2 px-6 rounded-full cursor-pointer"
+                  className="cursor-pointer rounded-full px-6 py-2"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="rounded-full cursor-pointer min-w-[120px]"
+                  className="min-w-[120px] cursor-pointer rounded-full"
                 >
                   {createMutation.isPending ? (
                     <>
-                      <Plus className="w-4 h-4 animate-pulse" /> Creating...
+                      <Plus className="h-4 w-4 animate-pulse" /> Creating...
                     </>
                   ) : (
                     <>
-                      <Plus className="w-4 h-4" /> Create Volume
+                      <Plus className="h-4 w-4" /> Create Volume
                     </>
                   )}
                 </Button>

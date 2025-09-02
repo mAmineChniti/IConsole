@@ -117,7 +117,7 @@ export function CreateClusterDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold truncate">
+          <DialogTitle className="truncate text-lg font-semibold">
             Create New Kubernetes Cluster
           </DialogTitle>
           <DialogDescription>
@@ -138,7 +138,7 @@ export function CreateClusterDialog({
                   <FormControl>
                     <Input
                       placeholder="my-cluster"
-                      className="w-full h-10 rounded-full"
+                      className="h-10 w-full rounded-full"
                       {...field}
                     />
                   </FormControl>
@@ -169,13 +169,13 @@ export function CreateClusterDialog({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-2 top-1/2 flex-shrink-0 p-0 w-6 h-6 rounded-full transform -translate-y-1/2 cursor-pointer sm:w-8 sm:h-8"
+                        className="absolute top-1/2 right-2 h-6 w-6 flex-shrink-0 -translate-y-1/2 transform cursor-pointer rounded-full p-0 sm:h-8 sm:w-8"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="w-4 h-4 text-muted-foreground" />
+                          <EyeOff className="text-muted-foreground h-4 w-4" />
                         ) : (
-                          <Eye className="w-4 h-4 text-muted-foreground" />
+                          <Eye className="text-muted-foreground h-4 w-4" />
                         )}
                       </Button>
                     </div>
@@ -199,7 +199,7 @@ export function CreateClusterDialog({
                         type="number"
                         min={1}
                         max={5}
-                        className="w-full h-10 rounded-full"
+                        className="h-10 w-full rounded-full"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                       />
@@ -219,7 +219,7 @@ export function CreateClusterDialog({
                         type="number"
                         min={0}
                         max={10}
-                        className="w-full h-10 rounded-full"
+                        className="h-10 w-full rounded-full"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                       />
@@ -574,23 +574,23 @@ export function CreateClusterDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={createCluster.isPending}
-                className="order-2 w-full rounded-full cursor-pointer sm:order-1 sm:w-auto"
+                className="order-2 w-full cursor-pointer rounded-full sm:order-1 sm:w-auto"
               >
                 <span className="truncate">Cancel</span>
               </Button>
               <Button
                 type="submit"
                 disabled={createCluster.isPending}
-                className="order-1 gap-2 w-full rounded-full cursor-pointer sm:order-2 sm:w-auto min-w-[140px]"
+                className="order-1 w-full min-w-[140px] cursor-pointer gap-2 rounded-full sm:order-2 sm:w-auto"
               >
                 {createCluster.isPending ? (
                   <>
-                    <Loader2 className="flex-shrink-0 w-4 h-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
                     <span className="truncate">Creating...</span>
                   </>
                 ) : (
                   <>
-                    <Plus className="flex-shrink-0 w-4 h-4" />
+                    <Plus className="h-4 w-4 flex-shrink-0" />
                     <span className="truncate">Create</span>
                   </>
                 )}

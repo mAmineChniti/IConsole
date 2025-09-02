@@ -100,7 +100,7 @@ export function VolumeAttachmentsDialog({
                       onValueChange={setSelectedInstance}
                     >
                       <SelectTrigger
-                        className="w-full rounded-full cursor-pointer"
+                        className="w-full cursor-pointer rounded-full"
                         aria-label="Select instance"
                       >
                         {selectedInstance
@@ -162,13 +162,13 @@ export function VolumeAttachmentsDialog({
                   ) => (
                     <li
                       key={att.attachment_id}
-                      className="flex flex-col gap-2 p-2 rounded border sm:flex-row sm:justify-between sm:items-center"
+                      className="flex flex-col gap-2 rounded border p-2 sm:flex-row sm:items-center sm:justify-between"
                     >
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="font-medium">
                           {att.server_name || att.server_id}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-muted-foreground text-xs">
                           Device: {att.device} | Host: {att.host} | Attached at:{" "}
                           {new Date(att.attached_at).toLocaleString()}
                         </div>
@@ -176,7 +176,7 @@ export function VolumeAttachmentsDialog({
                       <Button
                         size="sm"
                         variant="destructive"
-                        className="rounded-full cursor-pointer"
+                        className="cursor-pointer rounded-full"
                         onClick={() => handleDetach(att.attachment_id)}
                         disabled={!!detachingId}
                       >

@@ -165,7 +165,7 @@ export function FlavorCreateDialog({
                   <FormItem>
                     <FormLabel>
                       Disk (GB){" "}
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">
                         (optional)
                       </span>
                     </FormLabel>
@@ -247,7 +247,7 @@ export function FlavorCreateDialog({
                 name="is_public"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <div className="flex justify-between items-center pt-2">
+                    <div className="flex items-center justify-between pt-2">
                       <FormLabel>Public</FormLabel>
                       <FormControl>
                         <Switch
@@ -266,27 +266,27 @@ export function FlavorCreateDialog({
               <Button
                 type="button"
                 variant="outline"
-                className="gap-2 rounded-full cursor-pointer"
+                className="cursor-pointer gap-2 rounded-full"
                 onClick={() => onOpenChange(false)}
                 disabled={createMutation.isPending}
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
                 <span>Cancel</span>
               </Button>
               <Button
                 type="submit"
                 variant="default"
-                className="gap-2 rounded-full cursor-pointer min-w-[140px]"
+                className="min-w-[140px] cursor-pointer gap-2 rounded-full"
                 disabled={createMutation.isPending}
               >
                 {createMutation.isPending ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Creating...</span>
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4" />
+                    <Plus className="h-4 w-4" />
                     <span>Create</span>
                   </>
                 )}

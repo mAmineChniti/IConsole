@@ -111,14 +111,14 @@ function VolumeTypeUpdateForm({
           )}
         />
         <Input type="hidden" {...form.register("volume_type_id")} />
-        <div className="flex gap-2 justify-end mt-4">
+        <div className="mt-4 flex justify-end gap-2">
           {onCancel && (
             <Button
               type="button"
               variant="outline"
               onClick={onCancel}
               disabled={loading}
-              className="rounded-full cursor-pointer"
+              className="cursor-pointer rounded-full"
             >
               Cancel
             </Button>
@@ -126,11 +126,11 @@ function VolumeTypeUpdateForm({
           <Button
             type="submit"
             disabled={loading}
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
           >
             {loading ? (
               <>
-                <RefreshCw className="mr-2 w-4 h-4 animate-spin" />
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
@@ -216,13 +216,13 @@ export function VolumeTypes() {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-          <div className="text-sm text-muted-foreground">
-            <Skeleton className="w-40 h-4 rounded-full" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-muted-foreground text-sm">
+            <Skeleton className="h-4 w-40 rounded-full" />
           </div>
           <div className="flex gap-3">
-            <Skeleton className="w-9 h-9 rounded-full" />
-            <Skeleton className="w-40 h-9 rounded-full" />
+            <Skeleton className="h-9 w-9 rounded-full" />
+            <Skeleton className="h-9 w-40 rounded-full" />
           </div>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -232,18 +232,18 @@ export function VolumeTypes() {
               className="flex flex-col rounded-2xl border shadow-sm"
             >
               <CardHeader className="pb-4">
-                <div className="flex gap-4 items-center">
-                  <Skeleton className="w-12 h-12 rounded-full" />
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-12 w-12 rounded-full" />
                   <div className="flex-1 space-y-2">
-                    <Skeleton className="w-32 h-6 rounded-full" />
-                    <Skeleton className="w-24 h-4 rounded-full" />
+                    <Skeleton className="h-6 w-32 rounded-full" />
+                    <Skeleton className="h-4 w-24 rounded-full" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-2 justify-end">
-                  <Skeleton className="w-9 h-9 rounded-full" />
-                  <Skeleton className="w-9 h-9 rounded-full" />
+                <div className="flex justify-end gap-2">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-9 w-9 rounded-full" />
                 </div>
               </CardContent>
             </Card>
@@ -271,7 +271,7 @@ export function VolumeTypes() {
           text="Get started by creating your first volume type. Volume types let you define different storage backends and options for your cloud infrastructure."
           onRefresh={() => refetch()}
           refreshing={isFetching}
-          icon={<HardDrive className="w-7 h-7 text-muted-foreground" />}
+          icon={<HardDrive className="text-muted-foreground h-7 w-7" />}
           variant="dashed"
           primaryLabel="Create Volume Type"
           onPrimary={() => setViewMode("create")}
@@ -287,8 +287,8 @@ export function VolumeTypes() {
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
-          <div className="text-sm leading-relaxed text-muted-foreground">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-muted-foreground text-sm leading-relaxed">
             {totalItems} volume type{totalItems !== 1 ? "s" : ""} total
             {totalItems > 0 && (
               <>
@@ -311,12 +311,12 @@ export function VolumeTypes() {
         </div>
 
         <div className="relative max-w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 flex-shrink-0 w-4 h-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 flex-shrink-0 -translate-y-1/2" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search (name, description, visibility)"
-            className="pl-10 w-full h-10 rounded-full"
+            className="h-10 w-full rounded-full pl-10"
           />
         </div>
       </div>
@@ -331,16 +331,16 @@ export function VolumeTypes() {
             badges={
               <Badge
                 variant="secondary"
-                className="inline-flex gap-1 items-center px-2 h-5 text-xs rounded-full"
+                className="inline-flex h-5 items-center gap-1 rounded-full px-2 text-xs"
               >
                 {vt.Is_Public ? (
                   <>
-                    <Eye className="w-3.5 h-3.5" />
+                    <Eye className="h-3.5 w-3.5" />
                     Public
                   </>
                 ) : (
                   <>
-                    <Lock className="w-3.5 h-3.5" />
+                    <Lock className="h-3.5 w-3.5" />
                     Private
                   </>
                 )}
@@ -351,27 +351,27 @@ export function VolumeTypes() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full cursor-pointer"
+                  className="cursor-pointer rounded-full"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingType(vt);
                     setViewMode("edit");
                   }}
                 >
-                  <Edit className="mr-2 w-4 h-4" />
+                  <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
-                  className="text-white rounded-full cursor-pointer"
+                  className="cursor-pointer rounded-full text-white"
                   onClick={(e) => {
                     e.stopPropagation();
                     setTypeToDelete(vt);
                     setShowDelete(true);
                   }}
                 >
-                  <Trash2 className="mr-2 w-4 h-4" />
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </Button>
               </>
@@ -426,7 +426,7 @@ export function VolumeTypes() {
         description={
           <>
             Are you sure you want to delete this volume type{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {typeToDelete?.Name}
             </span>
             ? This action cannot be undone.

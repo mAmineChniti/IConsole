@@ -371,12 +371,12 @@ export function DescribeVMTab({
   }, []);
 
   return (
-    <div className="p-6 mx-auto max-w-2xl rounded-2xl border shadow-sm bg-background">
+    <div className="bg-background mx-auto max-w-2xl rounded-2xl border p-6 shadow-sm">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-semibold text-foreground">
+        <h2 className="text-foreground text-2xl font-semibold">
           {LANG[language].title}
         </h2>
-        <p className="mt-2 text-muted-foreground">{LANG[language].subtitle}</p>
+        <p className="text-muted-foreground mt-2">{LANG[language].subtitle}</p>
       </div>
 
       <Form {...form}>
@@ -389,7 +389,7 @@ export function DescribeVMTab({
                 variant={
                   listening || transformersListening ? "destructive" : "default"
                 }
-                className="flex-1 rounded-full transition-none cursor-pointer min-w-[160px]"
+                className="min-w-[160px] flex-1 cursor-pointer rounded-full transition-none"
                 disabled={
                   isCreating ||
                   !isSpeechSupported ||
@@ -404,14 +404,14 @@ export function DescribeVMTab({
                 }
               >
                 <span className="flex items-center">
-                  <span className="inline-block w-5 h-5 align-middle">
+                  <span className="inline-block h-5 w-5 align-middle">
                     {listening || transformersListening ? (
-                      <MicOff className="w-5 h-5" />
+                      <MicOff className="h-5 w-5" />
                     ) : (
-                      <Mic className="w-5 h-5" />
+                      <Mic className="h-5 w-5" />
                     )}
                   </span>
-                  <span className="ml-2 text-base text-left select-none min-w-[110px]">
+                  <span className="ml-2 min-w-[110px] text-left text-base select-none">
                     {!isSpeechSupported
                       ? LANG[language].mic.notSupported
                       : listening || transformersListening
@@ -424,11 +424,11 @@ export function DescribeVMTab({
                 type="button"
                 onClick={toggleLanguage}
                 variant="outline"
-                className="rounded-full cursor-pointer min-w-[80px]"
+                className="min-w-[80px] cursor-pointer rounded-full"
                 disabled={isCreating}
                 aria-label={LANG[language].langAria}
               >
-                <Languages className="w-5 h-5" />
+                <Languages className="h-5 w-5" />
                 <span className="ml-2 font-medium">
                   {LANG[language].langBtn}
                 </span>
@@ -438,7 +438,7 @@ export function DescribeVMTab({
               type="button"
               onClick={clearInput}
               variant="ghost"
-              className="rounded-full cursor-pointer min-w-[100px]"
+              className="min-w-[100px] cursor-pointer rounded-full"
               disabled={
                 isCreating ||
                 listening ||
@@ -446,7 +446,7 @@ export function DescribeVMTab({
                 isTransformersLoading
               }
             >
-              <Trash2 className="w-5 h-5" />
+              <Trash2 className="h-5 w-5" />
               <span className="ml-2">{LANG[language].clear}</span>
             </Button>
           </div>
@@ -461,7 +461,7 @@ export function DescribeVMTab({
                     {...field}
                     type="text"
                     placeholder="Enter VM name"
-                    className="w-full text-base rounded-full"
+                    className="w-full rounded-full text-base"
                     disabled={isCreating}
                   />
                 </FormControl>
@@ -481,7 +481,7 @@ export function DescribeVMTab({
                       {...field}
                       placeholder={LANG[language].placeholder}
                       rows={6}
-                      className="p-4 w-full text-base rounded-xl border resize-none focus-visible:ring-2 min-h-[140px] focus-visible:ring-ring focus-visible:border-primary"
+                      className="focus-visible:ring-ring focus-visible:border-primary min-h-[140px] w-full resize-none rounded-xl border p-4 text-base focus-visible:ring-2"
                       disabled={isCreating}
                     />
                     {((isFirefox && transformersListening) ||
@@ -490,11 +490,11 @@ export function DescribeVMTab({
                       <div className="absolute right-4 bottom-4 left-4 p-3">
                         <div className="flex items-center">
                           <div className="flex space-x-1">
-                            <div className="w-2 h-2 rounded-full animate-bounce bg-primary"></div>
-                            <div className="w-2 h-2 rounded-full delay-150 animate-bounce bg-primary"></div>
-                            <div className="w-2 h-2 rounded-full delay-300 animate-bounce bg-primary"></div>
+                            <div className="bg-primary h-2 w-2 animate-bounce rounded-full"></div>
+                            <div className="bg-primary h-2 w-2 animate-bounce rounded-full delay-150"></div>
+                            <div className="bg-primary h-2 w-2 animate-bounce rounded-full delay-300"></div>
                           </div>
-                          <span className="ml-2 font-medium text-primary">
+                          <span className="text-primary ml-2 font-medium">
                             {isFirefox && isTransformersLoading
                               ? language === "fr-FR"
                                 ? "Traitement..."
@@ -512,7 +512,7 @@ export function DescribeVMTab({
           />
 
           {!isSpeechSupported && (
-            <div className="p-4 rounded-lg border bg-muted text-foreground dark:text-foreground">
+            <div className="bg-muted text-foreground dark:text-foreground rounded-lg border p-4">
               <p className="font-medium">{LANG[language].speechNotSupported}</p>
               <p className="mt-1 text-sm">
                 {LANG[language].speechNotSupportedDesc}
@@ -520,19 +520,19 @@ export function DescribeVMTab({
             </div>
           )}
 
-          <div className="flex flex-col gap-2 justify-between items-center sm:flex-row">
-            <div className="text-xs text-muted-foreground">
+          <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
+            <div className="text-muted-foreground text-xs">
               {LANG[language].works}
             </div>
             <Button
               type="submit"
               disabled={isCreating || !description.trim()}
-              className="py-3 px-6 font-medium rounded-full shadow-sm cursor-pointer hover:shadow-md"
+              className="cursor-pointer rounded-full px-6 py-3 font-medium shadow-sm hover:shadow-md"
             >
               {isCreating ? (
-                <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
-                <Send className="mr-2 w-5 h-5" />
+                <Send className="mr-2 h-5 w-5" />
               )}
               {LANG[language].submit}
             </Button>
@@ -540,9 +540,9 @@ export function DescribeVMTab({
         </form>
       </Form>
 
-      <div className="p-4 mt-8 rounded-lg border bg-muted">
-        <h3 className="font-medium text-foreground">{LANG[language].howTo}</h3>
-        <ul className="pl-5 mt-2 space-y-1 text-sm list-disc text-muted-foreground">
+      <div className="bg-muted mt-8 rounded-lg border p-4">
+        <h3 className="text-foreground font-medium">{LANG[language].howTo}</h3>
+        <ul className="text-muted-foreground mt-2 list-disc space-y-1 pl-5 text-sm">
           {LANG[language].howToList.map((item, i) => (
             <li key={i}>{item}</li>
           ))}

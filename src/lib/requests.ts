@@ -82,6 +82,7 @@ import type {
   ImageImportFromNameResponse,
   ImageImportFromUploadResponse,
   ImageImportFromUrlResponse,
+  ImageListResponse,
   InstanceListResponse,
   KeyPairCreateResponse,
   KeyPairDeleteResponse,
@@ -569,11 +570,11 @@ export const ImageService = {
     return result.data!;
   },
 
-  async listImages(): Promise<ImageDetails[]> {
+  async listImages(): Promise<ImageListResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const url = API_CONFIG.BASE_URL + "/image/images";
-    const result = await client.get<ImageDetails[]>(url, { headers: token });
+    const result = await client.get<ImageListResponse>(url, { headers: token });
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },

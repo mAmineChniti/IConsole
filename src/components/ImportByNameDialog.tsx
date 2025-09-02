@@ -1,0 +1,151 @@
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { ImageService } from "@/lib/requests";
+import type { ImageImportFromNameRequest } from "@/types/RequestInterfaces";
+import { ImageImportFromNameRequestSchema } from "@/types/RequestSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2, Upload } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+export function ImportByNameDialog({
+  open,
+  onOpenChange,
+  onCancel,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCancel: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const importByNameForm = useForm<ImageImportFromNameRequest>({
+    resolver: zodResolver(ImageImportFromNameRequestSchema),
+    defaultValues: {
+      description: "",
+      visibility: "private",
+    },
+  });
+
+  const importByNameMutation = useMutation({
+    mutationFn: (data: ImageImportFromNameRequest) =>
+      ImageService.importFromName(data),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["images"] });
+      toast.success("Image imported successfully");
+      onOpenChange(false);
+      importByNameForm.reset();
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to import image");
+    },
+  });
+  const handleImportByName = (data: ImageImportFromNameRequest) => {
+    importByNameMutation.mutate(data);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-card text-card-foreground border-border/50 left-1/2 mx-4 max-w-[calc(100vw-2rem)] translate-x-[-50%] rounded-2xl border shadow-lg sm:mx-0 sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="truncate text-lg font-semibold">
+            Import Image by Name/Description
+          </DialogTitle>
+        </DialogHeader>
+        <Form {...importByNameForm}>
+          <form
+            onSubmit={importByNameForm.handleSubmit(handleImportByName)}
+            className="space-y-4"
+          >
+            <FormField
+              control={importByNameForm.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Describe the image to import"
+                      className="h-10 w-full rounded-full"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={importByNameForm.control}
+              name="visibility"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border px-3 py-2">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm font-medium">
+                      Visibility
+                    </FormLabel>
+                    <p className="text-muted-foreground text-xs">
+                      Toggle to make the image public
+                    </p>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      className="cursor-pointer"
+                      checked={field.value === "public"}
+                      onCheckedChange={(c) =>
+                        field.onChange(c ? "public" : "private")
+                      }
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <div className="flex flex-col justify-end gap-3 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                className="order-2 w-full cursor-pointer rounded-full sm:order-1 sm:w-auto"
+                onClick={onCancel}
+                disabled={importByNameMutation.isPending}
+              >
+                <span className="truncate">Cancel</span>
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={importByNameMutation.isPending}
+                className="order-1 w-full min-w-[140px] cursor-pointer gap-2 rounded-full sm:order-2 sm:w-auto"
+              >
+                {importByNameMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
+                    <span className="truncate">Importing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">Import</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

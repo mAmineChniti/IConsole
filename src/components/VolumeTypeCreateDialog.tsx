@@ -125,10 +125,10 @@ export function VolumeTypeCreateDialog({
               name="is_public"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
+                  <div className="flex items-center justify-between">
                     <FormLabel>Visibility</FormLabel>
-                    <div className="flex gap-3 items-center">
-                      <span className="text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3">
+                      <span className="text-muted-foreground text-xs">
                         {field.value ? "Public" : "Private"}
                       </span>
                       <FormControl>
@@ -145,30 +145,30 @@ export function VolumeTypeCreateDialog({
                 </FormItem>
               )}
             />
-            <div className="flex gap-2 justify-end mt-4">
+            <div className="mt-4 flex justify-end gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={createMutation.isPending}
-                className="rounded-full cursor-pointer"
+                className="cursor-pointer rounded-full"
               >
-                <X className="mr-2 w-4 h-4" />
+                <X className="mr-2 h-4 w-4" />
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="rounded-full cursor-pointer"
+                className="cursor-pointer rounded-full"
               >
                 {createMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Creating...
                   </>
                 ) : (
                   <>
-                    <Plus className="mr-2 w-4 h-4" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Create
                   </>
                 )}

@@ -120,14 +120,14 @@ export default function Login() {
           : undefined;
 
   return (
-    <div className="flex justify-center items-center p-4 min-h-screen sm:p-6 lg:p-8">
-      <div className="space-y-6 w-full max-w-sm sm:space-y-8 sm:max-w-md">
+    <div className="flex min-h-screen items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="w-full max-w-sm space-y-6 sm:max-w-md sm:space-y-8">
         <div className="space-y-4 text-center sm:space-y-6">
           <div className="flex justify-center">
             <div className="relative">
-              <div className="flex justify-center items-center w-12 h-12 bg-gradient-to-br rounded-full shadow-lg sm:w-16 sm:h-16 from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] shadow-lg sm:h-16 sm:w-16">
                 <Shield
-                  className="w-6 h-6 text-white sm:w-8 sm:h-8"
+                  className="h-6 w-6 text-white sm:h-8 sm:w-8"
                   aria-hidden="true"
                   focusable="false"
                 />
@@ -135,25 +135,25 @@ export default function Login() {
             </div>
           </div>
           <div className="space-y-2">
-            <h1 className="font-sans text-2xl font-bold tracking-tight leading-tight sm:text-3xl text-foreground">
+            <h1 className="text-foreground font-sans text-2xl leading-tight font-bold tracking-tight sm:text-3xl">
               Welcome to IConsole
             </h1>
-            <p className="px-2 text-sm leading-relaxed sm:text-base text-muted-foreground">
+            <p className="text-muted-foreground px-2 text-sm leading-relaxed sm:text-base">
               Secure access to your infrastructure management portal
             </p>
           </div>
         </div>
 
-        <Card className="overflow-hidden rounded-xl border shadow-lg bg-card text-card-foreground border-border">
-          <CardHeader className="pb-4 space-y-1 text-center sm:pb-6">
-            <CardTitle className="font-sans text-xl font-semibold leading-tight sm:text-2xl text-card-foreground">
+        <Card className="bg-card text-card-foreground border-border overflow-hidden rounded-xl border shadow-lg">
+          <CardHeader className="space-y-1 pb-4 text-center sm:pb-6">
+            <CardTitle className="text-card-foreground font-sans text-xl leading-tight font-semibold sm:text-2xl">
               Sign in to continue
             </CardTitle>
-            <CardDescription className="text-sm leading-relaxed text-muted-foreground">
+            <CardDescription className="text-muted-foreground text-sm leading-relaxed">
               Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-4 space-y-4 sm:px-6 sm:space-y-6">
+          <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -164,8 +164,8 @@ export default function Login() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium text-slate-700 dark:text-slate-300">
-                        <User className="flex-shrink-0 w-4 h-4" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <User className="h-4 w-4 flex-shrink-0" />
                         <span className="truncate">Username</span>
                       </FormLabel>
                       <FormControl>
@@ -186,7 +186,7 @@ export default function Login() {
                             )}
                           />
                           <User
-                            className="absolute left-3 top-1/2 flex-shrink-0 w-4 h-4 transform -translate-y-1/2 text-muted-foreground"
+                            className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 flex-shrink-0 -translate-y-1/2 transform"
                             aria-hidden="true"
                             focusable="false"
                           />
@@ -202,8 +202,8 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 items-center text-sm font-medium text-slate-700 dark:text-slate-300">
-                        <Lock className="flex-shrink-0 w-4 h-4" />
+                      <FormLabel className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <Lock className="h-4 w-4 flex-shrink-0" />
                         <span className="truncate">Password</span>
                       </FormLabel>
                       <FormControl>
@@ -219,18 +219,18 @@ export default function Login() {
                               "placeholder:text-muted-foreground",
                             )}
                           />
-                          <Lock className="absolute left-3 top-1/2 flex-shrink-0 w-4 h-4 transform -translate-y-1/2 text-muted-foreground" />
+                          <Lock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 flex-shrink-0 -translate-y-1/2 transform" />
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-2 top-1/2 flex-shrink-0 p-0 w-6 h-6 rounded-full transform -translate-y-1/2 cursor-pointer sm:w-8 sm:h-8"
+                            className="absolute top-1/2 right-2 h-6 w-6 flex-shrink-0 -translate-y-1/2 transform cursor-pointer rounded-full p-0 sm:h-8 sm:w-8"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
-                              <EyeOff className="w-4 h-4 text-muted-foreground" />
+                              <EyeOff className="text-muted-foreground h-4 w-4" />
                             ) : (
-                              <Eye className="w-4 h-4 text-muted-foreground" />
+                              <Eye className="text-muted-foreground h-4 w-4" />
                             )}
                           </Button>
                         </div>
@@ -244,10 +244,10 @@ export default function Login() {
                   <div
                     role="alert"
                     aria-live="assertive"
-                    className="flex gap-3 items-start p-3 text-sm text-red-700 bg-red-50 rounded-lg border border-red-200 sm:p-4 sm:rounded-xl dark:text-red-400 dark:border-red-800 dark:bg-red-900/20"
+                    className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 sm:rounded-xl sm:p-4 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
                   >
                     <AlertCircle
-                      className="flex-shrink-0 mt-0.5 w-4 h-4"
+                      className="mt-0.5 h-4 w-4 flex-shrink-0"
                       aria-hidden="true"
                       focusable="false"
                     />
@@ -267,9 +267,9 @@ export default function Login() {
                     "disabled:cursor-not-allowed disabled:opacity-50",
                   )}
                 >
-                  <div className="flex gap-2 justify-center items-center">
-                    <LogIn className="flex-shrink-0 w-4 h-4 transition-colors" />
-                    <span className="transition-colors truncate">
+                  <div className="flex items-center justify-center gap-2">
+                    <LogIn className="h-4 w-4 flex-shrink-0 transition-colors" />
+                    <span className="truncate transition-colors">
                       {loginMutation.isPending
                         ? "Signing in..."
                         : "Sign in securely"}
@@ -279,8 +279,8 @@ export default function Login() {
               </form>
             </Form>
 
-            <div className="pt-3 border-t sm:pt-4 border-border">
-              <p className="px-2 text-xs leading-relaxed text-center text-muted-foreground">
+            <div className="border-border border-t pt-3 sm:pt-4">
+              <p className="text-muted-foreground px-2 text-center text-xs leading-relaxed">
                 Protected by enterprise-grade security.
                 <br />
                 By signing in, you agree to our terms of service and privacy

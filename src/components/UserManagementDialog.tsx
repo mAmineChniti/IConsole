@@ -200,10 +200,10 @@ export function UserManagementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-y-auto mx-4 max-w-4xl rounded-xl border shadow-lg sm:mx-auto bg-card text-card-foreground border-border max-h-[90vh]">
+      <DialogContent className="bg-card text-card-foreground border-border mx-4 max-h-[90vh] max-w-4xl overflow-y-auto rounded-xl border shadow-lg sm:mx-auto">
         <DialogHeader className="space-y-3">
-          <DialogTitle className="flex gap-2 items-center text-lg">
-            <Users className="flex-shrink-0 w-5 h-5" />
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <Users className="h-5 w-5 flex-shrink-0" />
             <span className="truncate">Manage Users - {project.name}</span>
           </DialogTitle>
           <DialogDescription className="text-sm leading-relaxed">
@@ -217,9 +217,9 @@ export function UserManagementDialog({
               <div className="space-y-2">
                 <Label
                   id="select-user-label"
-                  className="flex gap-2 items-center text-sm font-medium text-slate-700 dark:text-slate-300"
+                  className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
-                  <User className="flex-shrink-0 w-4 h-4" />
+                  <User className="h-4 w-4 flex-shrink-0" />
                   Select User
                 </Label>
                 <Combobox
@@ -235,7 +235,7 @@ export function UserManagementDialog({
                 >
                   <ComboboxTrigger
                     aria-labelledby="select-user-label"
-                    className="w-full h-11 rounded-full border transition-all duration-200 cursor-pointer focus:ring-2 border-border bg-input text-foreground focus:border-primary focus:ring-primary/20"
+                    className="border-border bg-input text-foreground focus:border-primary focus:ring-primary/20 h-11 w-full cursor-pointer rounded-full border transition-all duration-200 focus:ring-2"
                   />
                   <ComboboxContent
                     popoverOptions={{
@@ -245,11 +245,11 @@ export function UserManagementDialog({
                   >
                     <ComboboxInput
                       placeholder="Search users..."
-                      className="py-2 px-3 text-sm rounded-none border-0 focus:ring-0 focus:ring-offset-0 focus:outline-none text-foreground"
+                      className="text-foreground rounded-none border-0 px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
                     />
-                    <ComboboxList className="overflow-y-auto p-1 max-h-[200px]">
+                    <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
                       {loadingUnassigned ? (
-                        <div className="py-2 px-3 text-sm">
+                        <div className="px-3 py-2 text-sm">
                           Loading users...
                         </div>
                       ) : unassignedUsers && unassignedUsers.length > 0 ? (
@@ -258,7 +258,7 @@ export function UserManagementDialog({
                             key={user.user_id}
                             value={user.user_id}
                             keywords={[user.user_name]}
-                            className="py-2 px-3 mx-1 text-sm rounded-full cursor-pointer text-foreground"
+                            className="text-foreground mx-1 cursor-pointer rounded-full px-3 py-2 text-sm"
                           >
                             {user.user_name}
                           </ComboboxItem>
@@ -271,23 +271,23 @@ export function UserManagementDialog({
                 </Combobox>
               </div>
               <div className="space-y-2">
-                <Label className="flex gap-2 items-center text-sm font-medium text-slate-700 dark:text-slate-300">
-                  <Users className="w-4 h-4" />
+                <Label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <Users className="h-4 w-4" />
                   Select Roles
                 </Label>
-                <div className="grid overflow-y-auto grid-cols-2 gap-2 p-3 max-h-32 rounded-md border transition-all duration-200 border-border text-foreground">
+                <div className="border-border text-foreground grid max-h-32 grid-cols-2 gap-2 overflow-y-auto rounded-md border p-3 transition-all duration-200">
                   {loadingRoles ? (
-                    <div className="col-span-2 text-sm text-center text-muted-foreground">
+                    <div className="text-muted-foreground col-span-2 text-center text-sm">
                       Loading roles...
                     </div>
                   ) : (
                     roles?.map((role) => (
                       <label
                         key={role.id}
-                        className="flex items-center space-x-2 cursor-pointer"
+                        className="flex cursor-pointer items-center space-x-2"
                       >
                         <Checkbox
-                          className="cursor-pointer bg-input text-foreground border-border"
+                          className="bg-input text-foreground border-border cursor-pointer"
                           checked={selectedRoles.includes(role.name)}
                           onCheckedChange={(checked) => {
                             if (checked === true) {
@@ -313,16 +313,16 @@ export function UserManagementDialog({
                 !selectedUser ||
                 selectedRoles.length === 0
               }
-              className="w-full rounded-full border-none cursor-pointer bg-primary text-primary-foreground"
+              className="bg-primary text-primary-foreground w-full cursor-pointer rounded-full border-none"
             >
               {assignUserMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Assigning...
                 </>
               ) : (
                 <>
-                  <UserPlus className="mr-2 w-4 h-4" />
+                  <UserPlus className="mr-2 h-4 w-4" />
                   Assign User
                 </>
               )}
@@ -332,33 +332,33 @@ export function UserManagementDialog({
           <Separator />
 
           <div className="space-y-4">
-            <h3 className="flex gap-2 items-center text-lg font-semibold dark:text-white text-slate-900">
-              <Users className="w-5 h-5" />
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+              <Users className="h-5 w-5" />
               Current Users
             </h3>
             <div className="space-y-3">
               {project.assignments.map((assignment) => (
                 <Card
                   key={assignment.user_id}
-                  className="p-4 rounded-xl border shadow-lg bg-card text-card-foreground border-border"
+                  className="bg-card text-card-foreground border-border rounded-xl border p-4 shadow-lg"
                 >
-                  <div className="flex flex-col gap-3 justify-between sm:flex-row sm:items-center">
-                    <div className="flex flex-1 gap-3 items-center min-w-0">
-                      <Avatar className="flex-shrink-0 w-10 h-10">
-                        <AvatarFallback className="text-xs font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500">
+                  <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <Avatar className="h-10 w-10 flex-shrink-0">
+                        <AvatarFallback className="bg-gradient-to-r from-blue-600 to-indigo-600 text-xs font-medium text-white dark:from-blue-500 dark:to-indigo-500">
                           {assignment.user_name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">
                           {assignment.user_name}
                         </p>
-                        <div className="flex flex-wrap gap-1 mt-1 max-w-full">
+                        <div className="mt-1 flex max-w-full flex-wrap gap-1">
                           {(assignment.roles ?? []).map((role) => (
                             <Badge
                               key={role.role_id}
                               variant="secondary"
-                              className="max-w-full text-xs rounded-full truncate"
+                              className="max-w-full truncate rounded-full text-xs"
                             >
                               {role.role_name}
                             </Badge>
@@ -366,7 +366,7 @@ export function UserManagementDialog({
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-shrink-0 gap-2 items-center">
+                    <div className="flex flex-shrink-0 items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -382,18 +382,18 @@ export function UserManagementDialog({
                             ),
                           );
                         }}
-                        className="rounded-full border cursor-pointer bg-background text-foreground border-border"
+                        className="bg-background text-foreground border-border cursor-pointer rounded-full border"
                       >
-                        <Settings className="w-4 h-4" />
+                        <Settings className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleRemoveUser(assignment.user_id)}
                         disabled={removeUserMutation.isPending}
-                        className="rounded-full border cursor-pointer bg-background text-foreground border-border"
+                        className="bg-background text-foreground border-border cursor-pointer rounded-full border"
                       >
-                        <UserMinus className="w-4 h-4" />
+                        <UserMinus className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -408,26 +408,26 @@ export function UserManagementDialog({
             open={!!editingUser}
             onOpenChange={() => setEditingUser(undefined)}
           >
-            <DialogContent className="overflow-y-auto mx-4 max-w-lg rounded-xl border shadow-lg sm:mx-auto bg-card text-card-foreground border-border max-h-[90vh]">
+            <DialogContent className="bg-card text-card-foreground border-border mx-4 max-h-[90vh] max-w-lg overflow-y-auto rounded-xl border shadow-lg sm:mx-auto">
               <DialogHeader className="space-y-3">
-                <DialogTitle className="flex gap-2 items-center text-lg dark:text-white text-slate-900">
-                  <Settings className="flex-shrink-0 w-5 h-5" />
+                <DialogTitle className="flex items-center gap-2 text-lg text-slate-900 dark:text-white">
+                  <Settings className="h-5 w-5 flex-shrink-0" />
                   <span className="truncate">
                     Edit Roles - {editingUser.userName}
                   </span>
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="grid overflow-y-auto grid-cols-1 gap-2 p-3 max-h-48 rounded-md border transition-all duration-200 sm:grid-cols-2 text-foreground">
+                <div className="text-foreground grid max-h-48 grid-cols-1 gap-2 overflow-y-auto rounded-md border p-3 transition-all duration-200 sm:grid-cols-2">
                   {roles?.map((role) => {
                     const isChecked = pendingRoleIds.includes(role.id);
                     return (
                       <label
                         key={role.id}
-                        className="flex items-center space-x-2 cursor-pointer"
+                        className="flex cursor-pointer items-center space-x-2"
                       >
                         <Checkbox
-                          className="cursor-pointer text-foreground border-border"
+                          className="text-foreground border-border cursor-pointer"
                           checked={isChecked}
                           onCheckedChange={(checked) => {
                             if (checked === true) {
@@ -444,27 +444,27 @@ export function UserManagementDialog({
                     );
                   })}
                 </div>
-                <div className="flex flex-col gap-3 justify-end pt-4 sm:flex-row">
+                <div className="flex flex-col justify-end gap-3 pt-4 sm:flex-row">
                   <Button
                     variant="outline"
                     onClick={() => setEditingUser(undefined)}
-                    className="order-2 w-full rounded-full border cursor-pointer sm:order-1 sm:w-auto bg-background text-foreground border-border"
+                    className="bg-background text-foreground border-border order-2 w-full cursor-pointer rounded-full border sm:order-1 sm:w-auto"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={() => handleUpdateRoles(pendingRoleIds)}
                     disabled={updateRolesMutation.isPending}
-                    className="order-1 w-full rounded-full border-none cursor-pointer sm:order-2 sm:w-auto bg-primary text-primary-foreground"
+                    className="bg-primary text-primary-foreground order-1 w-full cursor-pointer rounded-full border-none sm:order-2 sm:w-auto"
                   >
                     {updateRolesMutation.isPending ? (
                       <>
-                        <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         <span className="truncate">Updating...</span>
                       </>
                     ) : (
                       <>
-                        <Settings className="mr-2 w-4 h-4" />
+                        <Settings className="mr-2 h-4 w-4" />
                         <span className="truncate">Update Roles</span>
                       </>
                     )}

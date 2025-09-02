@@ -3,7 +3,7 @@
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,23 +37,23 @@ export function Overview() {
       <div className="space-y-6">
         <div className="flex justify-end">
           <div className="flex gap-2">
-            <Skeleton className="w-10 h-9 rounded-full" />
+            <Skeleton className="h-9 w-10 rounded-full" />
           </div>
         </div>
         <div className="grid gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-4 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card
               key={i}
-              className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg"
             >
               <CardContent>
-                <div className="flex gap-3 items-center mb-3">
-                  <Skeleton className="w-12 h-12 rounded-full" />
-                  <Skeleton className="w-32 h-6" />
+                <div className="mb-3 flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <Skeleton className="h-6 w-32" />
                 </div>
                 <div className="text-center">
-                  <Skeleton className="mx-auto mb-1 w-24 h-8" />
-                  <Skeleton className="mx-auto w-32 h-4" />
+                  <Skeleton className="mx-auto mb-1 h-8 w-24" />
+                  <Skeleton className="mx-auto h-4 w-32" />
                 </div>
               </CardContent>
             </Card>
@@ -64,39 +64,39 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg"
             >
               <CardHeader>
-                <CardTitle className="flex gap-2 items-center">
-                  <Skeleton className="w-8 h-8 rounded-full" />
-                  <Skeleton className="w-32 h-5" />
+                <CardTitle className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <Skeleton className="h-5 w-32" />
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <Skeleton className="w-24 h-4" />
-                  <Skeleton className="w-16 h-8" />
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-16" />
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <div className="space-y-3">
-                    <div className="flex gap-2 items-center">
-                      <Skeleton className="w-3 h-3 rounded-full" />
-                      <Skeleton className="w-24 h-4" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
                     </div>
-                    <div className="flex gap-2 items-center">
-                      <Skeleton className="w-3 h-3 rounded-full" />
-                      <Skeleton className="w-24 h-4" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <div className="flex gap-2 items-center">
-                      <Skeleton className="w-3 h-3 rounded-full" />
-                      <Skeleton className="w-24 h-4" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
                     </div>
-                    <div className="flex gap-2 items-center">
-                      <Skeleton className="w-3 h-3 rounded-full" />
-                      <Skeleton className="w-24 h-4" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
                     </div>
                   </div>
                 </div>
@@ -109,34 +109,34 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg"
             >
               <CardHeader>
-                <CardTitle className="flex gap-2 items-center">
-                  <Skeleton className="w-8 h-8 rounded-full" />
-                  <Skeleton className="w-32 h-5" />
+                <CardTitle className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <Skeleton className="h-5 w-32" />
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex justify-center items-center p-6">
-                <div className="relative w-40 h-40">
-                  <Skeleton className="w-full h-full rounded-full" />
-                  <div className="flex absolute inset-0 flex-col justify-center items-center">
-                    <Skeleton className="mb-1 w-20 h-8" />
-                    <Skeleton className="w-12 h-4" />
+              <CardContent className="flex items-center justify-center p-6">
+                <div className="relative h-40 w-40">
+                  <Skeleton className="h-full w-full rounded-full" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <Skeleton className="mb-1 h-8 w-20" />
+                    <Skeleton className="h-4 w-12" />
                   </div>
                 </div>
                 <div className="ml-10 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="w-16 h-4" />
-                    <Skeleton className="w-12 h-4" />
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="w-16 h-4" />
-                    <Skeleton className="w-12 h-4" />
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="w-16 h-4" />
-                    <Skeleton className="w-12 h-4" />
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
                   </div>
                 </div>
               </CardContent>
@@ -148,15 +148,15 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg"
             >
               <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <div className="flex gap-2 items-center">
-                    <Skeleton className="w-8 h-8 rounded-full" />
-                    <Skeleton className="w-32 h-5" />
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="h-5 w-32" />
                   </div>
-                  <Skeleton className="w-16 h-4" />
+                  <Skeleton className="h-4 w-16" />
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -164,18 +164,18 @@ export function Overview() {
                   {Array.from({ length: 3 }).map((_, j) => (
                     <div
                       key={j}
-                      className="flex justify-between items-center p-3 rounded-xl bg-muted/50"
+                      className="bg-muted/50 flex items-center justify-between rounded-xl p-3"
                     >
-                      <div className="flex gap-3 items-center">
-                        <Skeleton className="w-4 h-4 rounded-full" />
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-4 w-4 rounded-full" />
                         <div>
-                          <Skeleton className="mb-1 w-24 h-4" />
-                          <Skeleton className="w-32 h-3" />
+                          <Skeleton className="mb-1 h-4 w-24" />
+                          <Skeleton className="h-3 w-32" />
                         </div>
                       </div>
                       <div className="text-right">
-                        <Skeleton className="mb-1 w-16 h-3" />
-                        <Skeleton className="w-12 h-3" />
+                        <Skeleton className="mb-1 h-3 w-16" />
+                        <Skeleton className="h-3 w-12" />
                       </div>
                     </div>
                   ))}
@@ -209,7 +209,7 @@ export function Overview() {
         text="Infrastructure data is not available at the moment. Please try refreshing to load the latest information."
         onRefresh={() => refetch()}
         refreshing={isFetching}
-        icon={<Server className="w-7 h-7 text-muted-foreground" />}
+        icon={<Server className="text-muted-foreground h-7 w-7" />}
         variant="dashed"
       />
     );
@@ -228,68 +228,68 @@ export function Overview() {
         />
       </div>
       <div className="grid gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-4 xl:grid-cols-4">
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
           <CardContent>
-            <div className="flex gap-3 items-center mb-3">
-              <div className="p-3 rounded-full bg-primary/10">
-                <Server className="w-6 h-6 text-primary" />
+            <div className="mb-3 flex items-center gap-3">
+              <div className="bg-primary/10 rounded-full p-3">
+                <Server className="text-primary h-6 w-6" />
               </div>
-              <h3 className="text-base font-medium text-muted-foreground">
+              <h3 className="text-muted-foreground text-base font-medium">
                 Compute Nodes
               </h3>
             </div>
             <div className="text-center">
-              <div className="mb-1 text-4xl font-bold text-foreground">
+              <div className="text-foreground mb-1 text-4xl font-bold">
                 {platform_info.nodes}
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Active compute nodes
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
           <CardContent>
-            <div className="flex gap-3 items-center mb-3">
-              <div className="p-3 rounded-full bg-primary/10">
-                <FolderDot className="w-6 h-6 text-primary" />
+            <div className="mb-3 flex items-center gap-3">
+              <div className="bg-primary/10 rounded-full p-3">
+                <FolderDot className="text-primary h-6 w-6" />
               </div>
-              <h3 className="text-base font-medium text-muted-foreground">
+              <h3 className="text-muted-foreground text-base font-medium">
                 Projects
               </h3>
             </div>
             <div className="text-center">
-              <div className="mb-1 text-4xl font-bold text-foreground">
+              <div className="text-foreground mb-1 text-4xl font-bold">
                 {platform_info.projects}
               </div>
-              <p className="text-sm text-muted-foreground">Total projects</p>
+              <p className="text-muted-foreground text-sm">Total projects</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
           <CardContent>
-            <div className="flex gap-3 items-center mb-3">
-              <div className="p-3 rounded-full bg-primary/10">
-                <Users className="w-6 h-6 text-primary" />
+            <div className="mb-3 flex items-center gap-3">
+              <div className="bg-primary/10 rounded-full p-3">
+                <Users className="text-primary h-6 w-6" />
               </div>
-              <h3 className="text-base font-medium text-muted-foreground">
+              <h3 className="text-muted-foreground text-base font-medium">
                 Users
               </h3>
             </div>
             <div className="text-center">
-              <div className="mb-1 text-4xl font-bold text-foreground">
+              <div className="text-foreground mb-1 text-4xl font-bold">
                 {platform_info.users}
               </div>
-              <p className="text-sm text-muted-foreground">Registered users</p>
+              <p className="text-muted-foreground text-sm">Registered users</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
           <CardContent>
-            <div className="flex gap-3 items-center mb-3">
+            <div className="mb-3 flex items-center gap-3">
               <div
                 className={cn(
                   "rounded-full p-3",
@@ -299,22 +299,22 @@ export function Overview() {
                 )}
               >
                 {platform_info.hypervisor_errors.length > 0 ? (
-                  <AlertTriangle className="w-6 h-6 text-destructive" />
+                  <AlertTriangle className="text-destructive h-6 w-6" />
                 ) : (
-                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                 )}
               </div>
-              <h3 className="text-base font-medium text-muted-foreground">
+              <h3 className="text-muted-foreground text-base font-medium">
                 System Health
               </h3>
             </div>
             <div className="text-center">
-              <div className="mb-1 text-4xl font-bold text-foreground">
+              <div className="text-foreground mb-1 text-4xl font-bold">
                 {platform_info.hypervisor_errors.length > 0
                   ? "Issues"
                   : "Healthy"}
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 {platform_info.hypervisor_errors.length} errors detected
               </p>
             </div>
@@ -323,38 +323,38 @@ export function Overview() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-2">
-        <Card className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <div className="p-2 rounded-full bg-primary/10">
-                <Server className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <div className="bg-primary/10 rounded-full p-2">
+                <Server className="text-primary h-5 w-5" />
               </div>
               Instance Resources
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-base font-medium text-foreground">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground text-base font-medium">
                 Total Instances
               </span>
-              <span className="text-3xl font-bold text-foreground">
+              <span className="text-foreground text-3xl font-bold">
                 {resources.instances.total}
               </span>
             </div>
             <Separator />
             <div className="flex justify-between">
               <div className="space-y-3">
-                <div className="flex gap-2 items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-base text-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                  <span className="text-foreground text-base">
                     Active: {resources.instances.ACTIVE}
                   </span>
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="flex gap-2 items-center">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <span className="text-base text-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+                  <span className="text-foreground text-base">
                     Others: {resources.instances.OTHERS}
                   </span>
                 </div>
@@ -363,38 +363,38 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <div className="p-2 rounded-full bg-primary/10">
-                <HardDrive className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <div className="bg-primary/10 rounded-full p-2">
+                <HardDrive className="text-primary h-5 w-5" />
               </div>
               Volume Resources
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-base font-medium text-foreground">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground text-base font-medium">
                 Total Volumes
               </span>
-              <span className="text-3xl font-bold text-foreground">
+              <span className="text-foreground text-3xl font-bold">
                 {resources.volumes.total}
               </span>
             </div>
             <Separator />
             <div className="flex justify-between">
               <div className="space-y-3">
-                <div className="flex gap-2 items-center">
-                  <div className="w-3 h-3 rounded-full bg-primary"></div>
-                  <span className="text-base text-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="bg-primary h-3 w-3 rounded-full"></div>
+                  <span className="text-foreground text-base">
                     Available: {resources.volumes.available}
                   </span>
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="flex gap-2 items-center">
-                  <div className="w-3 h-3 rounded-full bg-muted"></div>
-                  <span className="text-base text-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="bg-muted h-3 w-3 rounded-full"></div>
+                  <span className="text-foreground text-base">
                     Others: {resources.volumes.OTHERS}
                   </span>
                 </div>
@@ -405,19 +405,19 @@ export function Overview() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-2">
-        <Card className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <div className="p-2 rounded-full bg-primary/10">
-                <Cpu className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <div className="bg-primary/10 rounded-full p-2">
+                <Cpu className="text-primary h-5 w-5" />
               </div>
               CPU Usage
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center items-center p-6">
-            <div className="relative w-40 h-40">
+          <CardContent className="flex items-center justify-center p-6">
+            <div className="relative h-40 w-40">
               <svg
-                className="w-40 h-40 transform -rotate-90"
+                className="h-40 w-40 -rotate-90 transform"
                 viewBox="0 0 36 36"
               >
                 <path
@@ -441,36 +441,36 @@ export function Overview() {
                   className="text-green-500 transition-all duration-500 ease-in-out"
                 />
               </svg>
-              <div className="flex absolute inset-0 flex-col justify-center items-center">
-                <span className="text-3xl font-bold text-foreground">
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-foreground text-3xl font-bold">
                   {resources.cpu.usage_percent}%
                 </span>
-                <span className="text-sm text-muted-foreground">CPU</span>
+                <span className="text-muted-foreground text-sm">CPU</span>
               </div>
             </div>
             <div className="ml-10 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-base text-muted-foreground">Used:</span>
-                <span className="text-base font-medium text-foreground">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-base">Used:</span>
+                <span className="text-foreground text-base font-medium">
                   {resources.cpu.used}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-base text-muted-foreground">Total:</span>
-                <span className="text-base font-medium text-foreground">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-base">Total:</span>
+                <span className="text-foreground text-base font-medium">
                   {resources.cpu.total}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-base text-muted-foreground">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-base">
                   Available:
                 </span>
-                <span className="text-base font-medium text-foreground">
+                <span className="text-foreground text-base font-medium">
                   {resources.cpu.unused}
                 </span>
               </div>
               {resources.cpu.note ? (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {resources.cpu.note}
                 </p>
               ) : undefined}
@@ -478,19 +478,19 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <div className="p-2 rounded-full bg-primary/10">
-                <MemoryStick className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <div className="bg-primary/10 rounded-full p-2">
+                <MemoryStick className="text-primary h-5 w-5" />
               </div>
               RAM Usage
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center items-center p-6">
-            <div className="relative w-40 h-40">
+          <CardContent className="flex items-center justify-center p-6">
+            <div className="relative h-40 w-40">
               <svg
-                className="w-40 h-40 transform -rotate-90"
+                className="h-40 w-40 -rotate-90 transform"
                 viewBox="0 0 36 36"
               >
                 <path
@@ -514,31 +514,31 @@ export function Overview() {
                   className="text-green-500 transition-all duration-500 ease-in-out"
                 />
               </svg>
-              <div className="flex absolute inset-0 flex-col justify-center items-center">
-                <span className="text-3xl font-bold text-foreground">
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-foreground text-3xl font-bold">
                   {resources.ram.usage_percent}%
                 </span>
-                <span className="text-sm text-muted-foreground">RAM</span>
+                <span className="text-muted-foreground text-sm">RAM</span>
               </div>
             </div>
             <div className="ml-10 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-base text-muted-foreground">Used:</span>
-                <span className="text-base font-medium text-foreground">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-base">Used:</span>
+                <span className="text-foreground text-base font-medium">
                   {resources.ram.used} GB
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-base text-muted-foreground">Total:</span>
-                <span className="text-base font-medium text-foreground">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-base">Total:</span>
+                <span className="text-foreground text-base font-medium">
                   {resources.ram.total} GB
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-base text-muted-foreground">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-base">
                   Available:
                 </span>
-                <span className="text-base font-medium text-foreground">
+                <span className="text-foreground text-base font-medium">
                   {resources.ram.unused} GB
                 </span>
               </div>
@@ -548,16 +548,16 @@ export function Overview() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-2">
-        <Card className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <div className="flex gap-2 items-center">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Zap className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="bg-primary/10 rounded-full p-2">
+                  <Zap className="text-primary h-5 w-5" />
                 </div>
                 Compute Services
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-muted-foreground text-sm">
                 {
                   compute_services.filter(
                     (s) => s.status === "enabled" && s.state === "up",
@@ -582,12 +582,12 @@ export function Overview() {
                         : "bg-destructive/10 hover:bg-destructive/20",
                     )}
                   >
-                    <div className="flex gap-3 items-center">
-                      <div className="flex gap-2 items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         {isHealthy ? (
-                          <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                         ) : (
-                          <XCircle className="w-4 h-4 text-destructive" />
+                          <XCircle className="text-destructive h-4 w-4" />
                         )}
                         <div
                           className={cn(
@@ -597,39 +597,29 @@ export function Overview() {
                         />
                       </div>
                       <div>
-                        <p className="text-base font-medium text-foreground">
+                        <p className="text-foreground text-base font-medium">
                           {service.name}
                         </p>
-                        <p className="font-mono text-sm text-muted-foreground">
+                        <p className="text-muted-foreground font-mono text-sm">
                           {service.host}
                         </p>
                       </div>
                     </div>
-                    <div className="flex gap-2 items-center text-right">
-                      <Badge
-                        variant={
-                          service.status === "enabled" ? "default" : "secondary"
-                        }
-                        className={cn(
-                          service.status === "enabled"
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                            : undefined,
-                        )}
-                      >
-                        {service.status}
-                      </Badge>
-                      <Badge
-                        variant={
-                          service.state === "up" ? "default" : "destructive"
-                        }
-                        className={cn(
-                          service.state === "up"
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-destructive/10 text-destructive",
-                        )}
-                      >
-                        {service.state}
-                      </Badge>
+                    <div className="flex items-center gap-2 text-right">
+                      <StatusBadge
+                        status={service.status}
+                        statusTextMap={{
+                          enabled: "ACTIVE",
+                          disabled: "SHUTOFF",
+                        }}
+                      />
+                      <StatusBadge
+                        status={service.state}
+                        statusTextMap={{
+                          up: "ACTIVE",
+                          down: "ERROR",
+                        }}
+                      />
                     </div>
                   </div>
                 );
@@ -638,16 +628,16 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <div className="flex gap-2 items-center">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Network className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="bg-primary/10 rounded-full p-2">
+                  <Network className="text-primary h-5 w-5" />
                 </div>
                 Network Services
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-muted-foreground text-sm">
                 {network_services.filter((s) => s.alive).length}/
                 {network_services.length} online
               </div>
@@ -667,12 +657,12 @@ export function Overview() {
                         : "bg-destructive/10 hover:bg-destructive/20",
                     )}
                   >
-                    <div className="flex gap-3 items-center">
-                      <div className="flex gap-2 items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         {isOnline ? (
-                          <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                         ) : (
-                          <XCircle className="w-4 h-4 text-destructive" />
+                          <XCircle className="text-destructive h-4 w-4" />
                         )}
                         <div
                           className={cn(
@@ -682,32 +672,16 @@ export function Overview() {
                         />
                       </div>
                       <div>
-                        <p className="text-base font-medium text-foreground">
+                        <p className="text-foreground text-base font-medium">
                           {service.name}
                         </p>
-                        <p className="font-mono text-sm text-muted-foreground">
+                        <p className="text-muted-foreground font-mono text-sm">
                           {service.host}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge
-                        variant={isOnline ? "default" : "destructive"}
-                        className={cn(
-                          "gap-1.5",
-                          isOnline
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-destructive/10 text-destructive",
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "h-1.5 w-1.5 animate-pulse rounded-full",
-                            isOnline ? "bg-green-500" : "bg-destructive",
-                          )}
-                        />
-                        {isOnline ? "Online" : "Offline"}
-                      </Badge>
+                      <StatusBadge status={isOnline ? "ACTIVE" : "ERROR"} />
                     </div>
                   </div>
                 );
@@ -718,10 +692,10 @@ export function Overview() {
       </div>
 
       {platform_info.hypervisor_errors.length > 0 && (
-        <Card className="rounded-xl border shadow-lg border-destructive bg-destructive/5">
+        <Card className="border-destructive bg-destructive/5 rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center text-destructive">
-              <AlertTriangle className="w-5 h-5" />
+            <CardTitle className="text-destructive flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
               Hypervisor Errors
             </CardTitle>
           </CardHeader>
@@ -730,9 +704,9 @@ export function Overview() {
               {platform_info.hypervisor_errors.map((error, index) => (
                 <div
                   key={index}
-                  className="p-3 rounded-xl border bg-destructive/10 border-destructive/20"
+                  className="bg-destructive/10 border-destructive/20 rounded-xl border p-3"
                 >
-                  <p className="text-base font-medium text-destructive">
+                  <p className="text-destructive text-base font-medium">
                     {error}
                   </p>
                 </div>

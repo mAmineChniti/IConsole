@@ -71,38 +71,38 @@ export function EmptyState({
               minH,
             )}
           >
-            <div className="inline-flex justify-center items-center w-14 h-14 rounded-full border shadow-sm border-border/60 bg-muted/40">
-              {icon ?? <Inbox className="w-7 h-7 text-muted-foreground" />}
+            <div className="border-border/60 bg-muted/40 inline-flex h-14 w-14 items-center justify-center rounded-full border shadow-sm">
+              {icon ?? <Inbox className="text-muted-foreground h-7 w-7" />}
             </div>
 
             {title ? (
-              <h3 className="text-lg font-medium tracking-tight sm:text-xl text-foreground/90">
+              <h3 className="text-foreground/90 text-lg font-medium tracking-tight sm:text-xl">
                 {title}
               </h3>
             ) : undefined}
 
-            <p className="mx-auto max-w-xl leading-relaxed sm:text-base text-muted-foreground text-[15px]">
+            <p className="text-muted-foreground mx-auto max-w-xl text-[15px] leading-relaxed sm:text-base">
               {text}
             </p>
           </div>
 
-          <div className="pt-4 mt-auto sm:pt-6">
-            <div className="flex flex-col gap-2 justify-center items-center w-full sm:flex-row">
+          <div className="mt-auto pt-4 sm:pt-6">
+            <div className="flex w-full flex-col items-center justify-center gap-2 sm:flex-row">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={onRefresh}
                 disabled={!!refreshing}
-                className="px-5 w-full h-9 rounded-full cursor-pointer sm:w-auto hover:bg-transparent hover:shadow-none"
+                className="h-9 w-full cursor-pointer rounded-full px-5 hover:bg-transparent hover:shadow-none sm:w-auto"
               >
                 {refreshing ? (
                   <>
-                    <RefreshCw className="mr-2 w-4 h-4 animate-spin" />
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                     Refreshing...
                   </>
                 ) : (
                   <>
-                    <RefreshCw className="mr-2 w-4 h-4" />
+                    <RefreshCw className="mr-2 h-4 w-4" />
                     Refresh
                   </>
                 )}
@@ -130,7 +130,7 @@ export function EmptyState({
                     action.className,
                   )}
                 >
-                  {action.icon ?? <Plus className="w-4 h-4" />}
+                  {action.icon ?? <Plus className="h-4 w-4" />}
                   {action.label}
                 </Button>
               ))}
