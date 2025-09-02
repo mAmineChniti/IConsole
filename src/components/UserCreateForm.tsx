@@ -98,39 +98,39 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
   };
 
   return (
-    <div className="py-8 mx-auto space-y-8 max-w-6xl min-h-[80vh]">
+    <div className="mx-auto min-h-[80vh] max-w-6xl space-y-8 py-8">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="flex gap-2 items-center rounded-full border transition-all duration-200 cursor-pointer text-muted-foreground bg-card border-border/50 hover:text-foreground"
+              className="text-muted-foreground bg-card border-border/50 hover:text-foreground flex cursor-pointer items-center gap-2 rounded-full border transition-all duration-200"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="h-4 w-4" />
               Back to Users
             </Button>
           </div>
 
-          <div className="flex gap-4 items-center">
-            <div className="flex justify-center items-center p-3 rounded-full bg-primary/10">
-              <User className="w-7 h-7 text-primary" />
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/10 flex items-center justify-center rounded-full p-3">
+              <User className="text-primary h-7 w-7" />
             </div>
             <div>
-              <h1 className="mb-1 text-2xl font-bold tracking-tight text-foreground">
+              <h1 className="text-foreground mb-1 text-2xl font-bold tracking-tight">
                 Create New User
               </h1>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Add a new user to your system with project and role assignments
               </p>
             </div>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+            <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold text-foreground">
+                <CardTitle className="text-foreground text-lg font-semibold">
                   Basic Information
                 </CardTitle>
               </CardHeader>
@@ -213,10 +213,10 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
               </CardContent>
             </Card>
 
-            <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+            <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
               <CardHeader>
-                <CardTitle className="flex gap-2 items-center text-lg font-semibold text-foreground">
-                  <Shield className="w-5 h-5 text-primary" />
+                <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
+                  <Shield className="text-primary h-5 w-5" />
                   Project & Permissions
                 </CardTitle>
               </CardHeader>
@@ -230,7 +230,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                         <FormLabel className="font-semibold">
                           Default Project
                         </FormLabel>
-                        <div className="flex gap-2 items-center">
+                        <div className="flex items-center gap-2">
                           <Combobox
                             data={(availableProjects?.projects ?? []).map(
                               (p) => ({
@@ -259,9 +259,9 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                             >
                               <ComboboxInput
                                 placeholder="Search projects..."
-                                className="py-2 px-3 text-sm rounded-none border-0 focus:ring-0 focus:ring-offset-0 focus:outline-none text-foreground"
+                                className="text-foreground rounded-none border-0 px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
                               />
-                              <ComboboxList className="overflow-y-auto p-1 max-h-[200px]">
+                              <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
                                 {isProjectsLoading ? (
                                   <ComboboxItem disabled value="__loading">
                                     Loading projects…
@@ -292,7 +292,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                               variant="ghost"
                               size="sm"
                               onClick={() => field.onChange(undefined)}
-                              className="flex-shrink-0 px-3 h-10 rounded-full"
+                              className="h-10 flex-shrink-0 rounded-full px-3"
                             >
                               Clear
                             </Button>
@@ -354,7 +354,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                               )}
                             </div>
                             {current.length > 0 && (
-                              <div className="text-sm text-muted-foreground">
+                              <div className="text-muted-foreground text-sm">
                                 Selected: {current.join(", ")}
                               </div>
                             )}
@@ -372,28 +372,28 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
             </Card>
           </div>
 
-          <div className="flex gap-3 justify-end pt-4">
+          <div className="flex justify-end gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={onBack}
-              className="py-2 px-6 rounded-full border transition-all duration-200 cursor-pointer bg-muted text-foreground border-border/50"
+              className="bg-muted text-foreground border-border/50 cursor-pointer rounded-full border px-6 py-2 transition-all duration-200"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="rounded-full transition-all duration-200 cursor-pointer bg-primary text-primary-foreground min-w-[120px]"
+              className="bg-primary text-primary-foreground min-w-[120px] cursor-pointer rounded-full transition-all duration-200"
             >
               {createMutation.isPending ? (
                 <>
-                  <Plus className="w-4 h-4 animate-pulse" />
+                  <Plus className="h-4 w-4 animate-pulse" />
                   Creating...
                 </>
               ) : (
                 <>
-                  <Plus className="w-4 h-4" />
+                  <Plus className="h-4 w-4" />
                   Create User
                 </>
               )}

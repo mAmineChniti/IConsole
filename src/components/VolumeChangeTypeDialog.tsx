@@ -76,7 +76,7 @@ export function VolumeChangeTypeDialog({
           ) : (
             <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger
-                className="w-full rounded-full cursor-pointer"
+                className="w-full cursor-pointer rounded-full"
                 aria-label="Select type"
               >
                 {selectedType
@@ -109,7 +109,7 @@ export function VolumeChangeTypeDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
           >
             Cancel
           </Button>
@@ -117,7 +117,7 @@ export function VolumeChangeTypeDialog({
             variant="default"
             onClick={handleChangeType}
             disabled={loading || !selectedType}
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
           >
             {loading ? "Changing..." : "Change Type"}
           </Button>

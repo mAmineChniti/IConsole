@@ -5,6 +5,8 @@ import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
+import { InfoDialog } from "@/components/reusable/InfoDialog";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,24 +27,30 @@ import { VolumeAttachmentsDialog } from "@/components/VolumeAttachmentsDialog";
 import { VolumeChangeTypeDialog } from "@/components/VolumeChangeTypeDialog";
 import { VolumeCreateForm } from "@/components/VolumeCreateForm";
 import { VolumeCreateSnapshotDialog } from "@/components/VolumeCreateSnapshotDialog";
-import { VolumeDetailsDialog } from "@/components/VolumeDetailsDialog";
 import { VolumeExtendDialog } from "@/components/VolumeExtendDialog";
 import { VolumeUploadToImageDialog } from "@/components/VolumeUploadToImageDialog";
 import { VolumeService } from "@/lib/requests";
-import { cn, parseVolumeSizeGiB } from "@/lib/utils";
+import { parseVolumeSizeGiB } from "@/lib/utils";
 import type { VolumeDeleteRequest } from "@/types/RequestInterfaces";
-import type { VolumeDetails } from "@/types/ResponseInterfaces";
+import type {
+  VolumeDetails,
+  VolumeGetDetails,
+} from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
+  Calendar,
+  Folder,
   HardDrive,
-  Loader2,
+  Link2,
+  Lock as LockIcon,
   MapPin,
   MoreHorizontal,
   Plus,
   RefreshCw,
   Server,
   Trash2,
+  Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -104,6 +112,19 @@ export function Volumes() {
     },
   });
 
+  const { data: volumeDetails, isLoading: volumeDetailsLoading } = useQuery<
+    VolumeGetDetails | undefined
+  >({
+    queryKey: ["volume-details", selectedVolumeId],
+    queryFn: () =>
+      selectedVolumeId
+        ? VolumeService.get(selectedVolumeId)
+        : Promise.resolve({} as VolumeGetDetails),
+    enabled: !!selectedVolumeId,
+    staleTime: 10000,
+    gcTime: 5 * 60 * 1000,
+  });
+
   const { data, isLoading, error, refetch, isFetching } = useQuery<
     VolumeDetails[]
   >({
@@ -147,85 +168,85 @@ export function Volumes() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <Skeleton className="w-40 h-4" />
-          <div className="flex gap-3 justify-end items-center w-full sm:w-auto">
-            <Skeleton className="w-9 h-9 rounded-full" />
-            <Skeleton className="w-40 h-10 rounded-full" />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <Skeleton className="h-4 w-40" />
+          <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
+            <Skeleton className="h-9 w-9 rounded-full" />
+            <Skeleton className="h-10 w-40 rounded-full" />
           </div>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={`skeleton-${i}`}
-              className="flex flex-col h-full rounded-xl border shadow-lg transition-all duration-200 cursor-pointer hover:shadow-xl bg-card text-card-foreground border-border/50 group"
+              className="bg-card text-card-foreground border-border/50 group flex h-full cursor-pointer flex-col rounded-xl border shadow-lg transition-all duration-200 hover:shadow-xl"
             >
               <CardHeader className="pb-3">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-lg font-semibold text-card-foreground truncate">
-                    <Skeleton className="w-32 h-6 rounded" />
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-card-foreground truncate text-lg font-semibold">
+                    <Skeleton className="h-6 w-32 rounded" />
                   </CardTitle>
-                  <span className="py-1 px-2 text-xs rounded bg-muted text-muted-foreground">
-                    <Skeleton className="w-16 h-4 rounded" />
+                  <span className="bg-muted text-muted-foreground rounded px-2 py-1 text-xs">
+                    <Skeleton className="h-4 w-16 rounded" />
                   </span>
                 </div>
               </CardHeader>
-              <CardContent className="flex flex-col flex-1 pt-0">
+              <CardContent className="flex flex-1 flex-col pt-0">
                 <div className="flex-1 space-y-3">
-                  <div className="flex flex-col gap-3 mt-2">
-                    <div className="flex flex-row gap-3 items-center">
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex gap-2 items-center w-full">
-                          <span className="inline-flex justify-center items-center w-7 h-7 bg-blue-100 rounded-md dark:bg-blue-900/30">
-                            <Skeleton className="w-4 h-4 rounded" />
+                  <div className="mt-2 flex flex-col gap-3">
+                    <div className="flex flex-row items-center gap-3">
+                      <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                        <div className="flex w-full items-center gap-2">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/30">
+                            <Skeleton className="h-4 w-4 rounded" />
                           </span>
-                          <div className="flex flex-col min-w-0">
-                            <Skeleton className="mb-1 w-10 h-3" />
-                            <span className="text-sm font-semibold text-card-foreground truncate">
-                              <Skeleton className="w-16 h-4" />
+                          <div className="flex min-w-0 flex-col">
+                            <Skeleton className="mb-1 h-3 w-10" />
+                            <span className="text-card-foreground truncate text-sm font-semibold">
+                              <Skeleton className="h-4 w-16" />
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex gap-2 items-center w-full">
-                          <span className="inline-flex justify-center items-center w-7 h-7 bg-purple-100 rounded-md dark:bg-purple-900/30">
-                            <Skeleton className="w-4 h-4 rounded" />
+                      <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                        <div className="flex w-full items-center gap-2">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-purple-100 dark:bg-purple-900/30">
+                            <Skeleton className="h-4 w-4 rounded" />
                           </span>
-                          <div className="flex flex-col min-w-0">
-                            <Skeleton className="mb-1 w-10 h-3" />
-                            <span className="text-sm font-semibold text-card-foreground truncate">
-                              <Skeleton className="w-16 h-4" />
+                          <div className="flex min-w-0 flex-col">
+                            <Skeleton className="mb-1 h-3 w-10" />
+                            <span className="text-card-foreground truncate text-sm font-semibold">
+                              <Skeleton className="h-4 w-16" />
                             </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-row gap-3 items-center">
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex flex-col min-w-0">
-                          <Skeleton className="mb-1 w-10 h-3" />
-                          <span className="text-sm font-semibold text-card-foreground truncate">
-                            <Skeleton className="w-16 h-4" />
+                    <div className="flex flex-row items-center gap-3">
+                      <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                        <div className="flex min-w-0 flex-col">
+                          <Skeleton className="mb-1 h-3 w-10" />
+                          <span className="text-card-foreground truncate text-sm font-semibold">
+                            <Skeleton className="h-4 w-16" />
                           </span>
                         </div>
                       </div>
-                      <div className="flex flex-1 p-2 min-w-0 rounded-lg bg-muted/60">
-                        <div className="flex flex-col min-w-0">
-                          <Skeleton className="mb-1 w-10 h-3" />
-                          <span className="text-sm font-semibold text-card-foreground truncate">
-                            <Skeleton className="w-10 h-4" />
+                      <div className="bg-muted/60 flex min-w-0 flex-1 rounded-lg p-2">
+                        <div className="flex min-w-0 flex-col">
+                          <Skeleton className="mb-1 h-3 w-10" />
+                          <span className="text-card-foreground truncate text-sm font-semibold">
+                            <Skeleton className="h-4 w-10" />
                           </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 mt-4">
-                  <div className="flex gap-2 justify-center items-center w-full">
-                    <Skeleton className="w-20 h-8 rounded-full" />
-                    <Skeleton className="w-20 h-8 rounded-full" />
-                    <Skeleton className="w-20 h-8 rounded-full" />
+                <div className="mt-4 flex flex-col gap-2">
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <Skeleton className="h-8 w-20 rounded-full" />
+                    <Skeleton className="h-8 w-20 rounded-full" />
+                    <Skeleton className="h-8 w-20 rounded-full" />
                   </div>
                 </div>
               </CardContent>
@@ -233,7 +254,7 @@ export function Volumes() {
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="w-40 h-9 rounded-full" />
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -260,7 +281,7 @@ export function Volumes() {
           text="Create your first volume to get started."
           onRefresh={() => refetch()}
           refreshing={isFetching}
-          icon={<HardDrive className="w-7 h-7 text-muted-foreground" />}
+          icon={<HardDrive className="text-muted-foreground h-7 w-7" />}
           variant="dashed"
           primaryActions={[
             {
@@ -276,8 +297,8 @@ export function Volumes() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-        <div className="text-sm leading-relaxed text-muted-foreground">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="text-muted-foreground text-sm leading-relaxed">
           {totalItems} volume{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -300,8 +321,8 @@ export function Volumes() {
         />
       </div>
 
-      <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:items-center">
-        <div className="flex-1 max-w-full sm:max-w-md">
+      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+        <div className="max-w-full flex-1 sm:max-w-md">
           <XSearch
             value={search}
             onChange={setSearch}
@@ -312,7 +333,7 @@ export function Volumes() {
       </div>
 
       {totalItems === 0 ? (
-        <div className="p-8 text-center rounded-2xl border text-muted-foreground">
+        <div className="text-muted-foreground rounded-2xl border p-8 text-center">
           No volumes match your search.
         </div>
       ) : (
@@ -328,40 +349,21 @@ export function Volumes() {
               }}
               badges={
                 <div className="flex items-center space-x-1">
-                  <Badge
-                    variant={
-                      volume.Status === "Available"
-                        ? "default"
-                        : volume.Status === "In-use"
-                          ? "secondary"
-                          : "outline"
-                    }
-                    className={cn(
-                      "gap-1.5",
-                      volume.Status === "Available"
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : volume.Status === "In-use"
-                          ? "bg-muted text-muted-foreground border-border border"
-                          : "border border-blue-200 bg-blue-100 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-                    )}
-                  >
-                    {volume.Status === "Available" ||
-                    volume.Status === "In-use" ? (
-                      <div
-                        className={cn(
-                          "h-1.5 w-1.5 animate-pulse rounded-full",
-                          volume.Status === "Available"
-                            ? "bg-green-500"
-                            : "bg-muted-foreground",
-                        )}
-                      />
-                    ) : (
-                      <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
-                    )}
-                    {volume.Status}
-                  </Badge>
-                  <Badge variant="outline" className="flex gap-1 items-center">
-                    <HardDrive className="w-3 h-3" />
+                  <StatusBadge
+                    status={volume.Status}
+                    statusTextMap={{
+                      AVAILABLE: "SUCCESS",
+                      "IN-USE": "ACTIVE",
+                      CREATING: "PENDING",
+                      DELETING: "UPDATING",
+                      ERROR: "ERROR",
+                      IN_PROGRESS: "PENDING",
+                      DETACHING: "UPDATING",
+                      ATTACHING: "UPDATING",
+                    }}
+                  />
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <HardDrive className="h-3 w-3" />
                     {volume.Size} GB
                   </Badge>
                 </div>
@@ -406,11 +408,11 @@ export function Volumes() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="gap-2 px-3 rounded-full cursor-pointer"
+                              className="cursor-pointer gap-2 rounded-full px-3"
                               onClick={(e) => e.stopPropagation()}
                               aria-label="Actions"
                             >
-                              <MoreHorizontal className="w-4 h-4" />
+                              <MoreHorizontal className="h-4 w-4" />
                               Actions
                             </Button>
                           </DropdownMenuTrigger>
@@ -432,7 +434,7 @@ export function Volumes() {
                           });
                         }}
                       >
-                        <Server className="w-4 h-4" /> Attachments
+                        <Server className="h-4 w-4" /> Attachments
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onSelect={(e) => {
@@ -445,7 +447,7 @@ export function Volumes() {
                           });
                         }}
                       >
-                        <Plus className="w-4 h-4" /> Extend
+                        <Plus className="h-4 w-4" /> Extend
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onSelect={(e) => {
@@ -457,9 +459,9 @@ export function Volumes() {
                           });
                         }}
                       >
-                        <HardDrive className="w-4 h-4" /> Upload to Image
+                        <HardDrive className="h-4 w-4" /> Upload to Image
                       </DropdownMenuItem>
-                      {volume.Status !== "In-use" && (
+                      {volume.Status?.toUpperCase() !== "IN-USE" && (
                         <DropdownMenuItem
                           onSelect={(e) => {
                             e.preventDefault();
@@ -470,7 +472,7 @@ export function Volumes() {
                             });
                           }}
                         >
-                          <Box className="w-4 h-4" /> Create Snapshot
+                          <Box className="h-4 w-4" /> Create Snapshot
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
@@ -483,7 +485,7 @@ export function Volumes() {
                           });
                         }}
                       >
-                        <RefreshCw className="w-4 h-4" /> Change Type
+                        <RefreshCw className="h-4 w-4" /> Change Type
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         variant="destructive"
@@ -495,7 +497,7 @@ export function Volumes() {
                         }}
                         disabled={deleteMutation.isPending}
                       >
-                        <Trash2 className="mr-2 w-4 h-4" /> Delete
+                        <Trash2 className="mr-2 h-4 w-4" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -504,7 +506,7 @@ export function Volumes() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="gap-2 px-3 rounded-full cursor-pointer"
+                        className="cursor-pointer gap-2 rounded-full px-3"
                         aria-label="Delete volume"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -513,7 +515,7 @@ export function Volumes() {
                         }}
                         disabled={deleteMutation.isPending}
                       >
-                        <Trash2 className="w-4 h-4" /> Delete
+                        <Trash2 className="h-4 w-4" /> Delete
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Delete this volume</TooltipContent>
@@ -524,14 +526,107 @@ export function Volumes() {
           ))}
         </div>
       )}
-      <VolumeDetailsDialog
+      <InfoDialog
         open={detailsDialogOpen}
         onOpenChange={(open) => {
           setDetailsDialogOpen(open);
           if (!open) setSelectedVolumeId(undefined);
         }}
-        volumeId={selectedVolumeId}
-        volumeItem={selectedVolumeItem}
+        isLoading={volumeDetailsLoading}
+        title={volumeDetails?.Nom ?? "Volume Details"}
+        badges={<StatusBadge status={selectedVolumeItem?.Status ?? ""} />}
+        description={volumeDetails?.Description ?? "N/A"}
+        infoItems={[
+          [
+            {
+              label: "Project",
+              value: volumeDetails?.Projet ?? "N/A",
+              icon: Folder,
+              variant: "blue",
+            },
+            {
+              label: "Status",
+              value: volumeDetails?.Statut ?? "N/A",
+              icon: Server,
+              variant:
+                volumeDetails?.Statut === "En ligne"
+                  ? "green"
+                  : volumeDetails?.Statut === "Erreur"
+                    ? "red"
+                    : "gray",
+            },
+            {
+              label: "Group",
+              value: volumeDetails?.Groupe ?? "N/A",
+              icon: Users,
+              variant: "indigo",
+            },
+            {
+              label: "Size",
+              value: volumeDetails?.Spécifications?.Taille ?? "N/A",
+              icon: HardDrive,
+              variant: "teal",
+            },
+            {
+              label: "Type",
+              value: volumeDetails?.Spécifications?.Type ?? "N/A",
+              icon: HardDrive,
+              variant: "violet",
+            },
+            {
+              label: "Bootable",
+              value: volumeDetails?.Spécifications?.Amorçable ?? "No",
+              icon: Server,
+              variant:
+                volumeDetails?.Spécifications?.Amorçable === "Oui"
+                  ? "emerald"
+                  : "gray",
+            },
+            {
+              label: "Encrypted",
+              value: volumeDetails?.Spécifications?.Chiffré ?? "No",
+              icon: LockIcon,
+              variant:
+                volumeDetails?.Spécifications?.Chiffré === "Oui"
+                  ? "green"
+                  : "gray",
+            },
+            {
+              label: "Created",
+              value: volumeDetails?.Spécifications?.["Créé"]
+                ? new Date(
+                    volumeDetails.Spécifications["Créé"],
+                  ).toLocaleString()
+                : "N/A",
+              icon: Calendar,
+              variant: "purple",
+            },
+            {
+              label: "Attached To",
+              value:
+                volumeDetails?.Attachements?.["Attaché à"] ?? "Not attached",
+              icon: Link2,
+              variant: volumeDetails?.Attachements?.["Attaché à"]
+                ? "sky"
+                : "gray",
+            },
+            {
+              label: "Availability Zone",
+              value: selectedVolumeItem?.["Availability Zone"] ?? "N/A",
+              icon: MapPin,
+              variant: "blue",
+            },
+          ],
+        ]}
+        actionButtons={
+          <Button
+            variant="outline"
+            className="cursor-pointer rounded-full"
+            onClick={() => setDetailsDialogOpen(false)}
+          >
+            Close
+          </Button>
+        }
       />
       <VolumeExtendDialog
         open={extendDialog.open}
@@ -588,7 +683,7 @@ export function Volumes() {
         description={
           <>
             Are you sure you want to delete this volume{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {volumeToDelete?.Name}
             </span>
             ? This action cannot be undone.

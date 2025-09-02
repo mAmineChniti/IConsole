@@ -89,7 +89,7 @@ export function HeaderActions({
                 btn.className,
               )}
             >
-              {btn.icon ?? <Plus className="w-4 h-4" />}
+              {btn.icon ?? <Plus className="h-4 w-4" />}
               <span className="hidden sm:inline">{btn.label}</span>
               <span className="sm:hidden">{btn.shortLabel ?? "New"}</span>
             </Button>

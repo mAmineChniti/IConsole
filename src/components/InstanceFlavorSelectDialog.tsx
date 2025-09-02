@@ -21,12 +21,12 @@ import { useEffect, useState } from "react";
 export function InstanceFlavorSelectDialog({
   open,
   onOpenChange,
-  currentFlavorName,
+  currentFlavorId,
   onSelect,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentFlavorName: string;
+  currentFlavorId?: string;
   onSelect: (flavorId: string) => void;
 }) {
   const [selectedFlavor, setSelectedFlavor] = useState("");
@@ -44,13 +44,10 @@ export function InstanceFlavorSelectDialog({
   });
 
   useEffect(() => {
-    if (flavors && currentFlavorName) {
-      const currentFlavor = flavors.find((f) => f.name === currentFlavorName);
-      if (currentFlavor) {
-        setSelectedFlavor(currentFlavor.id);
-      }
+    if (flavors && currentFlavorId) {
+      setSelectedFlavor(currentFlavorId);
     }
-  }, [flavors, currentFlavorName]);
+  }, [flavors, currentFlavorId]);
 
   if (error) {
     return (
@@ -59,14 +56,14 @@ export function InstanceFlavorSelectDialog({
           <DialogHeader>
             <DialogTitle>Error Loading Flavors</DialogTitle>
           </DialogHeader>
-          <div className="py-4 text-destructive">
+          <div className="text-destructive py-4">
             Failed to load flavors. Please try again later.
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="rounded-full cursor-pointer"
+              className="cursor-pointer rounded-full"
             >
               Cancel
             </Button>
@@ -86,15 +83,15 @@ export function InstanceFlavorSelectDialog({
         <DialogHeader>
           <DialogTitle>Select New Flavor</DialogTitle>
         </DialogHeader>
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="w-8 h-8 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : (
             <>
               <Select value={selectedFlavor} onValueChange={setSelectedFlavor}>
-                <SelectTrigger className="w-full rounded-full cursor-pointer">
+                <SelectTrigger className="w-full cursor-pointer rounded-full">
                   <SelectValue placeholder="Select a flavor...">
                     {selectedFlavorName || "Select a flavor..."}
                   </SelectValue>
@@ -107,23 +104,29 @@ export function InstanceFlavorSelectDialog({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="flex justify-end pt-4 space-x-2">
+              <div className="flex justify-end space-x-2 pt-4">
                 <Button
                   variant="outline"
                   onClick={() => onOpenChange(false)}
-                  className="rounded-full cursor-pointer"
+                  className="cursor-pointer rounded-full"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={() => {
-                    onSelect(selectedFlavor);
+                    if (selectedFlavor && selectedFlavor !== currentFlavorId) {
+                      onSelect(selectedFlavor);
+                    }
                     onOpenChange(false);
                   }}
-                  disabled={!selectedFlavor}
-                  className="rounded-full cursor-pointer"
+                  disabled={
+                    !selectedFlavor || selectedFlavor === currentFlavorId
+                  }
+                  className="cursor-pointer rounded-full"
                 >
-                  Resize Instance
+                  {selectedFlavor === currentFlavorId
+                    ? "Same Flavor Selected"
+                    : "Resize Instance"}
                 </Button>
               </div>
             </>

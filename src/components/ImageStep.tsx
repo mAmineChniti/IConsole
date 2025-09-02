@@ -24,22 +24,22 @@ export function ImageStep({
     return (
       <div className="space-y-6">
         <div className="space-y-2">
-          <Skeleton className="w-48 h-5" />
-          <Skeleton className="w-64 h-4" />
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-4 w-64" />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="rounded-xl border shadow-lg bg-card text-card-foreground border-border"
+              className="bg-card text-card-foreground border-border rounded-xl border shadow-lg"
             >
               <CardContent className="p-4">
-                <div className="flex gap-3 items-center mb-3">
-                  <div className="p-2 w-9 h-9 rounded-full bg-accent" />
-                  <Skeleton className="w-40 h-5" />
+                <div className="mb-3 flex items-center gap-3">
+                  <div className="bg-accent h-9 w-9 rounded-full p-2" />
+                  <Skeleton className="h-5 w-40" />
                 </div>
                 <div className="space-y-2">
-                  <Skeleton className="w-32 h-6 rounded-full" />
+                  <Skeleton className="h-6 w-32 rounded-full" />
                 </div>
               </CardContent>
             </Card>
@@ -69,11 +69,11 @@ export function ImageStep({
                     onClick={() => field.onChange(image.id)}
                   >
                     <CardContent className="p-4">
-                      <div className="flex gap-3 items-center mb-3">
-                        <div className="p-2 rounded-full bg-accent">
+                      <div className="mb-3 flex items-center gap-3">
+                        <div className="bg-accent rounded-full p-2">
                           <GetDistroIcon imageName={image.name} />
                         </div>
-                        <h3 className="font-semibold leading-none">
+                        <h3 className="leading-none font-semibold">
                           {image.name}
                         </h3>
                       </div>

@@ -1,11 +1,12 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { NetworkCreate } from "@/components/NetworkCreate";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -162,12 +163,12 @@ export function Networks() {
 
   if (isLoading) {
     return (
-      <div className="px-2 space-y-6 sm:px-0">
-        <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <Skeleton className="w-40 h-4" />
+      <div className="space-y-6 px-2 sm:px-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <Skeleton className="h-4 w-40" />
           <div className="flex gap-2">
-            <Skeleton className="flex-shrink-0 w-9 h-9 rounded-full" />
-            <Skeleton className="w-28 h-9 rounded-full" />
+            <Skeleton className="h-9 w-9 flex-shrink-0 rounded-full" />
+            <Skeleton className="h-9 w-28 rounded-full" />
           </div>
         </div>
 
@@ -175,29 +176,29 @@ export function Networks() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="overflow-hidden rounded-xl border shadow-sm bg-card border-border/50"
+              className="bg-card border-border/50 overflow-hidden rounded-xl border shadow-sm"
             >
               <CardHeader className="pb-3">
-                <div className="flex gap-2 justify-between items-start sm:items-center">
-                  <div className="flex flex-1 gap-2 items-center min-w-0">
-                    <Skeleton className="w-32 h-5 rounded sm:h-6" />
-                    <Skeleton className="w-16 h-5 rounded-full" />
+                <div className="flex items-start justify-between gap-2 sm:items-center">
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <Skeleton className="h-5 w-32 rounded sm:h-6" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
                   </div>
                   <div className="flex flex-shrink-0 gap-1 sm:gap-2">
-                    <Skeleton className="w-10 h-6 rounded-full" />
-                    <Skeleton className="w-8 h-8 rounded-full" />
-                    <Skeleton className="w-8 h-8 rounded-full" />
+                    <Skeleton className="h-6 w-10 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <Skeleton className="w-24 h-4 rounded" />
+                <Skeleton className="h-4 w-24 rounded" />
               </CardContent>
             </Card>
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="w-40 h-9 rounded-full" />
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -233,7 +234,7 @@ export function Networks() {
             text="Create a network to get started."
             onRefresh={() => refetch()}
             refreshing={isFetching}
-            icon={<Network className="w-7 h-7 text-muted-foreground" />}
+            icon={<Network className="text-muted-foreground h-7 w-7" />}
             variant="dashed"
             primaryActions={[
               {
@@ -249,7 +250,7 @@ export function Networks() {
   }
 
   return (
-    <div className="px-2 space-y-6 sm:px-0">
+    <div className="space-y-6 px-2 sm:px-0">
       {showCreate ? (
         <NetworkCreate
           onBack={() => setShowCreate(false)}
@@ -262,8 +263,8 @@ export function Networks() {
         />
       ) : (
         <>
-          <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-            <div className="text-sm leading-relaxed text-muted-foreground">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+            <div className="text-muted-foreground text-sm leading-relaxed">
               {totalItems} network{totalItems !== 1 ? "s" : ""}
               {totalItems > 0 && (
                 <>
@@ -288,8 +289,8 @@ export function Networks() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:items-center">
-            <div className="flex-1 max-w-full sm:max-w-md">
+          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+            <div className="max-w-full flex-1 sm:max-w-md">
               <XSearch
                 value={search}
                 onChange={setSearch}
@@ -300,7 +301,7 @@ export function Networks() {
           </div>
 
           {totalItems === 0 ? (
-            <div className="p-8 text-center rounded-2xl border text-muted-foreground">
+            <div className="text-muted-foreground rounded-2xl border p-8 text-center">
               No networks match your search.
             </div>
           ) : (
@@ -312,34 +313,10 @@ export function Networks() {
                     title={n.name}
                     badges={
                       <>
-                        <Badge
-                          variant={
-                            n.status === "ACTIVE" ? "default" : "destructive"
-                          }
-                          className={cn(
-                            "gap-1.5",
-                            n.status === "ACTIVE"
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-                          )}
-                        >
-                          <div
-                            className={cn(
-                              "h-1.5 w-1.5 animate-pulse rounded-full",
-                              n.status === "ACTIVE"
-                                ? "bg-green-500"
-                                : "bg-red-400 dark:bg-red-500",
-                            )}
-                          />
-                          {n.status === "ACTIVE"
-                            ? "Online"
-                            : n.status === "DOWN"
-                              ? "Offline"
-                              : (n.status?.toLowerCase() ?? "unknown")}
-                        </Badge>
+                        <StatusBadge status={n.status} />
                         <Badge
                           variant={n.is_external ? "default" : "secondary"}
-                          className="py-1 px-2 text-xs rounded-full"
+                          className="rounded-full px-2 py-1 text-xs"
                         >
                           {n.is_external ? "External" : "Internal"}
                         </Badge>
@@ -360,20 +337,20 @@ export function Networks() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="rounded-full cursor-pointer"
+                          className="cursor-pointer rounded-full"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedNetworkId(n.id);
                             setShowRouterDialog(true);
                           }}
                         >
-                          <Router className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <Router className="h-3 w-3 sm:h-4 sm:w-4" />
                           Add Router
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
-                          className="rounded-full cursor-pointer"
+                          className="cursor-pointer rounded-full"
                           onClick={(e) => {
                             e.stopPropagation();
                             setNetworkToDelete(n);
@@ -381,7 +358,7 @@ export function Networks() {
                           }}
                           disabled={deleteMutation.isPending}
                         >
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                           Delete Network
                         </Button>
                       </>
@@ -389,7 +366,7 @@ export function Networks() {
                   />
                 ))}
               </div>
-              <div className="flex justify-center mt-4">
+              <div className="mt-4 flex justify-center">
                 <Button
                   onClick={handleShowMore}
                   variant="outline"
@@ -418,7 +395,7 @@ export function Networks() {
         description={
           <>
             Are you sure you want to delete this network{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {networkToDelete?.name}
             </span>
             ? This action cannot be undone.
@@ -433,12 +410,12 @@ export function Networks() {
       />
 
       <Dialog open={showRouterDialog} onOpenChange={setShowRouterDialog}>
-        <DialogContent className="overflow-hidden mx-4 border shadow-lg sm:mx-0 sm:max-w-md bg-card text-card-foreground border-border max-w-[calc(100vw-2rem)]">
+        <DialogContent className="bg-card text-card-foreground border-border mx-4 max-w-[calc(100vw-2rem)] overflow-hidden border shadow-lg sm:mx-0 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold truncate">
+            <DialogTitle className="truncate text-lg font-semibold">
               Create Router
             </DialogTitle>
-            <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
+            <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
               Attach a router to an external network (then interface).
             </DialogDescription>
           </DialogHeader>

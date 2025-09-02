@@ -1,10 +1,11 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { ProjectFormDialog } from "@/components/ProjectFormDialog";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -55,16 +56,16 @@ function ProjectActions({
   onDelete: (projectId: string) => void;
 }) {
   return (
-    <div className="flex gap-1 items-center sm:gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant="outline"
             size="sm"
             onClick={() => onEdit(project)}
-            className="flex-shrink-0 p-0 w-8 h-8 rounded-full border cursor-pointer bg-card text-card-foreground border-border/50 hover:bg-card hover:text-card-foreground focus:bg-card focus:text-card-foreground"
+            className="bg-card text-card-foreground border-border/50 hover:bg-card hover:text-card-foreground focus:bg-card focus:text-card-foreground h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border p-0"
           >
-            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Edit project</TooltipContent>
@@ -75,9 +76,9 @@ function ProjectActions({
             variant="outline"
             size="sm"
             onClick={() => onDelete(project.id)}
-            className="flex-shrink-0 p-0 w-8 h-8 text-white rounded-full cursor-pointer dark:text-white hover:text-white focus:text-white bg-destructive dark:bg-destructive dark:hover:bg-destructive hover:bg-destructive focus:bg-destructive"
+            className="bg-destructive dark:bg-destructive dark:hover:bg-destructive hover:bg-destructive focus:bg-destructive h-8 w-8 flex-shrink-0 cursor-pointer rounded-full p-0 text-white hover:text-white focus:text-white dark:text-white"
           >
-            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Delete project</TooltipContent>
@@ -224,17 +225,17 @@ export function Projects() {
   if (isLoadingInitial) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <div className="flex gap-2 items-center text-sm text-muted-foreground">
-            <Skeleton className="w-40 h-4" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <Skeleton className="h-4 w-40" />
           </div>
           <div className="flex gap-3">
-            <Skeleton className="w-9 h-9 rounded-full" />
-            <Skeleton className="w-32 h-9 rounded-full" />
+            <Skeleton className="h-9 w-9 rounded-full" />
+            <Skeleton className="h-9 w-32 rounded-full" />
           </div>
         </div>
 
-        <div className="grid gap-6 items-start sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
@@ -243,53 +244,53 @@ export function Projects() {
               )}
             >
               <CardHeader className="pb-3">
-                <div className="flex gap-2 justify-between items-start">
-                  <div className="flex-1 min-w-0">
-                    <Skeleton className="mb-2 w-32 h-6" />
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <Skeleton className="mb-2 h-6 w-32" />
                   </div>
-                  <div className="flex flex-shrink-0 gap-2 items-center">
-                    <Skeleton className="w-20 h-6 rounded-full" />
+                  <div className="flex flex-shrink-0 items-center gap-2">
+                    <Skeleton className="h-6 w-20 rounded-full" />
                   </div>
                 </div>
-                <Skeleton className="mt-2 w-40 h-4" />
+                <Skeleton className="mt-2 h-4 w-40" />
               </CardHeader>
 
-              <CardContent className="flex flex-col flex-grow pt-0">
+              <CardContent className="flex flex-grow flex-col pt-0">
                 <div className="flex-grow space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-1.5 items-center">
-                      <span className="inline-flex justify-center items-center w-7 h-7 text-black bg-white rounded-full shadow-sm dark:text-white dark:bg-black">
-                        <Skeleton className="w-4 h-4" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow-sm dark:bg-black dark:text-white">
+                        <Skeleton className="h-4 w-4" />
                       </span>
-                      <Skeleton className="w-20 h-4" />
+                      <Skeleton className="h-4 w-20" />
                     </div>
-                    <Skeleton className="w-8 h-8 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
                   </div>
-                  <div className="overflow-y-auto space-y-2 max-h-32">
+                  <div className="max-h-32 space-y-2 overflow-y-auto">
                     {Array.from({ length: 2 }).map((_, j) => (
                       <div
                         key={j}
-                        className="flex gap-2 justify-between items-center p-2 rounded-full bg-muted/20"
+                        className="bg-muted/20 flex items-center justify-between gap-2 rounded-full p-2"
                       >
-                        <div className="flex flex-1 gap-2 items-center min-w-0">
-                          <Skeleton className="w-6 h-6 rounded-full" />
-                          <Skeleton className="w-24 h-4" />
+                        <div className="flex min-w-0 flex-1 items-center gap-2">
+                          <Skeleton className="h-6 w-6 rounded-full" />
+                          <Skeleton className="h-4 w-24" />
                         </div>
                         <div className="flex max-w-[40%] flex-wrap gap-1">
-                          <Skeleton className="w-12 h-5 rounded-full" />
-                          <Skeleton className="w-12 h-5 rounded-full" />
+                          <Skeleton className="h-5 w-12 rounded-full" />
+                          <Skeleton className="h-5 w-12 rounded-full" />
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="pt-3 mt-auto">
+                <div className="mt-auto pt-3">
                   <Separator />
-                  <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center">
-                    <Skeleton className="w-32 h-10 rounded-full" />
-                    <div className="flex gap-2 justify-center sm:justify-end">
-                      <Skeleton className="w-8 h-8 rounded-full" />
-                      <Skeleton className="w-8 h-8 rounded-full" />
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <Skeleton className="h-10 w-32 rounded-full" />
+                    <div className="flex justify-center gap-2 sm:justify-end">
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                      <Skeleton className="h-8 w-8 rounded-full" />
                     </div>
                   </div>
                 </div>
@@ -298,7 +299,7 @@ export function Projects() {
           ))}
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="w-40 h-9 rounded-full" />
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -347,8 +348,8 @@ export function Projects() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-        <div className="flex gap-2 items-center text-sm text-muted-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="text-muted-foreground flex items-center gap-2 text-sm">
           <span>
             {totalItems} project{totalItems !== 1 ? "s" : ""} total
             {totalItems > 0 && (
@@ -375,7 +376,7 @@ export function Projects() {
           }}
         />
       </div>
-      <div className="flex-1 max-w-full sm:max-w-md">
+      <div className="max-w-full flex-1 sm:max-w-md">
         <XSearch
           value={search}
           onChange={setSearch}
@@ -385,11 +386,11 @@ export function Projects() {
       </div>
 
       {totalItems === 0 ? (
-        <div className="flex justify-center items-center p-8 text-center rounded-2xl border text-muted-foreground min-h-32">
+        <div className="text-muted-foreground flex min-h-32 items-center justify-center rounded-2xl border p-8 text-center">
           No projects match your search.
         </div>
       ) : (
-        <div className="grid gap-6 items-start sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {visibleData.map((project) => (
             <Card
               key={project.id}
@@ -398,47 +399,35 @@ export function Projects() {
               )}
             >
               <CardHeader className="pb-3">
-                <div className="flex gap-2 justify-between items-start">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-lg font-semibold text-foreground truncate">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-foreground truncate text-lg font-semibold">
                       {project.name}
                     </CardTitle>
                   </div>
-                  <div className="flex flex-shrink-0 gap-2 items-center">
-                    <Badge
-                      variant={project.enabled ? "default" : "secondary"}
-                      className={cn(
-                        "flex items-center gap-1.5 px-2 py-0.5 text-xs",
-                        project.enabled
-                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                          : "bg-muted text-muted-foreground",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "inline-block h-1.5 w-1.5 animate-pulse rounded-full",
-                          project.enabled
-                            ? "bg-green-500"
-                            : "bg-muted-foreground/40",
-                        )}
-                      />
-                      {project.enabled ? "Enabled" : "Disabled"}
-                    </Badge>
+                  <div className="flex flex-shrink-0 items-center gap-2">
+                    <StatusBadge
+                      status={project.enabled ? "Enabled" : "Disabled"}
+                      statusTextMap={{
+                        Enabled: "ACTIVE",
+                        Disabled: "SHUTOFF",
+                      }}
+                    />
                   </div>
                 </div>
                 {project.description && (
-                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                  <p className="text-muted-foreground mt-2 line-clamp-2 text-sm">
                     {project.description}
                   </p>
                 )}
               </CardHeader>
 
-              <CardContent className="flex flex-col flex-grow pt-0">
+              <CardContent className="flex flex-grow flex-col pt-0">
                 <div className="flex-grow space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-1.5 items-center">
-                      <span className="inline-flex justify-center items-center w-7 h-7 text-black bg-white rounded-full shadow-sm dark:text-white dark:bg-black">
-                        <Users className="w-4 h-4 text-card-foreground" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow-sm dark:bg-black dark:text-white">
+                        <Users className="text-card-foreground h-4 w-4" />
                       </span>
                       <span className="text-sm font-medium">
                         {project.assignments?.length ?? 0} user
@@ -449,12 +438,12 @@ export function Projects() {
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleProjectExpansion(project.id)}
-                      className="py-1 px-2 rounded-full cursor-pointer bg-muted"
+                      className="bg-muted cursor-pointer rounded-full px-2 py-1"
                     >
                       {expandedProjects.has(project.id) ? (
-                        <ChevronUp className="w-4 h-4" />
+                        <ChevronUp className="h-4 w-4" />
                       ) : (
-                        <ChevronDown className="w-4 h-4" />
+                        <ChevronDown className="h-4 w-4" />
                       )}
                     </Button>
                   </div>
@@ -462,24 +451,24 @@ export function Projects() {
                   {expandedProjects.has(project.id) && (
                     <>
                       <Separator />
-                      <div className="overflow-y-auto space-y-2 max-h-32">
+                      <div className="max-h-32 space-y-2 overflow-y-auto">
                         {project.assignments &&
                         project.assignments.length > 0 ? (
                           project.assignments.map(
                             (assignment: UserAssignment) => (
                               <div
                                 key={assignment.user_id}
-                                className="flex gap-2 justify-between items-center p-2 rounded-full bg-muted/20"
+                                className="bg-muted/20 flex items-center justify-between gap-2 rounded-full p-2"
                               >
-                                <div className="flex flex-1 gap-2 items-center min-w-0">
-                                  <Avatar className="flex-shrink-0 w-6 h-6">
-                                    <AvatarFallback className="text-xs font-medium text-black bg-white dark:text-white dark:bg-black">
+                                <div className="flex min-w-0 flex-1 items-center gap-2">
+                                  <Avatar className="h-6 w-6 flex-shrink-0">
+                                    <AvatarFallback className="bg-white text-xs font-medium text-black dark:bg-black dark:text-white">
                                       {(
                                         assignment.user_name?.charAt(0) ?? "?"
                                       ).toUpperCase()}
                                     </AvatarFallback>
                                   </Avatar>
-                                  <span className="text-sm font-medium truncate">
+                                  <span className="truncate text-sm font-medium">
                                     {assignment.user_name ?? "Unknown"}
                                   </span>
                                 </div>
@@ -490,7 +479,7 @@ export function Projects() {
                                       <Badge
                                         key={role.role_id}
                                         variant="outline"
-                                        className="max-w-full text-xs rounded-full truncate"
+                                        className="max-w-full truncate rounded-full text-xs"
                                       >
                                         {role.role_name}
                                       </Badge>
@@ -498,7 +487,7 @@ export function Projects() {
                                   {(assignment.roles ?? []).length > 2 && (
                                     <Badge
                                       variant="outline"
-                                      className="text-xs rounded-full"
+                                      className="rounded-full text-xs"
                                     >
                                       +{(assignment.roles ?? []).length - 2}
                                     </Badge>
@@ -508,7 +497,7 @@ export function Projects() {
                             ),
                           )
                         ) : (
-                          <p className="text-sm text-center text-muted-foreground">
+                          <p className="text-muted-foreground text-center text-sm">
                             No users assigned
                           </p>
                         )}
@@ -517,16 +506,16 @@ export function Projects() {
                   )}
                 </div>
 
-                <div className="pt-3 mt-auto">
+                <div className="mt-auto pt-3">
                   <Separator />
-                  <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center">
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Button
                       variant="default"
                       size="sm"
                       onClick={() => handleManageUsers(project)}
-                      className="flex-1 py-2 px-6 rounded-full cursor-pointer bg-primary text-primary-foreground"
+                      className="bg-primary text-primary-foreground flex-1 cursor-pointer rounded-full px-6 py-2"
                     >
-                      <UserPlus className="mr-2 w-4 h-4" />
+                      <UserPlus className="mr-2 h-4 w-4" />
                       <span className="truncate">Manage Users</span>
                     </Button>
                     <div className="flex justify-center sm:justify-end">
@@ -591,7 +580,7 @@ export function Projects() {
         description={
           <>
             Are you sure you want to delete this project{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {projectToDelete?.name}
             </span>
             ? This action cannot be undone.

@@ -138,30 +138,30 @@ export function ImportVM() {
 
   if (resourcesLoading)
     return (
-      <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+      <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
         <CardHeader>
-          <CardTitle className="flex gap-2 items-center">
-            <div className="p-2 rounded-full bg-muted">
-              <Skeleton className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2">
+            <div className="bg-muted rounded-full p-2">
+              <Skeleton className="h-5 w-5" />
             </div>
-            <Skeleton className="w-44 h-6" />
+            <Skeleton className="h-6 w-44" />
           </CardTitle>
           <CardDescription>
-            <Skeleton className="w-64 h-4" />
+            <Skeleton className="h-4 w-64" />
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             <div>
-              <Skeleton className="mb-2 w-24 h-4" />
-              <div className="flex justify-center items-center w-full">
-                <div className="flex flex-col justify-center items-center w-full h-32 rounded-lg border-2 border-dashed border-border">
-                  <div className="flex flex-col justify-center items-center pt-5 pb-6">
-                    <div className="p-2 mb-2 rounded-full bg-muted">
-                      <Skeleton className="w-8 h-8" />
+              <Skeleton className="mb-2 h-4 w-24" />
+              <div className="flex w-full items-center justify-center">
+                <div className="border-border flex h-32 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <div className="bg-muted mb-2 rounded-full p-2">
+                      <Skeleton className="h-8 w-8" />
                     </div>
-                    <Skeleton className="mb-2 w-40 h-4" />
-                    <Skeleton className="w-24 h-3" />
+                    <Skeleton className="mb-2 h-4 w-40" />
+                    <Skeleton className="h-3 w-24" />
                   </div>
                 </div>
               </div>
@@ -171,102 +171,102 @@ export function ImportVM() {
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
                   </div>
-                  <Skeleton className="w-24 h-4" />
+                  <Skeleton className="h-4 w-24" />
                 </div>
-                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
               <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
                   </div>
-                  <Skeleton className="w-32 h-4" />
+                  <Skeleton className="h-4 w-32" />
                 </div>
-                <Skeleton className="w-full h-10 rounded-full" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
-                  </div>
-                  <Skeleton className="w-24 h-4" />
-                </div>
-                <Skeleton className="w-full h-10 rounded-full" />
-              </div>
-              <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
-                  </div>
-                  <Skeleton className="w-24 h-4" />
-                </div>
-                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
                   </div>
-                  <Skeleton className="w-28 h-4" />
+                  <Skeleton className="h-4 w-24" />
                 </div>
-                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
               <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
                   </div>
-                  <Skeleton className="w-32 h-4" />
+                  <Skeleton className="h-4 w-24" />
                 </div>
-                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
                   </div>
-                  <Skeleton className="w-28 h-4" />
+                  <Skeleton className="h-4 w-28" />
                 </div>
-                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
               <div className="space-y-2">
-                <div className="flex gap-2 items-center mb-1">
-                  <div className="p-1 rounded-full bg-muted">
-                    <Skeleton className="w-4 h-4" />
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
                   </div>
-                  <Skeleton className="w-36 h-4" />
+                  <Skeleton className="h-4 w-32" />
                 </div>
-                <Skeleton className="w-full h-10 rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-28" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
+              </div>
+              <div className="space-y-2">
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="bg-muted rounded-full p-1">
+                    <Skeleton className="h-4 w-4" />
+                  </div>
+                  <Skeleton className="h-4 w-36" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-full" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="flex gap-2 items-center mb-1">
-                <div className="p-1 rounded-full bg-muted">
-                  <Skeleton className="w-4 h-4" />
+              <div className="mb-1 flex items-center gap-2">
+                <div className="bg-muted rounded-full p-1">
+                  <Skeleton className="h-4 w-4" />
                 </div>
-                <Skeleton className="w-36 h-4" />
+                <Skeleton className="h-4 w-36" />
               </div>
-              <Skeleton className="w-full h-10 rounded-full" />
+              <Skeleton className="h-10 w-full rounded-full" />
             </div>
 
             <Separator />
 
             <div className="flex justify-center sm:justify-end">
-              <Skeleton className="w-full h-10 rounded-full sm:w-48" />
+              <Skeleton className="h-10 w-full rounded-full sm:w-48" />
             </div>
           </div>
         </CardContent>
@@ -274,11 +274,11 @@ export function ImportVM() {
     );
 
   return (
-    <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+    <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
       <CardHeader>
-        <CardTitle className="flex gap-2 items-center">
-          <div className="p-2 rounded-full bg-muted">
-            <Upload className="w-5 h-5 text-primary" />
+        <CardTitle className="flex items-center gap-2">
+          <div className="bg-muted rounded-full p-2">
+            <Upload className="text-primary h-5 w-5" />
           </div>
           Import Virtual Machine
         </CardTitle>
@@ -303,7 +303,8 @@ export function ImportVM() {
                     maxFiles={1}
                     accept={{
                       "application/octet-stream": [".vmdk"],
-                      "": [".vmdk"],
+                      "application/x-vmdk": [".vmdk"],
+                      "*/*": [".vmdk"],
                     }}
                     onDrop={(accepted) => {
                       const file = accepted?.[0];
@@ -328,17 +329,17 @@ export function ImportVM() {
                     className="h-32 cursor-pointer"
                   >
                     <DropzoneEmptyState>
-                      <div className="flex flex-col justify-center items-center">
-                        <div className="flex justify-center items-center rounded-md bg-muted text-muted-foreground size-8">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-md">
                           <Upload size={16} />
                         </div>
-                        <p className="my-2 w-full text-sm font-medium truncate text-wrap">
+                        <p className="my-2 w-full truncate text-sm font-medium text-wrap">
                           Upload a file
                         </p>
-                        <p className="w-full text-xs text-muted-foreground truncate text-wrap">
+                        <p className="text-muted-foreground w-full truncate text-xs text-wrap">
                           Drag and drop or click to upload
                         </p>
-                        <p className="text-xs text-muted-foreground text-wrap">
+                        <p className="text-muted-foreground text-xs text-wrap">
                           Accepts .vmdk
                         </p>
                       </div>
@@ -346,7 +347,7 @@ export function ImportVM() {
                     <DropzoneContent />
                   </Dropzone>
                   {importForm.formState.errors.vmdk_file && (
-                    <p className="mt-2 text-sm text-destructive">
+                    <p className="text-destructive mt-2 text-sm">
                       {importForm.formState.errors.vmdk_file.message?.toString() ??
                         "Please select a VMDK file"}
                     </p>
@@ -363,9 +364,9 @@ export function ImportVM() {
                 name="vm_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex gap-2 items-center">
-                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                        <Server className="w-4 h-4 text-muted-foreground" />
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <Server className="text-muted-foreground h-4 w-4" />
                       </span>
                       VM Name
                     </FormLabel>
@@ -373,7 +374,7 @@ export function ImportVM() {
                       <Input
                         {...field}
                         placeholder="Enter VM name"
-                        className="rounded-full bg-input text-foreground"
+                        className="bg-input text-foreground rounded-full"
                       />
                     </FormControl>
                     <FormMessage />
@@ -386,9 +387,9 @@ export function ImportVM() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex gap-2 items-center">
-                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                        <FileText className="w-4 h-4 text-muted-foreground" />
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <FileText className="text-muted-foreground h-4 w-4" />
                       </span>
                       Description (Optional)
                     </FormLabel>
@@ -396,7 +397,7 @@ export function ImportVM() {
                       <Input
                         {...field}
                         placeholder="Brief description"
-                        className="rounded-full bg-input text-foreground"
+                        className="bg-input text-foreground rounded-full"
                       />
                     </FormControl>
                     <FormMessage />
@@ -411,9 +412,9 @@ export function ImportVM() {
                 name="min_disk"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex gap-2 items-center">
-                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                        <HardDrive className="w-4 h-4 text-muted-foreground" />
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <HardDrive className="text-muted-foreground h-4 w-4" />
                       </span>
                       Minimum Disk (GB)
                     </FormLabel>
@@ -434,7 +435,7 @@ export function ImportVM() {
                               : undefined,
                           );
                         }}
-                        className="rounded-full bg-input text-foreground"
+                        className="bg-input text-foreground rounded-full"
                       />
                     </FormControl>
                     <FormMessage />
@@ -447,9 +448,9 @@ export function ImportVM() {
                 name="min_ram"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex gap-2 items-center">
-                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                        <MemoryStick className="w-4 h-4 text-muted-foreground" />
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <MemoryStick className="text-muted-foreground h-4 w-4" />
                       </span>
                       Minimum RAM (MB)
                     </FormLabel>
@@ -470,7 +471,7 @@ export function ImportVM() {
                               : undefined,
                           );
                         }}
-                        className="rounded-full bg-input text-foreground"
+                        className="bg-input text-foreground rounded-full"
                       />
                     </FormControl>
                     <FormMessage />
@@ -485,15 +486,15 @@ export function ImportVM() {
                 name="flavor_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex gap-2 items-center">
-                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                        <IceCream className="w-4 h-4 rotate-45 text-muted-foreground" />
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <IceCream className="text-muted-foreground h-4 w-4 rotate-45" />
                       </span>
                       Flavor
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="w-full rounded-full cursor-pointer">
+                        <SelectTrigger className="w-full cursor-pointer rounded-full">
                           <SelectValue placeholder="Select flavor" />
                         </SelectTrigger>
                       </FormControl>
@@ -515,15 +516,15 @@ export function ImportVM() {
                 name="network_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex gap-2 items-center">
-                      <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                        <Network className="w-4 h-4 text-muted-foreground" />
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <Network className="text-muted-foreground h-4 w-4" />
                       </span>
                       Network
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="w-full rounded-full cursor-pointer">
+                        <SelectTrigger className="w-full cursor-pointer rounded-full">
                           <SelectValue placeholder="Select network" />
                         </SelectTrigger>
                       </FormControl>
@@ -554,9 +555,9 @@ export function ImportVM() {
                   );
                   return (
                     <FormItem>
-                      <FormLabel className="flex gap-2 items-center">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <KeyRound className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <KeyRound className="text-muted-foreground h-4 w-4" />
                         </span>
                         Key Pair
                       </FormLabel>
@@ -565,7 +566,7 @@ export function ImportVM() {
                         value={fromForm(field.value)}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full rounded-full cursor-pointer">
+                          <SelectTrigger className="w-full cursor-pointer rounded-full">
                             <SelectValue placeholder="Select key pair" />
                           </SelectTrigger>
                         </FormControl>
@@ -595,9 +596,9 @@ export function ImportVM() {
                   );
                   return (
                     <FormItem>
-                      <FormLabel className="flex gap-2 items-center">
-                        <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                          <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <ShieldCheck className="text-muted-foreground h-4 w-4" />
                         </span>
                         Security Group
                       </FormLabel>
@@ -606,7 +607,7 @@ export function ImportVM() {
                         value={fromForm(field.value)}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full rounded-full cursor-pointer">
+                          <SelectTrigger className="w-full cursor-pointer rounded-full">
                             <SelectValue placeholder="Select security group" />
                           </SelectTrigger>
                         </FormControl>
@@ -630,9 +631,9 @@ export function ImportVM() {
               name="admin_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex gap-2 items-center">
-                    <span className="flex justify-center items-center p-1 rounded-full bg-muted">
-                      <UserCog className="w-4 h-4 text-muted-foreground" />
+                  <FormLabel className="flex items-center gap-2">
+                    <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                      <UserCog className="text-muted-foreground h-4 w-4" />
                     </span>
                     Admin Password
                   </FormLabel>
@@ -641,7 +642,7 @@ export function ImportVM() {
                       {...field}
                       type="password"
                       placeholder="Enter admin password"
-                      className="rounded-full bg-input text-foreground"
+                      className="bg-input text-foreground rounded-full"
                     />
                   </FormControl>
                   <FormDescription>
@@ -658,16 +659,16 @@ export function ImportVM() {
               <Button
                 type="submit"
                 disabled={importVMMutation.isPending || !importFile}
-                className="w-full rounded-full cursor-pointer sm:w-auto bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+                className="bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground w-full cursor-pointer rounded-full sm:w-auto"
               >
                 {importVMMutation.isPending ? (
                   <>
-                    <Loader2 className="flex-shrink-0 mr-2 w-4 h-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 flex-shrink-0 animate-spin" />
                     <span className="truncate">Importing VM...</span>
                   </>
                 ) : (
                   <>
-                    <Download className="flex-shrink-0 mr-2 w-4 h-4" />
+                    <Download className="mr-2 h-4 w-4 flex-shrink-0" />
                     <span className="truncate">Import Virtual Machine</span>
                   </>
                 )}

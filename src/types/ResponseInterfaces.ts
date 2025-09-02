@@ -173,20 +173,21 @@ export interface FlavorActionResponse {
   status: string;
 }
 
-export interface ImageDetails {
+export interface Image {
   id: string;
   name: string;
   status: string;
   visibility: "public" | "private" | "shared" | "community";
   protected: boolean;
-  size?: string;
-  disk_format?: string;
-  container_format?: string;
-  created?: string;
-  updated?: string;
 }
 
-export type ImageListResponse = ImageDetails[];
+export type ImageListResponse = Image[];
+
+export interface ImageDetails extends Image {
+  disk_format: string;
+  container_format: string;
+  size: number;
+}
 
 export interface ImageDeleteResponse {
   message: string;

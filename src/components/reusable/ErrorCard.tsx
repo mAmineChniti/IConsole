@@ -21,19 +21,19 @@ export function ErrorCard({
   const titleId = useId();
   const messageId = useId();
   return (
-    <div className="px-2 space-y-6 max-w-none sm:px-4 lg:px-6">
-      <Card className="overflow-hidden w-full rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+    <div className="max-w-none space-y-6 px-2 sm:px-4 lg:px-6">
+      <Card className="bg-card text-card-foreground border-border/50 w-full overflow-hidden rounded-xl border shadow-lg">
         <CardContent className="p-4 text-center sm:p-6 lg:p-8">
           <div className="flex flex-col items-center space-y-4">
-            <div className="flex-shrink-0 p-2 rounded-full sm:p-3 bg-destructive/10">
+            <div className="bg-destructive/10 flex-shrink-0 rounded-full p-2 sm:p-3">
               <AlertTriangle
                 aria-hidden="true"
                 focusable="false"
-                className="w-6 h-6 sm:w-8 sm:h-8 text-destructive"
+                className="text-destructive h-6 w-6 sm:h-8 sm:w-8"
               />
             </div>
             <div
-              className="space-y-2 w-full"
+              className="w-full space-y-2"
               role="alert"
               aria-live="assertive"
               aria-atomic="true"
@@ -42,13 +42,13 @@ export function ErrorCard({
             >
               <h3
                 id={titleId}
-                className="font-sans text-lg font-semibold leading-tight break-words sm:text-xl text-destructive"
+                className="text-destructive font-sans text-lg leading-tight font-semibold break-words sm:text-xl"
               >
                 {title}
               </h3>
               <p
                 id={messageId}
-                className="mx-auto max-w-full font-sans text-sm leading-relaxed break-words sm:max-w-md sm:text-base text-muted-foreground"
+                className="text-muted-foreground mx-auto max-w-full font-sans text-sm leading-relaxed break-words sm:max-w-md sm:text-base"
               >
                 {message}
               </p>
@@ -59,18 +59,18 @@ export function ErrorCard({
                 onClick={onRetry}
                 disabled={isRetrying}
                 aria-busy={isRetrying}
-                className="mt-4 w-full font-sans tracking-tight rounded-full shadow-md transition-colors cursor-pointer sm:w-auto min-w-[120px]"
+                className="mt-4 w-full min-w-[120px] cursor-pointer rounded-full font-sans tracking-tight shadow-md transition-colors sm:w-auto"
                 variant="destructive"
               >
                 {isRetrying ? (
                   <>
-                    <RefreshCw className="flex-shrink-0 mr-2 w-4 h-4 text-white animate-spin" />
-                    <span className="text-white truncate">Retrying...</span>
+                    <RefreshCw className="mr-2 h-4 w-4 flex-shrink-0 animate-spin text-white" />
+                    <span className="truncate text-white">Retrying...</span>
                   </>
                 ) : (
                   <>
-                    <RefreshCw className="flex-shrink-0 mr-2 w-4 h-4 text-white" />
-                    <span className="text-white truncate">Retry</span>
+                    <RefreshCw className="mr-2 h-4 w-4 flex-shrink-0 text-white" />
+                    <span className="truncate text-white">Retry</span>
                   </>
                 )}
               </Button>

@@ -44,7 +44,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
     return (
       <div className={cn("relative flex-shrink-0", sizeClasses)}>
         {loading && (
-          <div className="flex absolute inset-0 justify-center items-center w-full h-full">
+          <div className="absolute inset-0 flex h-full w-full items-center justify-center">
             <Server
               className={cn(
                 "h-full w-full flex-shrink-0",
@@ -79,7 +79,7 @@ export function GetDistroIcon({ imageName }: { imageName: string }) {
   return (
     <div className={cn("relative flex-shrink-0", sizeClasses)}>
       {loading && (
-        <div className="flex absolute inset-0 justify-center items-center w-full h-full">
+        <div className="absolute inset-0 flex h-full w-full items-center justify-center">
           <Server
             className={cn("text-muted-foreground h-full w-full flex-shrink-0")}
             aria-hidden="true"

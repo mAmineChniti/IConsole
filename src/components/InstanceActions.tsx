@@ -1,28 +1,175 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { InstanceFlavorSelectDialog } from "@/components/InstanceFlavorSelectDialog";
+import { InstanceVolumeDialog } from "@/components/InstanceVolumeDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { InfraService } from "@/lib/requests";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Camera, Power, PowerOff, RotateCcw, Trash2 } from "lucide-react";
+import { FlavorService, InfraService } from "@/lib/requests";
+import type { InstanceListItem } from "@/types/ResponseInterfaces";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Box,
+  Camera,
+  FileText,
+  GripVertical,
+  HardDrive,
+  Pause,
+  Power,
+  PowerOff,
+  RotateCcw,
+  ShieldAlert,
+  Terminal,
+  Trash2,
+} from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export function InstanceActions({
-  instanceId,
+  instance,
   status,
   disabled = false,
+  onViewLogs,
 }: {
-  instanceId: string;
+  instance: InstanceListItem;
   status: string;
   disabled?: boolean;
+  onViewLogs?: (instance: InstanceListItem) => void;
 }) {
   const queryClient = useQueryClient();
+  const isDisabled = disabled || status === "BUILD";
+  const [isResizeDialogOpen, setIsResizeDialogOpen] = useState(false);
+  const [isVolumeDialogOpen, setIsVolumeDialogOpen] = useState(false);
+
+  const {
+    data: consoleData,
+    isLoading: isConsoleLoading,
+    refetch: refetchConsole,
+  } = useQuery({
+    queryKey: ["console", instance.id],
+    queryFn: () => InfraService.getConsole({ instance_id: instance.id }),
+    enabled: false,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
+  const { data: flavors = [] } = useQuery({
+    queryKey: ["flavors"],
+    queryFn: () => FlavorService.list(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const consoleUrl = consoleData?.url;
+  const currentFlavorId = flavors?.find((f) => f.name === instance.flavor)?.id;
+
+  const supportedActions = {
+    pause: true,
+    suspend: true,
+    shelve: true,
+    rescue: true,
+    console: true,
+    logs: true,
+    resize: true,
+    volumes: true,
+  };
+
+  const handleViewLogs = () => {
+    if (onViewLogs) {
+      onViewLogs(instance);
+    }
+  };
+
+  const pauseMutation = useMutation({
+    mutationFn: () => InfraService.pause({ instance_id: instance.id }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
+      ]);
+      toast.success("Instance paused successfully");
+    },
+    onError: (err: unknown) =>
+      toast.error(err instanceof Error ? err.message : "Failed to pause"),
+  });
+
+  const suspendMutation = useMutation({
+    mutationFn: () => InfraService.suspend({ instance_id: instance.id }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
+      ]);
+      toast.success("Instance suspended successfully");
+    },
+    onError: (err: unknown) =>
+      toast.error(err instanceof Error ? err.message : "Failed to suspend"),
+  });
+
+  const shelveMutation = useMutation({
+    mutationFn: () => InfraService.shelve({ instance_id: instance.id }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
+      ]);
+      toast.success("Instance shelved successfully");
+    },
+    onError: (err: unknown) =>
+      toast.error(err instanceof Error ? err.message : "Failed to shelve"),
+  });
+
+  const rescueMutation = useMutation({
+    mutationFn: () => InfraService.rescue({ instance_id: instance.id }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
+      ]);
+      toast.success("Rescue mode activated");
+    },
+    onError: (err: unknown) =>
+      toast.error(err instanceof Error ? err.message : "Failed to rescue"),
+  });
+
+  const resizeMutation = useMutation({
+    mutationFn: (newFlavorId: string) =>
+      InfraService.resize({
+        instance_id: instance.id,
+        new_flavor: newFlavorId,
+      }),
+    onSuccess: async () => {
+      toast.success("Instance resize started successfully");
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["instances"] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
+      ]);
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to resize instance: ${error.message}`);
+    },
+  });
+
+  const handleResize = (flavorId: string) => {
+    if (flavorId) {
+      resizeMutation.mutate(flavorId);
+    }
+  };
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const deleteMutation = useMutation({
@@ -31,7 +178,7 @@ export function InstanceActions({
       setShowDeleteDialog(false);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
-        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
       ]);
       toast.success("Instance deleted successfully");
     },
@@ -47,7 +194,7 @@ export function InstanceActions({
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
-        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
       ]);
       toast.success("Instance started successfully");
     },
@@ -67,7 +214,7 @@ export function InstanceActions({
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
-        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
       ]);
       toast.success("Instance stopped successfully");
     },
@@ -87,7 +234,7 @@ export function InstanceActions({
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
-        queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
+        queryClient.invalidateQueries({ queryKey: ["instance", instance.id] }),
       ]);
       toast.success("Instance rebooted successfully");
     },
@@ -105,8 +252,8 @@ export function InstanceActions({
   const createSnapshotMutation = useMutation({
     mutationFn: () =>
       InfraService.createSnapshot({
-        instance_id: instanceId,
-        snapshot_name: `snapshot-${instanceId.slice(0, 8)}-${Date.now()}`,
+        instance_id: instance.id,
+        snapshot_name: `snapshot-${instance.instance_name.slice(0, 8)}-${Date.now()}`,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["snapshots", "list"] });
@@ -118,7 +265,6 @@ export function InstanceActions({
       ),
   });
 
-  const isDisabled = disabled || status === "BUILD";
   const canStart = status === "SHUTOFF" && !isDisabled;
   const canStop = status === "ACTIVE" && !isDisabled;
   const canReboot = status === "ACTIVE" && !isDisabled;
@@ -126,22 +272,22 @@ export function InstanceActions({
     !isDisabled && (status === "ACTIVE" || status === "SHUTOFF");
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center justify-center gap-2">
       {canStart && (
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                startMutation.mutate(instanceId);
+                startMutation.mutate(instance.id);
               }}
               disabled={startMutation.isPending || isDisabled}
               size="sm"
               variant="outline"
-              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+              className="group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-full transition-all duration-200"
             >
-              <Power className="mr-1 w-4 h-4 transition-colors duration-200 group-hover:text-accent-foreground" />
-              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
+              <Power className="group-hover:text-accent-foreground mr-1 h-4 w-4 transition-colors duration-200" />
+              <span className="group-hover:text-accent-foreground transition-colors duration-200">
                 Start
               </span>
             </Button>
@@ -156,15 +302,15 @@ export function InstanceActions({
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                stopMutation.mutate(instanceId);
+                stopMutation.mutate(instance.id);
               }}
               disabled={stopMutation.isPending || isDisabled}
               size="sm"
               variant="outline"
-              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+              className="group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-full transition-all duration-200"
             >
-              <PowerOff className="mr-1 w-4 h-4 transition-colors duration-200 group-hover:text-accent-foreground" />
-              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
+              <PowerOff className="group-hover:text-accent-foreground mr-1 h-4 w-4 transition-colors duration-200" />
+              <span className="group-hover:text-accent-foreground transition-colors duration-200">
                 Stop
               </span>
             </Button>
@@ -179,15 +325,15 @@ export function InstanceActions({
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                rebootMutation.mutate(instanceId);
+                rebootMutation.mutate(instance.id);
               }}
               disabled={rebootMutation.isPending || isDisabled}
               size="sm"
               variant="outline"
-              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+              className="group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-full transition-all duration-200"
             >
-              <RotateCcw className="mr-1 w-4 h-4 transition-all duration-300 group-hover:rotate-180 group-hover:text-accent-foreground" />
-              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
+              <RotateCcw className="group-hover:text-accent-foreground mr-1 h-4 w-4 transition-all duration-300 group-hover:rotate-180" />
+              <span className="group-hover:text-accent-foreground transition-colors duration-200">
                 Reboot
               </span>
             </Button>
@@ -196,28 +342,158 @@ export function InstanceActions({
         </Tooltip>
       )}
 
-      {canSnapshot && (
+      <DropdownMenu>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={isDisabled}
+                size="sm"
+                className="group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-full transition-all duration-200"
+              >
+                <GripVertical className="group-hover:text-accent-foreground mr-1 h-4 w-4 transition-colors duration-200" />
+                <span className="group-hover:text-accent-foreground transition-colors duration-200">
+                  Instance Actions
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Instance actions</TooltipContent>
+        </Tooltip>
+        <DropdownMenuContent align="end">
+          {supportedActions.pause && (
+            <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                createSnapshotMutation.mutate();
+                pauseMutation.mutate();
               }}
-              disabled={createSnapshotMutation.isPending || isDisabled}
-              size="sm"
-              variant="outline"
-              className="rounded-full transition-all duration-200 cursor-pointer group bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+              disabled={isDisabled || status !== "ACTIVE"}
             >
-              <Camera className="mr-1 w-4 h-4 transition-colors duration-200 group-hover:text-accent-foreground" />
-              <span className="transition-colors duration-200 group-hover:text-accent-foreground">
-                Snapshot
-              </span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Create snapshot</TooltipContent>
-        </Tooltip>
-      )}
+              <Pause className="mr-2 h-4 w-4" /> Pause
+            </DropdownMenuItem>
+          )}
+          {supportedActions.suspend && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                suspendMutation.mutate();
+              }}
+              disabled={isDisabled || status !== "ACTIVE"}
+            >
+              <Pause className="mr-2 h-4 w-4" /> Suspend
+            </DropdownMenuItem>
+          )}
+          {supportedActions.shelve && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                shelveMutation.mutate();
+              }}
+              disabled={isDisabled || status !== "ACTIVE"}
+            >
+              <Pause className="mr-2 h-4 w-4" /> Shelve
+            </DropdownMenuItem>
+          )}
+          {supportedActions.rescue && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                rescueMutation.mutate();
+              }}
+              disabled={isDisabled || status !== "ACTIVE"}
+            >
+              <ShieldAlert className="mr-2 h-4 w-4" /> Rescue Mode
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger
+              disabled={isDisabled}
+              onMouseEnter={() => refetchConsole()}
+            >
+              <Terminal className="mr-2 h-4 w-4" /> Console
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                {supportedActions.console && (
+                  <Link
+                    href={consoleUrl ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    passHref
+                  >
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        if (!consoleUrl) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toast.error("Console URL not available");
+                        }
+                      }}
+                      disabled={isDisabled || isConsoleLoading || !consoleUrl}
+                    >
+                      <Terminal className="mr-2 h-4 w-4" />
+                      {isConsoleLoading ? "Loading console..." : "Open Console"}
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                {supportedActions.logs && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleViewLogs();
+                    }}
+                    disabled={isDisabled}
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> View Logs
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+
+          {supportedActions.resize && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsResizeDialogOpen(true);
+                }}
+                disabled={!["ACTIVE", "SHUTOFF"].includes(status)}
+              >
+                <Box className="mr-2 h-4 w-4" /> Resize Instance
+              </DropdownMenuItem>
+              {canSnapshot && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    createSnapshotMutation.mutate();
+                  }}
+                  disabled={createSnapshotMutation.isPending || isDisabled}
+                >
+                  <Camera className="mr-2 h-4 w-4" /> Create Snapshot
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsVolumeDialogOpen(true);
+                }}
+                disabled={isDisabled}
+              >
+                <HardDrive className="mr-2 h-4 w-4" />{" "}
+                {instance.has_volume ? "Detach Volume" : "Attach Volume"}
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <Tooltip>
         <TooltipTrigger asChild>
@@ -229,9 +505,9 @@ export function InstanceActions({
             disabled={isDisabled}
             size="sm"
             variant="destructive"
-            className="rounded-full transition-all duration-200 cursor-pointer group bg-destructive text-destructive-foreground border-border"
+            className="group bg-destructive text-destructive-foreground border-border cursor-pointer rounded-full transition-all duration-200"
           >
-            <Trash2 className="mr-1 w-4 h-4 text-white transition-colors duration-200" />
+            <Trash2 className="mr-1 h-4 w-4 text-white transition-colors duration-200" />
             <span className="text-white transition-colors duration-200">
               Delete
             </span>
@@ -240,17 +516,35 @@ export function InstanceActions({
         <TooltipContent>Delete the instance</TooltipContent>
       </Tooltip>
 
-      <ConfirmDeleteDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        title="Delete Instance"
-        description="Are you sure you want to delete this instance? This action cannot be undone."
-        confirmLabel={
-          deleteMutation.isPending ? "Deleting..." : "Delete Instance"
-        }
-        confirming={deleteMutation.isPending}
-        onConfirm={() => deleteMutation.mutate(instanceId)}
-      />
+      <div onClick={(e) => e.stopPropagation()}>
+        <ConfirmDeleteDialog
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+          title="Delete Instance"
+          description="Are you sure you want to delete this instance? This action cannot be undone."
+          confirmLabel={
+            deleteMutation.isPending ? "Deleting..." : "Delete Instance"
+          }
+          confirming={deleteMutation.isPending}
+          onConfirm={() => deleteMutation.mutate(instance.id)}
+        />
+      </div>
+      <div onClick={(e) => e.stopPropagation()}>
+        <InstanceVolumeDialog
+          open={isVolumeDialogOpen}
+          onOpenChange={setIsVolumeDialogOpen}
+          instanceId={instance.id}
+          hasVolume={instance.has_volume}
+        />
+      </div>
+      <div onClick={(e) => e.stopPropagation()}>
+        <InstanceFlavorSelectDialog
+          open={isResizeDialogOpen}
+          onOpenChange={setIsResizeDialogOpen}
+          currentFlavorId={currentFlavorId}
+          onSelect={handleResize}
+        />
+      </div>
     </div>
   );
 }

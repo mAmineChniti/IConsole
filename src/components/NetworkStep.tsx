@@ -34,28 +34,28 @@ export function NetworkStep({
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <div className="flex gap-2 items-center">
-              <Skeleton className="flex-shrink-0 w-4 h-4" />
-              <Skeleton className="w-16 h-4" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-4 flex-shrink-0" />
+              <Skeleton className="h-4 w-16" />
             </div>
-            <Skeleton className="w-full h-11" />
+            <Skeleton className="h-11 w-full" />
           </div>
 
           <div className="space-y-2">
-            <div className="flex gap-2 items-center">
-              <Skeleton className="flex-shrink-0 w-4 h-4" />
-              <Skeleton className="w-16 h-4" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-4 flex-shrink-0" />
+              <Skeleton className="h-4 w-16" />
             </div>
-            <Skeleton className="w-full h-11" />
+            <Skeleton className="h-11 w-full" />
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="flex gap-2 items-center">
-            <Skeleton className="flex-shrink-0 w-4 h-4" />
-            <Skeleton className="w-24 h-4" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4 flex-shrink-0" />
+            <Skeleton className="h-4 w-24" />
           </div>
-          <Skeleton className="w-full h-11" />
+          <Skeleton className="h-11 w-full" />
         </div>
       </div>
     );
@@ -76,8 +76,8 @@ export function NetworkStep({
               );
               return (
                 <FormItem>
-                  <FormLabel className="flex gap-2 items-center text-sm font-medium text-foreground">
-                    <Network className="flex-shrink-0 w-4 h-4 text-primary" />
+                  <FormLabel className="text-foreground flex items-center gap-2 text-sm font-medium">
+                    <Network className="text-primary h-4 w-4 flex-shrink-0" />
                     <span className="truncate">Network</span>
                   </FormLabel>
                   <Select
@@ -85,11 +85,11 @@ export function NetworkStep({
                     value={fromForm(field.value)}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full h-11 rounded-full border cursor-pointer bg-input text-foreground border-border">
+                      <SelectTrigger className="bg-input text-foreground border-border h-11 w-full cursor-pointer rounded-full border">
                         <SelectValue placeholder="Select network" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
+                    <SelectContent className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
                       {options.map((opt) => (
                         <SelectItem
                           key={`net-${opt.key}`}
@@ -119,8 +119,8 @@ export function NetworkStep({
               );
               return (
                 <FormItem>
-                  <FormLabel className="flex gap-2 items-center text-sm font-medium text-foreground">
-                    <Shield className="flex-shrink-0 w-4 h-4 text-primary" />
+                  <FormLabel className="text-foreground flex items-center gap-2 text-sm font-medium">
+                    <Shield className="text-primary h-4 w-4 flex-shrink-0" />
                     <span className="truncate">Key Pair</span>
                   </FormLabel>
                   <Select
@@ -128,11 +128,11 @@ export function NetworkStep({
                     value={fromForm(field.value)}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full h-11 rounded-full border cursor-pointer bg-input text-foreground border-border">
+                      <SelectTrigger className="bg-input text-foreground border-border h-11 w-full cursor-pointer rounded-full border">
                         <SelectValue placeholder="Select key pair" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
+                    <SelectContent className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
                       {options.map((opt) => (
                         <SelectItem
                           key={`kp-${opt.key}`}
@@ -163,8 +163,8 @@ export function NetworkStep({
             );
             return (
               <FormItem>
-                <FormLabel className="flex gap-2 items-center text-sm font-medium text-foreground">
-                  <Shield className="flex-shrink-0 w-4 h-4 text-primary" />
+                <FormLabel className="text-foreground flex items-center gap-2 text-sm font-medium">
+                  <Shield className="text-primary h-4 w-4 flex-shrink-0" />
                   <span className="truncate">Security Group</span>
                 </FormLabel>
                 <Select
@@ -172,11 +172,11 @@ export function NetworkStep({
                   value={fromForm(field.value)}
                 >
                   <FormControl>
-                    <SelectTrigger className="w-full h-11 rounded-full border cursor-pointer bg-input text-foreground border-border">
+                    <SelectTrigger className="bg-input text-foreground border-border h-11 w-full cursor-pointer rounded-full border">
                       <SelectValue placeholder="Select security group" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
+                  <SelectContent className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
                     {options.map((opt) => (
                       <SelectItem
                         key={`sg-${opt.key}`}

@@ -134,13 +134,13 @@ export function KeyPairImportDialog({
                           });
                           toast.error(err.message || "Invalid key file");
                         }}
-                        className="p-0 rounded-2xl border-dashed cursor-pointer"
+                        className="cursor-pointer rounded-2xl border-dashed p-0"
                       >
                         <DropzoneEmptyState className="py-6" />
                         <DropzoneContent className="py-6" />
                       </Dropzone>
                       {watchedFile && (
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-muted-foreground text-sm">
                           Selected: {watchedFile.name} (
                           {(watchedFile.size / 1024).toFixed(2)} KB)
                         </div>
@@ -155,27 +155,27 @@ export function KeyPairImportDialog({
               <Button
                 type="button"
                 variant="outline"
-                className="gap-2 rounded-full cursor-pointer"
+                className="cursor-pointer gap-2 rounded-full"
                 onClick={() => onOpenChange(false)}
                 disabled={importMutation.isPending}
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
                 <span>Cancel</span>
               </Button>
               <Button
                 type="submit"
                 variant="default"
-                className="gap-2 rounded-full cursor-pointer min-w-[120px]"
+                className="min-w-[120px] cursor-pointer gap-2 rounded-full"
                 disabled={importMutation.isPending}
               >
                 {importMutation.isPending ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Importing...</span>
                   </>
                 ) : (
                   <>
-                    <Upload className="w-4 h-4" />
+                    <Upload className="h-4 w-4" />
                     <span>Import</span>
                   </>
                 )}

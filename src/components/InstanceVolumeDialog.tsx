@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/select";
 import { InfraService } from "@/lib/requests";
 import {
-  type AvailableVolumesResponse,
   type AttachedVolumesResponse,
+  type AvailableVolumesResponse,
 } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HardDriveUpload, Loader2, Trash2 } from "lucide-react";
@@ -143,28 +143,28 @@ export function InstanceVolumeDialog({
               <h4 className="font-medium">Attached Volume</h4>
               {isLoadingAttached ? (
                 <div className="flex items-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Loading volume information...</span>
                 </div>
               ) : attachedVolumes?.length ? (
-                <div className="p-3 mt-2 rounded-lg border">
+                <div className="mt-2 rounded-lg border p-3">
                   <p className="font-medium">
                     {attachedVolumes[0]?.name ?? "Unnamed Volume"}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     ID: {attachedVolumes[0]?.id ?? "N/A"}
                   </p>
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="mt-2 w-full rounded-full cursor-pointer"
+                    className="mt-2 w-full cursor-pointer rounded-full"
                     onClick={handleDetach}
                     disabled={detachMutation.isPending}
                   >
                     {detachMutation.isPending ? (
-                      <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <Trash2 className="mr-2 w-4 h-4" />
+                      <Trash2 className="mr-2 h-4 w-4" />
                     )}
                     Detach Volume
                   </Button>
@@ -178,7 +178,7 @@ export function InstanceVolumeDialog({
               <h4 className="mb-2 font-medium">Available Volumes</h4>
               {isLoadingAvailable ? (
                 <div className="flex items-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Loading available volumes...</span>
                 </div>
               ) : availableVolumes.length > 0 ? (
@@ -187,7 +187,7 @@ export function InstanceVolumeDialog({
                     value={selectedVolume}
                     onValueChange={setSelectedVolume}
                   >
-                    <SelectTrigger className="w-full rounded-full cursor-pointer">
+                    <SelectTrigger className="w-full cursor-pointer rounded-full">
                       <SelectValue placeholder="Select a volume to attach" />
                     </SelectTrigger>
                     <SelectContent>
@@ -200,13 +200,13 @@ export function InstanceVolumeDialog({
                   </Select>
                   <Button
                     onClick={handleAttach}
-                    className="w-full rounded-full cursor-pointer"
+                    className="w-full cursor-pointer rounded-full"
                     disabled={!selectedVolume || attachMutation.isPending}
                   >
                     {attachMutation.isPending ? (
-                      <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <HardDriveUpload className="mr-2 w-4 h-4" />
+                      <HardDriveUpload className="mr-2 h-4 w-4" />
                     )}
                     Attach Volume
                   </Button>

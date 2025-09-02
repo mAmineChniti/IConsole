@@ -103,10 +103,9 @@ export interface ImageImportFromUrlRequest {
 }
 
 export interface ImageUpdateRequest {
-  name?: string;
+  new_name?: string;
   visibility?: "public" | "private" | "shared" | "community";
   protected?: boolean;
-  tags?: string[];
 }
 
 export interface VMCreateRequest {

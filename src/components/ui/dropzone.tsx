@@ -135,17 +135,17 @@ export const DropzoneContent = ({
 
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>
-      <div className="flex justify-center items-center rounded-md bg-muted text-muted-foreground size-8">
+      <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-md">
         <UploadIcon size={16} />
       </div>
-      <p className="my-2 w-full text-sm font-medium truncate">
+      <p className="my-2 w-full truncate text-sm font-medium">
         {src.length > maxLabelItems
           ? `${new Intl.ListFormat("en").format(
               src.slice(0, maxLabelItems).map((file) => file.name),
             )} and ${src.length - maxLabelItems} more`
           : new Intl.ListFormat("en").format(src.map((file) => file.name))}
       </p>
-      <p className="w-full text-xs text-muted-foreground text-wrap">
+      <p className="text-muted-foreground w-full text-xs text-wrap">
         Drag and drop or click to replace
       </p>
     </div>
@@ -188,17 +188,17 @@ export const DropzoneEmptyState = ({
 
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>
-      <div className="flex justify-center items-center rounded-md bg-muted text-muted-foreground size-8">
+      <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-md">
         <UploadIcon size={16} />
       </div>
-      <p className="my-2 w-full text-sm font-medium truncate text-wrap">
+      <p className="my-2 w-full truncate text-sm font-medium text-wrap">
         Upload {maxFiles === 1 ? "a file" : "files"}
       </p>
-      <p className="w-full text-xs text-muted-foreground truncate text-wrap">
+      <p className="text-muted-foreground w-full truncate text-xs text-wrap">
         Drag and drop or click to upload
       </p>
       {caption && (
-        <p className="text-xs text-muted-foreground text-wrap">{caption}.</p>
+        <p className="text-muted-foreground text-xs text-wrap">{caption}.</p>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { getStatusBadge } from "@/components/Clusters";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -83,26 +83,26 @@ export function ClusterDetailsDialog({
         )}
       >
         <DialogHeader>
-          <DialogTitle className="flex gap-2 items-center text-lg font-semibold">
-            <Server className="w-5 h-5 text-primary" />
+          <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
+            <Server className="text-primary h-5 w-5" />
             {clusterDetails?.cluster_name}
           </DialogTitle>
         </DialogHeader>
 
         {clusterDetailsLoading && !clusterDetails ? (
-          <div className="flex flex-col justify-center items-center py-12 space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center space-y-4 py-12">
+            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+            <p className="text-muted-foreground text-sm">
               Loading cluster details...
             </p>
           </div>
         ) : isFetching ? (
-          <div className="flex absolute inset-0 justify-center items-center rounded-xl bg-background/50 backdrop-blur-sm">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <div className="bg-background/50 absolute inset-0 flex items-center justify-center rounded-xl backdrop-blur-sm">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
           </div>
         ) : clusterDetailsError ? (
-          <div className="flex gap-2 items-start p-4 text-red-600 bg-red-50 rounded-md">
-            <AlertCircle className="flex-shrink-0 mt-0.5 w-5 h-5" />
+          <div className="flex items-start gap-2 rounded-md bg-red-50 p-4 text-red-600">
+            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
             <div>
               <p className="font-medium">Failed to load cluster details</p>
               <p className="mt-1 text-sm">Please try again later</p>
@@ -111,21 +111,37 @@ export function ClusterDetailsDialog({
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="p-3 space-y-2 rounded-lg bg-muted/30">
-                <div className="flex gap-2 items-center text-sm text-muted-foreground">
-                  <HardDrive className="w-4 h-4" />
+              <div className="bg-muted/30 space-y-2 rounded-lg p-3">
+                <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <HardDrive className="h-4 w-4" />
                   <span>Status</span>
                 </div>
-                <div className="font-medium">
-                  {clusterDetails?.overall_status
-                    ? getStatusBadge(clusterDetails.overall_status)
-                    : "UNAVAILABLE"}
-                </div>
+                {clusterDetails?.overall_status && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Status:</span>
+                    <StatusBadge
+                      status={clusterDetails.overall_status}
+                      statusTextMap={{
+                        ACTIVE: "ACTIVE",
+                        CREATING: "BUILD",
+                        UPDATING: "UPDATING",
+                        DELETING: "PENDING",
+                        ERROR: "ERROR",
+                        STOPPED: "STOPPED",
+                        FAILED: "FAILED",
+                      }}
+                      className="px-2 py-0.5"
+                    />
+                  </div>
+                )}
+                {!clusterDetails?.overall_status && (
+                  <div className="font-medium">&quot;UNAVAILABLE&quot;</div>
+                )}
               </div>
 
-              <div className="p-3 space-y-2 rounded-lg bg-muted/30">
-                <div className="flex gap-2 items-center text-sm text-muted-foreground">
-                  <Cpu className="w-4 h-4" />
+              <div className="bg-muted/30 space-y-2 rounded-lg p-3">
+                <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <Cpu className="h-4 w-4" />
                   <span>Nodes</span>
                 </div>
                 <div className="font-medium">
@@ -133,9 +149,9 @@ export function ClusterDetailsDialog({
                 </div>
               </div>
 
-              <div className="p-3 space-y-2 rounded-lg bg-muted/30">
-                <div className="flex gap-2 items-center text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
+              <div className="bg-muted/30 space-y-2 rounded-lg p-3">
+                <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <Clock className="h-4 w-4" />
                   <span>Created</span>
                 </div>
                 <div className="text-sm">
@@ -145,9 +161,9 @@ export function ClusterDetailsDialog({
             </div>
 
             {clusterDetails?.nodes && clusterDetails?.nodes.length > 0 && (
-              <div className="pt-4 border-t">
-                <h3 className="flex gap-2 items-center mb-3 text-sm font-medium">
-                  <HardDrive className="w-4 h-4" />
+              <div className="border-t pt-4">
+                <h3 className="mb-3 flex items-center gap-2 text-sm font-medium">
+                  <HardDrive className="h-4 w-4" />
                   Nodes ({clusterDetails?.nodes?.length ?? "UNAVAILABLE"})
                 </h3>
                 <div className="space-y-3">
@@ -159,24 +175,24 @@ export function ClusterDetailsDialog({
                         "hover:bg-muted/20",
                       )}
                     >
-                      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="space-y-2">
-                          <div className="flex gap-2 items-center">
+                          <div className="flex items-center gap-2">
                             {node?.role === "master" ? (
-                              <Server className="w-4 h-4 text-amber-500" />
+                              <Server className="h-4 w-4 text-amber-500" />
                             ) : (
-                              <HardDrive className="w-4 h-4 text-blue-500" />
+                              <HardDrive className="h-4 w-4 text-blue-500" />
                             )}
                             <h4 className="font-medium">
                               {node?.name ?? "UNAVAILABLE"}
                             </h4>
-                            <span className="py-0.5 px-2 text-xs rounded-full bg-muted text-muted-foreground">
+                            <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
                               {node?.role ?? "UNAVAILABLE"}
                             </span>
                           </div>
 
-                          <div className="flex flex-wrap gap-3 items-center text-sm">
-                            <div className="flex gap-1.5 items-center">
+                          <div className="flex flex-wrap items-center gap-3 text-sm">
+                            <div className="flex items-center gap-1.5">
                               <div
                                 className={cn(
                                   "h-2 w-2 rounded-full",
@@ -193,8 +209,8 @@ export function ClusterDetailsDialog({
                             </div>
 
                             {node.floating_ip && (
-                              <div className="flex gap-1 items-center text-muted-foreground">
-                                <Network className="w-3.5 h-3.5" />
+                              <div className="text-muted-foreground flex items-center gap-1">
+                                <Network className="h-3.5 w-3.5" />
                                 <span className="font-mono text-xs">
                                   {node.floating_ip ?? "UNAVAILABLE"}
                                 </span>
@@ -202,8 +218,8 @@ export function ClusterDetailsDialog({
                             )}
 
                             {node.ssh_key && (
-                              <div className="flex gap-1 items-center text-muted-foreground">
-                                <Key className="w-3.5 h-3.5" />
+                              <div className="text-muted-foreground flex items-center gap-1">
+                                <Key className="h-3.5 w-3.5" />
                                 <span className="text-xs">
                                   {node.ssh_key ?? "UNAVAILABLE"}
                                 </span>
@@ -214,14 +230,16 @@ export function ClusterDetailsDialog({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="w-8 h-8 rounded-full cursor-pointer group"
-                          onClick={() => handleIpCopy(node.floating_ip)}
+                          className="group h-8 w-8 cursor-pointer rounded-full"
+                          onClick={() =>
+                            node.floating_ip && handleIpCopy(node.floating_ip)
+                          }
                           disabled={!node.floating_ip}
                         >
                           {copiedIp === node.floating_ip ? (
-                            <Check className="w-4 h-4 text-green-500" />
+                            <Check className="h-4 w-4 text-green-500" />
                           ) : (
-                            <Copy className="w-4 h-4 transition-opacity group-hover:opacity-80" />
+                            <Copy className="h-4 w-4 transition-opacity group-hover:opacity-80" />
                           )}
                         </Button>
                       </div>
@@ -236,7 +254,7 @@ export function ClusterDetailsDialog({
           <Button
             variant="outline"
             onClick={() => setIsDetailsOpen(false)}
-            className="w-full rounded-full cursor-pointer sm:w-auto"
+            className="w-full cursor-pointer rounded-full sm:w-auto"
           >
             Close
           </Button>

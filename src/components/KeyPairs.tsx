@@ -1,8 +1,8 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { KeyPairCreateDialog } from "@/components/KeyPairCreateDialog";
 import { KeyPairImportDialog } from "@/components/KeyPairImportDialog";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
@@ -122,21 +122,21 @@ export function KeyPairs() {
 
   if (isLoading) {
     return (
-      <div className="px-2 space-y-6 sm:px-0">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <div className="text-sm leading-relaxed text-muted-foreground">
-            <Skeleton className="inline-block w-40 h-4 align-middle" />
+      <div className="space-y-6 px-2 sm:px-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <div className="text-muted-foreground text-sm leading-relaxed">
+            <Skeleton className="inline-block h-4 w-40 align-middle" />
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:justify-between sm:items-center">
-          <div className="relative flex-1 max-w-full sm:max-w-md">
-            <Skeleton className="w-full h-10 rounded-full" />
+        <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative max-w-full flex-1 sm:max-w-md">
+            <Skeleton className="h-10 w-full rounded-full" />
           </div>
-          <div className="flex gap-2 self-end ml-auto sm:self-auto">
-            <Skeleton className="w-10 h-10 rounded-full" />
-            <Skeleton className="w-36 h-10 rounded-full" />
-            <Skeleton className="w-36 h-10 rounded-full" />
+          <div className="ml-auto flex gap-2 self-end sm:self-auto">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-10 w-36 rounded-full" />
+            <Skeleton className="h-10 w-36 rounded-full" />
           </div>
         </div>
 
@@ -145,23 +145,23 @@ export function KeyPairs() {
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
-                className="flex flex-col gap-2 p-2 text-sm text-center rounded-md border"
+                className="flex flex-col gap-2 rounded-md border p-2 text-center text-sm"
               >
                 <div className="min-w-0">
-                  <Skeleton className="mx-auto w-24 h-4 rounded-full" />
+                  <Skeleton className="mx-auto h-4 w-24 rounded-full" />
                 </div>
                 <div>
-                  <Skeleton className="mx-auto w-20 h-5 rounded-full" />
+                  <Skeleton className="mx-auto h-5 w-20 rounded-full" />
                 </div>
-                <div className="flex gap-2 justify-center items-center mt-auto">
-                  <Skeleton className="w-20 h-8 rounded-full" />
-                  <Skeleton className="w-8 h-8 rounded-full" />
+                <div className="mt-auto flex items-center justify-center gap-2">
+                  <Skeleton className="h-8 w-20 rounded-full" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
                 </div>
               </div>
             ))}
           </div>
           <div className="flex justify-center pt-2">
-            <Skeleton className="w-48 h-10 rounded-full" />
+            <Skeleton className="h-10 w-48 rounded-full" />
           </div>
         </div>
       </div>
@@ -187,7 +187,7 @@ export function KeyPairs() {
           text="Create a new key pair or import a public key file to get started."
           onRefresh={() => refetch()}
           refreshing={isFetching}
-          icon={<KeyIcon className="w-7 h-7 text-muted-foreground" />}
+          icon={<KeyIcon className="text-muted-foreground h-7 w-7" />}
           variant="dashed"
           primaryActions={[
             {
@@ -223,9 +223,9 @@ export function KeyPairs() {
   }
 
   return (
-    <div className="px-2 space-y-6 sm:px-0">
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-        <div className="text-sm leading-relaxed text-muted-foreground">
+    <div className="space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="text-muted-foreground text-sm leading-relaxed">
           {totalItems} key pair{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -234,7 +234,7 @@ export function KeyPairs() {
             </>
           )}
         </div>
-        <div className="flex gap-2 self-end ml-auto sm:self-auto">
+        <div className="ml-auto flex gap-2 self-end sm:self-auto">
           <HeaderActions
             onRefresh={() => refetch()}
             isRefreshing={isFetching}
@@ -255,8 +255,8 @@ export function KeyPairs() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:items-center">
-        <div className="flex-1 max-w-full sm:max-w-md">
+      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+        <div className="max-w-full flex-1 sm:max-w-md">
           <XSearch
             value={search}
             onChange={setSearch}
@@ -269,7 +269,7 @@ export function KeyPairs() {
       {
         <div className="space-y-4">
           {visible.length === 0 ? (
-            <div className="p-8 text-center rounded-2xl border text-muted-foreground">
+            <div className="text-muted-foreground rounded-2xl border p-8 text-center">
               No key pairs match your search.
             </div>
           ) : (
@@ -282,14 +282,14 @@ export function KeyPairs() {
                   badges={
                     <Badge
                       variant="secondary"
-                      className="inline-flex gap-1 items-center py-0.5 px-2 text-xs"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs"
                     >
                       {k.type === "ssh" ? (
-                        <KeyIcon className="w-3.5 h-3.5" />
+                        <KeyIcon className="h-3.5 w-3.5" />
                       ) : k.type === "x509" ? (
-                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <ShieldCheck className="h-3.5 w-3.5" />
                       ) : (
-                        <KeyRound className="w-3.5 h-3.5" />
+                        <KeyRound className="h-3.5 w-3.5" />
                       )}
                       <span className="capitalize">{k.type}</span>
                     </Badge>
@@ -300,7 +300,7 @@ export function KeyPairs() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          className="text-white rounded-full cursor-pointer"
+                          className="cursor-pointer rounded-full text-white"
                           onClick={(e) => {
                             e.stopPropagation();
                             setKeyToDelete({ name: k.name });
@@ -309,7 +309,7 @@ export function KeyPairs() {
                           disabled={deleteMutation.isPending}
                           aria-label={`Delete ${k.name}`}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="h-4 w-4" />
                           Delete Keypair
                         </Button>
                       </TooltipTrigger>
@@ -365,7 +365,7 @@ export function KeyPairs() {
                 and store it securely.
               </p>
               <div>
-                <div className="mb-1 text-xs text-muted-foreground">
+                <div className="text-muted-foreground mb-1 text-xs">
                   Private Key
                 </div>
                 <SyntaxHighlighter
@@ -396,32 +396,32 @@ export function KeyPairs() {
             <div className="space-y-4 text-sm">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <div className="text-xs text-muted-foreground">Name</div>
+                  <div className="text-muted-foreground text-xs">Name</div>
                   <div className="mt-1 font-medium break-words">
                     {isLoadingDetails ? (
-                      <Skeleton className="w-32 h-5" />
+                      <Skeleton className="h-5 w-32" />
                     ) : (
                       selected?.name
                     )}
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground">Type</div>
+                  <div className="text-muted-foreground text-xs">Type</div>
                   <div className="mt-1 font-medium break-words">
                     {isLoadingDetails ? (
-                      <Skeleton className="w-24 h-5" />
+                      <Skeleton className="h-5 w-24" />
                     ) : (
                       selected?.type
                     )}
                   </div>
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-muted-foreground text-xs">
                     Fingerprint
                   </div>
                   <div className="mt-1 font-mono text-xs break-all">
                     {isLoadingDetails ? (
-                      <Skeleton className="w-48 h-4" />
+                      <Skeleton className="h-4 w-48" />
                     ) : (
                       selected?.fingerprint
                     )}
@@ -429,14 +429,14 @@ export function KeyPairs() {
                 </div>
               </div>
               <div>
-                <div className="mb-1 text-xs text-muted-foreground">
+                <div className="text-muted-foreground mb-1 text-xs">
                   Public Key
                 </div>
                 {isLoadingDetails ? (
-                  <div className="p-4 space-y-2 rounded-md bg-muted">
-                    <Skeleton className="w-full h-4" />
-                    <Skeleton className="w-5/6 h-4" />
-                    <Skeleton className="w-4/5 h-4" />
+                  <div className="bg-muted space-y-2 rounded-md p-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <Skeleton className="h-4 w-4/5" />
                   </div>
                 ) : (
                   <SyntaxHighlighter
@@ -471,14 +471,14 @@ export function KeyPairs() {
                 asChild
                 variant="default"
                 size="sm"
-                className="gap-1.5 rounded-full cursor-pointer"
+                className="cursor-pointer gap-1.5 rounded-full"
               >
                 <Link
                   href={`data:text/plain;charset=utf-8,${encodeURIComponent((generatedPrivateKey ?? "").trim() + "\n")}`}
                   download={`${selected?.name ?? "key"}`}
                   aria-label="Download private key"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="h-4 w-4" />
                   <span>Download</span>
                 </Link>
               </Button>
@@ -487,14 +487,14 @@ export function KeyPairs() {
                 asChild
                 variant="default"
                 size="sm"
-                className="gap-1.5 rounded-full cursor-pointer"
+                className="cursor-pointer gap-1.5 rounded-full"
               >
                 <Link
                   href={`data:text/plain;charset=utf-8,${encodeURIComponent(selected?.public_key?.trim() + "\n")}`}
                   download={`${selected?.name || "key"}.pub`}
                   aria-label="Download public key"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="h-4 w-4" />
                   <span>Download</span>
                 </Link>
               </Button>
@@ -502,7 +502,7 @@ export function KeyPairs() {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full cursor-pointer"
+              className="cursor-pointer rounded-full"
               onClick={() => setDetailsOpen(false)}
             >
               Close
@@ -519,7 +519,7 @@ export function KeyPairs() {
           keyToDelete ? (
             <>
               Are you sure you want to delete key pair{" "}
-              <span className="font-semibold text-foreground">
+              <span className="text-foreground font-semibold">
                 {keyToDelete.name}
               </span>
               ?

@@ -68,35 +68,35 @@ export default function InstanceLogs({ instance, onClose }: InstanceLogsProps) {
   };
 
   return (
-    <div className="flex overflow-hidden flex-col w-full h-full bg-background">
-      <div className="sticky top-0 z-10 flex-none p-4 border-b bg-background/95 backdrop-blur-sm">
-        <div className="flex gap-4 justify-between items-center">
-          <div className="flex gap-3 items-center">
+    <div className="bg-background flex h-full w-full flex-col overflow-hidden">
+      <div className="bg-background/95 sticky top-0 z-10 flex-none border-b p-4 backdrop-blur-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="flex gap-2 items-center rounded-full border transition-all duration-200 cursor-pointer text-muted-foreground bg-card border-border/50 hover:text-foreground"
+              className="text-muted-foreground bg-card border-border/50 hover:text-foreground flex cursor-pointer items-center gap-2 rounded-full border transition-all duration-200"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Back to Instances</span>
             </Button>
-            <div className="flex flex-col sm:flex-row sm:gap-3 sm:items-center">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
               <h1 className="text-lg font-semibold whitespace-nowrap">
                 Logs for{" "}
-                <span className="py-0.5 px-2 font-mono text-sm rounded bg-muted">
+                <span className="bg-muted rounded px-2 py-0.5 font-mono text-sm">
                   {instance.instance_name}
                 </span>
               </h1>
               {data?.logs.output && (
-                <div className="py-0.5 px-2 text-xs rounded-full bg-muted text-muted-foreground">
+                <div className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
                   {data.logs.output.split("\n").filter(Boolean).length} lines
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             <div
               className={cn(
                 "hidden items-center gap-1.5 rounded-full px-2.5 py-1 text-xs sm:flex",
@@ -128,9 +128,9 @@ export default function InstanceLogs({ instance, onClose }: InstanceLogsProps) {
                     ? "Pause auto-refresh"
                     : "Resume auto-refresh",
                   icon: autoRefresh ? (
-                    <Pause className="w-4 h-4" />
+                    <Pause className="h-4 w-4" />
                   ) : (
-                    <Play className="w-4 h-4" />
+                    <Play className="h-4 w-4" />
                   ),
                   tooltip: autoRefresh
                     ? "Pause auto-refresh"
@@ -142,7 +142,7 @@ export default function InstanceLogs({ instance, onClose }: InstanceLogsProps) {
                     void handleCopyLogs();
                   },
                   label: "Copy logs",
-                  icon: <Copy className="w-4 h-4" />,
+                  icon: <Copy className="h-4 w-4" />,
                   disabled: !data?.logs.output,
                   tooltip: "Copy logs to clipboard",
                 },
@@ -154,21 +154,24 @@ export default function InstanceLogs({ instance, onClose }: InstanceLogsProps) {
         </div>
       </div>
 
-      <div className="flex overflow-hidden relative flex-col flex-1">
+      <div className="relative flex flex-1 flex-col overflow-hidden">
         <div
           ref={logsContainerRef}
-          className="overflow-auto p-4 w-full h-[70vh] min-h-[300px]"
+          className="h-[70vh] min-h-[300px] w-full overflow-auto p-4"
         >
           {isLoading ? (
-            <div className="flex justify-center items-center h-full">
-              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            <div className="flex h-full items-center justify-center">
+              <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
             </div>
           ) : error ? (
-            <div className="p-4 m-4 rounded text-destructive bg-destructive/10">
+            <div className="text-destructive bg-destructive/10 m-4 rounded p-4">
               {error.message || "An error occurred while fetching logs"}
             </div>
           ) : data?.logs.output ? (
-            <div className="overflow-auto w-full h-full contain-content">
+            <div
+              className="h-full w-full overflow-auto"
+              style={{ contain: "content" }}
+            >
               <SyntaxHighlighter
                 language="bash"
                 style={atomDark}
@@ -208,7 +211,7 @@ export default function InstanceLogs({ instance, onClose }: InstanceLogsProps) {
               <div ref={logsEndRef} className="h-4" />
             </div>
           ) : (
-            <div className="p-4 italic text-muted-foreground">
+            <div className="text-muted-foreground p-4 italic">
               No logs available
             </div>
           )}

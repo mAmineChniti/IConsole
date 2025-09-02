@@ -39,17 +39,17 @@ export function SummaryStep({
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
+        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <Cpu className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <Cpu className="text-primary h-5 w-5" />
               Compute Resources
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Flavor:</span>
-              <span className="font-medium text-foreground">
+              <span className="text-foreground font-medium">
                 {selectedFlavor?.name ?? "N/A"}
               </span>
             </div>
@@ -57,85 +57,74 @@ export function SummaryStep({
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">vCPUs:</span>
-                  <span className="font-medium text-foreground">
+                  <span className="text-foreground font-medium">
                     {selectedFlavor.vcpus}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">RAM:</span>
-                  <span className="font-medium text-foreground">
-                    {selectedFlavor.ram >= 1024
-                      ? `${(selectedFlavor.ram / 1024).toFixed(1)} GB`
-                      : `${selectedFlavor.ram} MB`}
+                  <span className="text-foreground font-medium">
+                    {selectedFlavor.ram}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Storage:</span>
-                  <span className="font-medium text-foreground">
-                    {selectedFlavor.disk} GB
+                  <span className="text-foreground font-medium">
+                    {selectedFlavor.disk}
                   </span>
                 </div>
-                {selectedFlavor.ephemeral > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Ephemeral:</span>
-                    <span className="font-medium text-foreground">
-                      {selectedFlavor.ephemeral} GB
-                    </span>
-                  </div>
-                )}
-                {selectedFlavor.swap > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Swap:</span>
-                    <span className="font-medium text-foreground">
-                      {selectedFlavor.swap} MB
-                    </span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Ephemeral:</span>
+                  <span className="text-foreground font-medium">
+                    {selectedFlavor.ephemeral}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Swap:</span>
+                  <span className="text-foreground font-medium">
+                    {selectedFlavor.swap}
+                  </span>
+                </div>
               </>
             )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Flavor ID:</span>
-              <span className="font-mono text-xs text-muted-foreground">
+              <span className="text-muted-foreground font-mono text-xs">
                 {data.flavor_id}
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
+        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <HardDrive className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <HardDrive className="text-primary h-5 w-5" />
               Operating System
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Image:</span>
-              <span className="font-medium text-foreground">
+              <span className="text-foreground font-medium">
                 {selectedImage?.name}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Image ID:</span>
-              <span className="font-mono text-xs text-muted-foreground">
-                {selectedImage?.id?.slice(0, 8) ?? "N/A"}...{" "}
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
+        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <Network className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <Network className="text-primary h-5 w-5" />
               Network Configuration
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Network:</span>
-              <span className="font-medium text-foreground">
+              <span className="text-foreground font-medium">
                 {selectedNetwork?.name}
               </span>
             </div>
@@ -150,17 +139,17 @@ export function SummaryStep({
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border shadow-lg bg-card text-card-foreground border-border">
+        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
           <CardHeader>
-            <CardTitle className="flex gap-2 items-center">
-              <Settings className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="text-primary h-5 w-5" />
               VM Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Name:</span>
-              <span className="font-medium text-foreground">{data.name}</span>
+              <span className="text-foreground font-medium">{data.name}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Admin Username:</span>
@@ -176,8 +165,8 @@ export function SummaryStep({
 
       <Separator />
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-        <p className="text-center sm:text-left text-muted-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-muted-foreground text-center sm:text-left">
           Ready to create your virtual machine?
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -185,24 +174,24 @@ export function SummaryStep({
             onClick={onCancel}
             disabled={isCreating}
             variant="outline"
-            className="order-2 w-full rounded-full border transition-all duration-200 cursor-pointer sm:order-1 sm:w-auto bg-muted text-foreground border-border"
+            className="bg-muted text-foreground border-border order-2 w-full cursor-pointer rounded-full border transition-all duration-200 sm:order-1 sm:w-auto"
           >
-            <ArrowLeft className="flex-shrink-0 mr-2 w-4 h-4" />
+            <ArrowLeft className="mr-2 h-4 w-4 flex-shrink-0" />
             <span className="truncate">Back to Details</span>
           </Button>
           <Button
             onClick={onCreateVM}
             disabled={isCreating}
-            className="order-1 w-full rounded-full transition-all duration-200 cursor-pointer sm:order-2 sm:w-auto bg-primary text-primary-foreground min-w-[180px]"
+            className="bg-primary text-primary-foreground order-1 w-full min-w-[180px] cursor-pointer rounded-full transition-all duration-200 sm:order-2 sm:w-auto"
           >
             {isCreating ? (
               <>
-                <Loader2 className="flex-shrink-0 mr-2 w-4 h-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 flex-shrink-0 animate-spin" />
                 <span className="truncate">Creating VM...</span>
               </>
             ) : (
               <>
-                <Zap className="flex-shrink-0 mr-2 w-4 h-4" />
+                <Zap className="mr-2 h-4 w-4 flex-shrink-0" />
                 <span className="truncate">Create Virtual Machine</span>
               </>
             )}

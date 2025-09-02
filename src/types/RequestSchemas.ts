@@ -792,15 +792,18 @@ export const ImageDeleteRequestSchema = z.object({
 });
 
 export const ImageUpdateRequestSchema = z.object({
-  name: z
+  new_name: z
     .string()
     .min(1, "Image name is required")
     .max(64, "Image name too long")
+    .regex(
+      /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
+      "Image name must start with alphanumeric character",
+    )
     .trim()
     .optional(),
   visibility: z.enum(["public", "private", "shared", "community"]).optional(),
   protected: z.boolean().optional(),
-  tags: z.array(z.string().min(1).trim()).optional(),
 });
 
 export const ImageImportFromUploadRequestSchema = z.object({

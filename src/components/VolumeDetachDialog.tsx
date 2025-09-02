@@ -48,7 +48,7 @@ export function VolumeDetachDialog({
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
@@ -56,7 +56,7 @@ export function VolumeDetachDialog({
           </Button>
           <Button
             variant="destructive"
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
             onClick={handleDetach}
             disabled={loading}
           >

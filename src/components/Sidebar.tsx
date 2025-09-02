@@ -260,6 +260,8 @@ export function Sidebar() {
   });
 
   const handleProjectChange = (projectId: string) => {
+    if (switchProjectMutation.isPending || projectId === selectedProject)
+      return;
     switchProjectMutation.mutate(projectId);
   };
   const logoutMutation = useMutation({
@@ -308,29 +310,29 @@ export function Sidebar() {
   };
 
   return (
-    <ShadcnSidebar className="flex overflow-hidden flex-col w-64 h-full border-r bg-sidebar text-sidebar-foreground border-sidebar-border">
-      <SidebarHeader className="p-3 border-b sm:p-4 border-sidebar-border bg-sidebar">
-        <div className="flex justify-center items-center min-w-0">
+    <ShadcnSidebar className="bg-sidebar text-sidebar-foreground border-sidebar-border flex h-full w-64 flex-col overflow-hidden border-r">
+      <SidebarHeader className="border-sidebar-border bg-sidebar border-b p-3 sm:p-4">
+        <div className="flex min-w-0 items-center justify-center">
           <Link
             href="/dashboard/overview"
             aria-label="Go to Overview"
-            className="flex gap-2 items-center min-w-0"
+            className="flex min-w-0 items-center gap-2"
           >
-            <div className="flex justify-center items-center w-7 h-7 bg-gradient-to-br rounded-full shadow-lg from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] shadow-lg">
               <Shield
-                className="w-4 h-4 text-white"
+                className="h-4 w-4 text-white"
                 aria-hidden="true"
                 focusable="false"
               />
             </div>
-            <span className="font-sans text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br select-none truncate from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+            <span className="truncate bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] bg-clip-text font-sans text-xl font-bold tracking-tight text-transparent select-none">
               IConsole
             </span>
           </Link>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="overflow-y-auto p-2 bg-sidebar">
+      <SidebarContent className="bg-sidebar overflow-y-auto p-2">
         <SidebarGroup>
           <SidebarMenu className="space-y-2">
             <SidebarMenuItem>
@@ -369,11 +371,11 @@ export function Sidebar() {
                 >
                   <ComboboxInput
                     placeholder="Search projects..."
-                    className="py-2 px-3 text-sm rounded-none border-0 focus:ring-0 focus:ring-offset-0 focus:outline-none"
+                    className="rounded-none border-0 px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
                   />
-                  <ComboboxList className="overflow-y-auto p-1 max-h-[200px]">
+                  <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
                     {projectsLoading ? (
-                      <div className="py-2 px-3 text-sm text-muted-foreground">
+                      <div className="text-muted-foreground px-3 py-2 text-sm">
                         Loading projects...
                       </div>
                     ) : projects?.projects && projects.projects.length > 0 ? (
@@ -382,7 +384,7 @@ export function Sidebar() {
                           key={project.project_id}
                           value={project.project_id}
                           keywords={[project.project_name]}
-                          className="py-2 px-3 mx-1 text-sm rounded-md transition-colors cursor-pointer text-card-foreground truncate hover:bg-accent hover:text-accent-foreground"
+                          className="text-card-foreground hover:bg-accent hover:text-accent-foreground mx-1 cursor-pointer truncate rounded-md px-3 py-2 text-sm transition-colors"
                         >
                           <span className="truncate">
                             {project.project_name}
@@ -417,8 +419,8 @@ export function Sidebar() {
                           : "text-sidebar-foreground",
                       )}
                     >
-                      <item.icon className="flex-shrink-0 mr-3 w-4 h-4" />
-                      <span className="text-sm font-medium truncate">
+                      <item.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="truncate text-sm font-medium">
                         {item.title}
                       </span>
                     </Link>
@@ -443,8 +445,8 @@ export function Sidebar() {
                     computeOpen && "rounded-full",
                   )}
                 >
-                  <Cpu className="flex-shrink-0 mr-3 w-4 h-4" />
-                  <span className="flex-1 text-sm font-medium text-left truncate">
+                  <Cpu className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <span className="flex-1 truncate text-left text-sm font-medium">
                     Compute
                   </span>
                   <ChevronDown
@@ -457,7 +459,7 @@ export function Sidebar() {
               </SidebarMenuButton>
 
               {computeOpen && (
-                <SidebarMenuSub className="pl-0 mt-1 ml-4 space-y-1 border-l-0">
+                <SidebarMenuSub className="mt-1 ml-4 space-y-1 border-l-0 pl-0">
                   {computeSubItems.map((subItem) => {
                     const isSubActive = pathname === subItem.href;
                     return (
@@ -478,8 +480,8 @@ export function Sidebar() {
                                 : "text-sidebar-foreground",
                             )}
                           >
-                            <subItem.icon className="flex-shrink-0 mr-3 w-4 h-4" />
-                            <span className="text-sm font-medium truncate">
+                            <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate text-sm font-medium">
                               {subItem.title}
                             </span>
                           </Link>
@@ -510,8 +512,8 @@ export function Sidebar() {
                           : "text-sidebar-foreground",
                       )}
                     >
-                      <item.icon className="flex-shrink-0 mr-3 w-4 h-4" />
-                      <span className="text-sm font-medium truncate">
+                      <item.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="truncate text-sm font-medium">
                         {item.title}
                       </span>
                     </Link>
@@ -535,8 +537,8 @@ export function Sidebar() {
                     volumeOpen && "rounded-full",
                   )}
                 >
-                  <HardDrive className="flex-shrink-0 mr-3 w-4 h-4" />
-                  <span className="flex-1 text-sm font-medium text-left truncate">
+                  <HardDrive className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <span className="flex-1 truncate text-left text-sm font-medium">
                     Volumes
                   </span>
                   <ChevronDown
@@ -549,7 +551,7 @@ export function Sidebar() {
               </SidebarMenuButton>
 
               {volumeOpen && (
-                <SidebarMenuSub className="pl-0 mt-1 ml-4 space-y-1 border-l-0">
+                <SidebarMenuSub className="mt-1 ml-4 space-y-1 border-l-0 pl-0">
                   {volumesSubItems.map((subItem) => {
                     const isSubActive = pathname === subItem.href;
                     return (
@@ -570,8 +572,8 @@ export function Sidebar() {
                                 : "text-sidebar-foreground",
                             )}
                           >
-                            <subItem.icon className="flex-shrink-0 mr-3 w-4 h-4" />
-                            <span className="text-sm font-medium truncate">
+                            <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate text-sm font-medium">
                               {subItem.title}
                             </span>
                           </Link>
@@ -586,11 +588,11 @@ export function Sidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-3 space-y-2 border-t sm:p-4 bg-sidebar border-sidebar-border">
+      <SidebarFooter className="bg-sidebar border-sidebar-border space-y-2 border-t p-3 sm:p-4">
         {userName && (
-          <div className="flex gap-3 items-center px-3 mb-2 w-full h-10 rounded-full transition-all bg-accent text-accent-foreground">
-            <Avatar className="w-6 h-6 shadow-sm">
-              <AvatarFallback className="text-base font-bold tracking-wide text-white bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3]">
+          <div className="bg-accent text-accent-foreground mb-2 flex h-10 w-full items-center gap-3 rounded-full px-3 transition-all">
+            <Avatar className="h-6 w-6 shadow-sm">
+              <AvatarFallback className="bg-gradient-to-br from-[#1DA1F2] via-[#0a8ddb] to-[#005fa3] text-base font-bold tracking-wide text-white">
                 {userName
                   .split(" ")
                   .map((n) => n[0])
@@ -599,28 +601,28 @@ export function Sidebar() {
                   .slice(0, 2)}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-semibold max-w-[140px] truncate">
+            <span className="max-w-[140px] truncate text-sm font-semibold">
               {userName}
             </span>
           </div>
         )}
         <SidebarMenuButton
           asChild
-          className="px-3 w-full h-10 rounded-md transition-all cursor-pointer hover:rounded-full focus:rounded-full active:rounded-full hover:bg-accent hover:text-accent-foreground"
+          className="hover:bg-accent hover:text-accent-foreground h-10 w-full cursor-pointer rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full"
         >
           <Button
             variant="ghost"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex justify-start items-center w-full min-w-0 rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full text-sidebar-foreground"
+            className="text-sidebar-foreground flex w-full min-w-0 items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full"
           >
             {!mounted ? (
-              <span className="flex-shrink-0 mr-3 w-4 h-4"></span>
+              <span className="mr-3 h-4 w-4 flex-shrink-0"></span>
             ) : theme === "dark" ? (
-              <Sun className="flex-shrink-0 mr-3 w-4 h-4" />
+              <Sun className="mr-3 h-4 w-4 flex-shrink-0" />
             ) : (
-              <Moon className="flex-shrink-0 mr-3 w-4 h-4" />
+              <Moon className="mr-3 h-4 w-4 flex-shrink-0" />
             )}
-            <span className="text-sm font-medium truncate">
+            <span className="truncate text-sm font-medium">
               {!mounted ? "" : theme === "dark" ? "Light Mode" : "Dark Mode"}
             </span>
           </Button>
@@ -628,7 +630,7 @@ export function Sidebar() {
 
         <SidebarMenuButton
           asChild
-          className="px-3 w-full h-10 rounded-full transition-all cursor-pointer text-destructive"
+          className="text-destructive h-10 w-full cursor-pointer rounded-full px-3 transition-all"
         >
           <Button
             variant="ghost"
@@ -636,8 +638,8 @@ export function Sidebar() {
             className="!text-destructive flex w-full min-w-0 items-center justify-start rounded-full transition-all"
             style={{ color: "var(--color-destructive)" }}
           >
-            <LogOut className="flex-shrink-0 mr-3 w-4 h-4" />
-            <span className="text-sm font-medium truncate">Sign Out</span>
+            <LogOut className="mr-3 h-4 w-4 flex-shrink-0" />
+            <span className="truncate text-sm font-medium">Sign Out</span>
           </Button>
         </SidebarMenuButton>
       </SidebarFooter>

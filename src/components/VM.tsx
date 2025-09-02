@@ -223,20 +223,20 @@ export function VM({ onBack }: { onBack?: () => void }) {
   return (
     <div className="space-y-6">
       {onBack && (
-        <div className="flex gap-4 items-center mb-2">
+        <div className="mb-2 flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="flex gap-2 items-center rounded-full border transition-all duration-200 cursor-pointer text-muted-foreground bg-card border-border/50 hover:text-foreground"
+            className="text-muted-foreground bg-card border-border/50 hover:text-foreground flex cursor-pointer items-center gap-2 rounded-full border transition-all duration-200"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="h-4 w-4" />
             Back to Instances
           </Button>
         </div>
       )}
       <div
-        className="flex overflow-hidden items-center p-1 space-x-1 rounded-full border bg-card text-card-foreground border-border/50"
+        className="bg-card text-card-foreground border-border/50 flex items-center space-x-1 overflow-hidden rounded-full border p-1"
         role="tablist"
         aria-label="VM tabs"
       >
@@ -254,7 +254,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
           aria-controls="create-tab-panel"
           id="create-tab"
         >
-          <Plus className="flex-shrink-0 mr-1 w-4 h-4 sm:mr-2" />
+          <Plus className="mr-1 h-4 w-4 flex-shrink-0 sm:mr-2" />
           <span className="truncate">Create VM</span>
         </Button>
         <Button
@@ -271,7 +271,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
           aria-controls="describe-tab-panel"
           id="describe-tab"
         >
-          <Mic className="flex-shrink-0 mr-1 w-4 h-4 sm:mr-2" />
+          <Mic className="mr-1 h-4 w-4 flex-shrink-0 sm:mr-2" />
           <span className="truncate">Describe VM</span>
         </Button>
       </div>
@@ -284,9 +284,9 @@ export function VM({ onBack }: { onBack?: () => void }) {
           aria-labelledby="create-tab"
           tabIndex={0}
         >
-          <Card className="overflow-hidden rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+          <Card className="bg-card text-card-foreground border-border/50 overflow-hidden rounded-xl border shadow-lg">
             <CardContent className="p-3 sm:p-6">
-              <div className="flex overflow-x-auto items-center w-full">
+              <div className="flex w-full items-center overflow-x-auto">
                 {steps.map((step, index) => {
                   const isActive = step.key === currentStep;
                   const isCompleted = index < currentStepIndex;
@@ -313,9 +313,9 @@ export function VM({ onBack }: { onBack?: () => void }) {
                           )}
                         >
                           {isCompleted ? (
-                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                           ) : (
-                            <StepIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <StepIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                           )}
                         </div>
                         <span
@@ -348,16 +348,16 @@ export function VM({ onBack }: { onBack?: () => void }) {
             </CardContent>
           </Card>
 
-          <Card className="overflow-hidden rounded-xl border shadow-lg bg-card text-card-foreground border-border/50">
+          <Card className="bg-card text-card-foreground border-border/50 overflow-hidden rounded-xl border shadow-lg">
             <CardHeader className="space-y-3">
-              <CardTitle className="flex gap-2 items-center text-lg">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 {(() => {
                   const step = steps.find((s) => s.key === currentStep);
                   const StepIcon = step?.icon ?? Cpu;
                   return (
                     <>
-                      <div className="flex-shrink-0 p-2 rounded-full bg-primary/10">
-                        <StepIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                      <div className="bg-primary/10 flex-shrink-0 rounded-full p-2">
+                        <StepIcon className="text-primary h-4 w-4 sm:h-5 sm:w-5" />
                       </div>
                       <span className="truncate">{step?.title}</span>
                     </>
@@ -416,22 +416,22 @@ export function VM({ onBack }: { onBack?: () => void }) {
             {currentStep !== "summary" && (
               <CardContent className="pt-0">
                 <Separator className="mb-6" />
-                <div className="flex flex-col gap-3 justify-between sm:flex-row">
+                <div className="flex flex-col justify-between gap-3 sm:flex-row">
                   <Button
                     variant="outline"
                     onClick={goToPreviousStep}
                     disabled={currentStepIndex === 0}
-                    className="order-2 w-full rounded-full cursor-pointer sm:order-1 sm:w-auto"
+                    className="order-2 w-full cursor-pointer rounded-full sm:order-1 sm:w-auto"
                   >
-                    <ArrowLeft className="flex-shrink-0 mr-2 w-4 h-4" />
+                    <ArrowLeft className="mr-2 h-4 w-4 flex-shrink-0" />
                     <span className="truncate">Previous</span>
                   </Button>
                   <Button
                     onClick={goToNextStep}
-                    className="order-1 w-full rounded-full cursor-pointer sm:order-2 sm:w-auto bg-primary text-primary-foreground"
+                    className="bg-primary text-primary-foreground order-1 w-full cursor-pointer rounded-full sm:order-2 sm:w-auto"
                   >
                     <span className="truncate">Next</span>
-                    <ArrowRight className="flex-shrink-0 ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-2 h-4 w-4 flex-shrink-0" />
                   </Button>
                 </div>
               </CardContent>

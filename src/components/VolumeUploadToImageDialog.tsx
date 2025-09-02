@@ -51,7 +51,7 @@ export function VolumeUploadToImageDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm font-medium">Image Name</label>
+            <label className="mb-1 block text-sm font-medium">Image Name</label>
             <Input
               value={imageName}
               className="w-full rounded-full"
@@ -62,7 +62,7 @@ export function VolumeUploadToImageDialog({
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
@@ -70,7 +70,7 @@ export function VolumeUploadToImageDialog({
           </Button>
           <Button
             variant="default"
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
             onClick={handleUpload}
             disabled={loading || !imageName}
           >

@@ -1,12 +1,13 @@
 "use client";
 
-import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { FlavorCreateDialog } from "@/components/FlavorCreateDialog";
+import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoCard } from "@/components/reusable/InfoCard";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -54,7 +55,6 @@ import {
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { InfoCard } from "./reusable/InfoCard";
 
 export function Flavors() {
   const qc = useQueryClient();
@@ -167,17 +167,17 @@ export function Flavors() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <Skeleton className="w-64 h-4" />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <Skeleton className="h-4 w-64" />
         </div>
-        <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:justify-between sm:items-center">
-          <div className="relative flex-1 max-w-full sm:max-w-md">
-            <Skeleton className="w-full h-10 rounded-full" />
-            <div className="absolute right-2.5 top-1/2 w-6 h-6 rounded-full -translate-y-1/2 bg-muted/50" />
+        <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative max-w-full flex-1 sm:max-w-md">
+            <Skeleton className="h-10 w-full rounded-full" />
+            <div className="bg-muted/50 absolute top-1/2 right-2.5 h-6 w-6 -translate-y-1/2 rounded-full" />
           </div>
-          <div className="flex gap-2 self-end ml-auto sm:self-auto">
-            <Skeleton className="w-10 h-10 rounded-full" />
-            <Skeleton className="w-28 h-10 rounded-full" />
+          <div className="ml-auto flex gap-2 self-end sm:self-auto">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-10 w-28 rounded-full" />
           </div>
         </div>
 
@@ -185,41 +185,41 @@ export function Flavors() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="border shadow-lg bg-card text-card-foreground border-border/50"
+              className="bg-card text-card-foreground border-border/50 border shadow-lg"
             >
               <CardContent className="p-3">
-                <div className="flex items-center mb-2">
-                  <div className="flex gap-3 items-center">
-                    <div className="flex justify-center items-center w-8 h-8 rounded-full bg-muted" />
+                <div className="mb-2 flex items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full" />
                     <div className="space-y-1">
-                      <Skeleton className="w-36 h-4" />
-                      <Skeleton className="w-14 h-3" />
+                      <Skeleton className="h-4 w-36" />
+                      <Skeleton className="h-3 w-14" />
                     </div>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="flex gap-2 items-center">
-                    <div className="w-6 h-6 rounded-full bg-muted" />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-muted h-6 w-6 rounded-full" />
                     <div className="flex-1">
-                      <Skeleton className="w-24 h-3" />
+                      <Skeleton className="h-3 w-24" />
                     </div>
                   </div>
-                  <div className="flex gap-2 items-center">
-                    <div className="w-6 h-6 rounded-full bg-muted" />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-muted h-6 w-6 rounded-full" />
                     <div className="flex-1">
-                      <Skeleton className="w-28 h-3" />
+                      <Skeleton className="h-3 w-28" />
                     </div>
                   </div>
-                  <div className="flex gap-2 items-center">
-                    <div className="w-6 h-6 rounded-full bg-muted" />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-muted h-6 w-6 rounded-full" />
                     <div className="flex-1">
-                      <Skeleton className="w-20 h-3" />
+                      <Skeleton className="h-3 w-20" />
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 justify-center pt-2">
-                  <Skeleton className="w-20 h-8 rounded-full" />
-                  <Skeleton className="w-20 h-8 rounded-full" />
+                <div className="flex justify-center gap-2 pt-2">
+                  <Skeleton className="h-8 w-20 rounded-full" />
+                  <Skeleton className="h-8 w-20 rounded-full" />
                 </div>
               </CardContent>
             </Card>
@@ -238,7 +238,7 @@ export function Flavors() {
           refreshing={isFetching}
           primaryLabel="New Flavor"
           onPrimary={() => setCreateOpen(true)}
-          icon={<Cpu className="w-7 h-7 text-muted-foreground" />}
+          icon={<Cpu className="text-muted-foreground h-7 w-7" />}
           variant="dashed"
         />
         <FlavorCreateDialog
@@ -253,10 +253,10 @@ export function Flavors() {
   }
 
   return (
-    <div className="px-2 space-y-6 sm:px-0">
+    <div className="space-y-6 px-2 sm:px-0">
       <div className="space-y-3">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <div className="text-sm leading-relaxed text-muted-foreground">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <div className="text-muted-foreground text-sm leading-relaxed">
             {totalItems} flavor{totalItems !== 1 ? "s" : ""} total
             {totalItems > 0 && (
               <>
@@ -278,7 +278,7 @@ export function Flavors() {
             }}
           />
         </div>
-        <div className="flex-1 max-w-full sm:max-w-md">
+        <div className="max-w-full flex-1 sm:max-w-md">
           <XSearch
             value={search}
             onChange={setSearch}
@@ -297,7 +297,7 @@ export function Flavors() {
       ) : (
         <div className="space-y-4">
           {visible.length === 0 ? (
-            <div className="flex justify-center items-center p-8 text-center rounded-2xl border text-muted-foreground min-h-32">
+            <div className="text-muted-foreground flex min-h-32 items-center justify-center rounded-2xl border p-8 text-center">
               No flavors match your search.
             </div>
           ) : (
@@ -307,12 +307,13 @@ export function Flavors() {
                   key={flavor.id}
                   title={flavor.name}
                   badges={
-                    <Badge
-                      variant={flavor.is_public ? "default" : "secondary"}
-                      className="text-xs"
-                    >
-                      {flavor.is_public ? "Public" : "Private"}
-                    </Badge>
+                    <StatusBadge
+                      status={flavor.is_public ? "ACTIVE" : "DISABLED"}
+                      statusTextMap={{
+                        ACTIVE: "ACTIVE",
+                        DISABLED: "SHUTOFF",
+                      }}
+                    />
                   }
                   infoItems={[
                     [
@@ -359,10 +360,10 @@ export function Flavors() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="gap-1.5 py-1 px-3 text-sm rounded-full cursor-pointer"
+                            className="cursor-pointer gap-1.5 rounded-full px-3 py-1 text-sm"
                             onClick={() => openEdit(flavor.id)}
                           >
-                            <Pencil className="w-4 h-4" /> Edit
+                            <Pencil className="h-4 w-4" /> Edit
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Edit flavor</TooltipContent>
@@ -372,7 +373,7 @@ export function Flavors() {
                           <Button
                             variant="destructive"
                             size="sm"
-                            className="gap-1.5 py-1 px-3 text-sm rounded-full cursor-pointer"
+                            className="cursor-pointer gap-1.5 rounded-full px-3 py-1 text-sm"
                             onClick={() => {
                               setDeleteOpen(true);
                               setToDelete({ flavor_id: flavor.id });
@@ -380,7 +381,7 @@ export function Flavors() {
                             disabled={deleteMutation.isPending}
                             aria-label={`Delete ${flavor.name}`}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="h-4 w-4" />
                             Delete
                           </Button>
                         </TooltipTrigger>
@@ -598,7 +599,7 @@ export function Flavors() {
                   control={updateForm.control}
                   name="is_public"
                   render={({ field }) => (
-                    <FormItem className="flex col-span-full justify-between items-center pt-2">
+                    <FormItem className="col-span-full flex items-center justify-between pt-2">
                       <FormLabel>Public</FormLabel>
                       <FormControl>
                         <Switch
@@ -616,27 +617,27 @@ export function Flavors() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="gap-2 rounded-full cursor-pointer"
+                  className="cursor-pointer gap-2 rounded-full"
                   onClick={() => setEditOpen(false)}
                   disabled={updateMutation.isPending}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="h-4 w-4" />
                   <span>Cancel</span>
                 </Button>
                 <Button
                   type="submit"
                   variant="default"
-                  className="gap-2 rounded-full cursor-pointer min-w-[140px]"
+                  className="min-w-[140px] cursor-pointer gap-2 rounded-full"
                   disabled={updateMutation.isPending}
                 >
                   {updateMutation.isPending ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Updating...</span>
                     </>
                   ) : (
                     <>
-                      <Pencil className="w-4 h-4" />
+                      <Pencil className="h-4 w-4" />
                       <span>Save</span>
                     </>
                   )}
@@ -655,7 +656,7 @@ export function Flavors() {
           toDelete ? (
             <>
               Are you sure you want to delete flavor{" "}
-              <span className="font-semibold text-foreground">
+              <span className="text-foreground font-semibold">
                 {list.find((f) => f.id === toDelete.flavor_id)?.name ??
                   toDelete.flavor_id}
               </span>

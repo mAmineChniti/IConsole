@@ -63,10 +63,10 @@ export function ClusterTokenDialog({
   if (isLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="overflow-y-auto max-w-4xl md:max-w-2xl lg:max-w-4xl max-h-[90vh] w-[95vw] sm:max-w-[90vw]">
+        <DialogContent className="max-h-[90vh] w-[95vw] max-w-4xl overflow-y-auto sm:max-w-[90vw] md:max-w-2xl lg:max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="flex gap-2 items-center">
-              <Server className="w-5 h-5" />
+            <DialogTitle className="flex items-center gap-2">
+              <Server className="h-5 w-5" />
               Cluster Dashboard Access
             </DialogTitle>
             <DialogDescription>
@@ -76,35 +76,35 @@ export function ClusterTokenDialog({
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Skeleton className="mb-1.5 w-16 h-4" />
-              <Skeleton className="w-full h-10 rounded-md" />
+              <Skeleton className="mb-1.5 h-4 w-16" />
+              <Skeleton className="h-10 w-full rounded-md" />
             </div>
 
             <div>
-              <Skeleton className="mb-1.5 w-24 h-4" />
+              <Skeleton className="mb-1.5 h-4 w-24" />
               <div className="relative">
-                <Skeleton className="w-full h-20 rounded-md" />
-                <Skeleton className="absolute top-2 right-2 w-8 h-8 rounded-full" />
+                <Skeleton className="h-20 w-full rounded-md" />
+                <Skeleton className="absolute top-2 right-2 h-8 w-8 rounded-full" />
               </div>
             </div>
 
             <div>
-              <Skeleton className="mb-1.5 w-14 h-4" />
+              <Skeleton className="mb-1.5 h-4 w-14" />
               <div className="relative">
-                <Skeleton className="w-full h-32 rounded-md" />
-                <Skeleton className="absolute top-2 right-2 w-8 h-8 rounded-full" />
+                <Skeleton className="h-32 w-full rounded-md" />
+                <Skeleton className="absolute top-2 right-2 h-8 w-8 rounded-full" />
               </div>
             </div>
 
             <div>
-              <Skeleton className="mb-1.5 w-24 h-4" />
-              <Skeleton className="w-full h-32 rounded-md" />
+              <Skeleton className="mb-1.5 h-4 w-24" />
+              <Skeleton className="h-32 w-full rounded-md" />
             </div>
           </div>
 
           <DialogFooter className="flex justify-between pt-2">
-            <Skeleton className="w-40 h-9 rounded-full" />
-            <Skeleton className="w-20 h-9 rounded-full" />
+            <Skeleton className="h-9 w-40 rounded-full" />
+            <Skeleton className="h-9 w-20 rounded-full" />
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -112,10 +112,10 @@ export function ClusterTokenDialog({
   }
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-y-auto max-w-4xl md:max-w-2xl lg:max-w-4xl max-h-[90vh] w-[95vw] sm:max-w-[90vw]">
+      <DialogContent className="max-h-[90vh] w-[95vw] max-w-4xl overflow-y-auto sm:max-w-[90vw] md:max-w-2xl lg:max-w-4xl">
         <DialogHeader>
-          <DialogTitle className="flex gap-2 items-center">
-            <Server className="w-5 h-5" />
+          <DialogTitle className="flex items-center gap-2">
+            <Server className="h-5 w-5" />
             Cluster Dashboard Access
           </DialogTitle>
           <DialogDescription>
@@ -125,7 +125,7 @@ export function ClusterTokenDialog({
         </DialogHeader>
         <div className="space-y-4">
           {error ? (
-            <div className="p-3 mb-4 text-sm rounded-md text-destructive bg-destructive/10">
+            <div className="text-destructive bg-destructive/10 mb-4 rounded-md p-3 text-sm">
               Failed to load dashboard token. Please try again.
             </div>
           ) : (
@@ -163,7 +163,7 @@ export function ClusterTokenDialog({
 
               <div>
                 <h4 className="mb-1 text-sm font-medium">Dashboard URL</h4>
-                <div className="relative group">
+                <div className="group relative">
                   <Link
                     href={data?.dashboard_path ?? "#"}
                     target="_blank"
@@ -201,9 +201,9 @@ export function ClusterTokenDialog({
                     href={data?.dashboard_path ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute right-2 top-1/2 z-10 p-1.5 transition-colors -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 z-10 -translate-y-1/2 p-1.5 transition-colors"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="h-4 w-4" />
                   </Link>
                 </div>
               </div>
@@ -237,14 +237,14 @@ export function ClusterTokenDialog({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="flex absolute top-2 right-2 justify-center items-center w-7 h-7 rounded-full cursor-pointer sm:w-8 sm:h-8 bg-background/80 group hover:bg-background/60"
+                    className="bg-background/80 group hover:bg-background/60 absolute top-2 right-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full sm:h-8 sm:w-8"
                     onClick={() => data?.token && handleTokenCopy(data.token)}
                     disabled={!data?.token}
                   >
                     {copiedToken === data?.token ? (
-                      <Check className="w-4 h-4 text-green-500" />
+                      <Check className="h-4 w-4 text-green-500" />
                     ) : (
-                      <Copy className="w-4 h-4 transition-opacity group-hover:opacity-80" />
+                      <Copy className="h-4 w-4 transition-opacity group-hover:opacity-80" />
                     )}
                   </Button>
                 </div>
@@ -286,27 +286,27 @@ export function ClusterTokenDialog({
             </div>
           )}
         </div>
-        <DialogFooter className="flex flex-col gap-3 justify-end sm:flex-row sm:items-center">
+        <DialogFooter className="flex flex-col justify-end gap-3 sm:flex-row sm:items-center">
           {data?.kubeconfig && (
             <Button
               asChild
               variant="default"
               size="sm"
-              className="gap-1.5 w-full rounded-full cursor-pointer sm:w-auto"
+              className="w-full cursor-pointer gap-1.5 rounded-full sm:w-auto"
             >
               <Link
                 href={`data:application/yaml;charset=utf-8,${encodeURIComponent(data.kubeconfig.trim() + "\n")}`}
                 download={`kubeconfig-${clusterName ?? "cluster"}.yaml`}
                 aria-label="Download kubeconfig"
               >
-                <Download className="w-4 h-4" />
+                <Download className="h-4 w-4" />
                 <span>Download Kubeconfig</span>
               </Link>
             </Button>
           )}
           <Button
             variant="outline"
-            className="w-full rounded-full cursor-pointer sm:w-auto"
+            className="w-full cursor-pointer rounded-full sm:w-auto"
             onClick={() => onOpenChange(false)}
           >
             Close

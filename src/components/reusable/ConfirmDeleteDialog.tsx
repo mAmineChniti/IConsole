@@ -45,7 +45,7 @@ export function ConfirmDeleteDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={confirming}
-            className="flex-1 rounded-full cursor-pointer"
+            className="flex-1 cursor-pointer rounded-full"
           >
             {cancelLabel}
           </Button>
@@ -59,12 +59,12 @@ export function ConfirmDeleteDialog({
           >
             {confirming ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
+                <RefreshCw className="h-4 w-4 animate-spin" />
                 Deleting...
               </>
             ) : (
               <>
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="h-4 w-4" />
                 {confirmLabel}
               </>
             )}

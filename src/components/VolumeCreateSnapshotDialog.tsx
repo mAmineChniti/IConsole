@@ -66,7 +66,7 @@ export function VolumeCreateSnapshotDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm font-medium">Name</label>
+            <label className="mb-1 block text-sm font-medium">Name</label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -75,7 +75,7 @@ export function VolumeCreateSnapshotDialog({
             />
           </div>
           <div>
-            <label className="block mb-1 text-sm font-medium">
+            <label className="mb-1 block text-sm font-medium">
               Description
             </label>
             <Textarea
@@ -92,7 +92,7 @@ export function VolumeCreateSnapshotDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
           >
             Cancel
           </Button>
@@ -100,7 +100,7 @@ export function VolumeCreateSnapshotDialog({
             variant="default"
             onClick={handleCreate}
             disabled={loading || name.trim().length === 0}
-            className="rounded-full cursor-pointer"
+            className="cursor-pointer rounded-full"
           >
             {loading ? "Creating..." : "Create Snapshot"}
           </Button>

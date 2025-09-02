@@ -4,10 +4,11 @@ import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { InfoDialog } from "@/components/reusable/InfoDialog";
+import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -33,23 +34,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { VolumeService } from "@/lib/requests";
-import { cn } from "@/lib/utils";
 import type {
   VolumeSnapshotDetails,
   VolumeSnapshotListResponse,
 } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  AlertTriangle,
-  Box,
-  CheckCircle2,
+  Calendar,
   ChevronDown,
-  Clock,
+  FileText,
   HardDrive,
   Loader2,
   Pencil,
   RotateCcw,
   Save,
+  Server,
   Trash2,
   X,
 } from "lucide-react";
@@ -78,13 +77,6 @@ export function Snapshots() {
   useEffect(() => {
     setVisibleCount(6);
   }, [searchTerm]);
-  const [detailsLoading, setDetailsLoading] = useState(false);
-  const [detailsError, setDetailsError] = useState<string | undefined>(
-    undefined,
-  );
-  const [snapshotDetails, setSnapshotDetails] = useState<
-    VolumeSnapshotDetails | undefined
-  >(undefined);
   const [updateName, setUpdateName] = useState("");
   const [updateDescription, setUpdateDescription] = useState("");
   const [updateLoading, setUpdateLoading] = useState(false);
@@ -163,24 +155,20 @@ export function Snapshots() {
     },
   });
 
-  const handleCardClick = async (id: string) => {
+  const handleViewDetails = async (id: string) => {
     setSelectedSnapshotId(id);
     setDetailsDialogOpen(true);
-    setDetailsLoading(true);
-    setDetailsError(undefined);
-    try {
-      const details = await VolumeService.getSnapshotDetails(id);
-      setSnapshotDetails(details);
-    } catch (err) {
-      setDetailsError(
-        err instanceof Error ? err.message : "Failed to load snapshot details",
-      );
-      setSnapshotDetails(undefined);
-    } finally {
-      setDetailsLoading(false);
-    }
   };
-
+  const {
+    data: snapshotDetails,
+    isLoading: snapshotDetailsLoading,
+    isFetching: snapshotDetailsFetching,
+  } = useQuery<VolumeSnapshotDetails>({
+    queryKey: ["snapshots", selectedSnapshotId],
+    queryFn: () => VolumeService.getSnapshotDetails(selectedSnapshotId!),
+    enabled: !!selectedSnapshotId,
+    staleTime: 15000,
+  });
   const handleEditClick = async (id: string) => {
     setSelectedSnapshotId(id);
     setUpdateDialogOpen(true);
@@ -188,8 +176,8 @@ export function Snapshots() {
     setUpdateError(undefined);
     try {
       const details = await VolumeService.getSnapshotDetails(id);
-      setUpdateName(details.Name);
-      setUpdateDescription(details.Description);
+      setUpdateName(details.Name ?? "");
+      setUpdateDescription(details.Description ?? "");
     } catch (err) {
       setUpdateError(
         err instanceof Error ? err.message : "Failed to load snapshot details",
@@ -219,53 +207,21 @@ export function Snapshots() {
   const hasMore = visibleCount < totalItems;
   const remaining = Math.max(0, totalItems - visibleCount);
 
-  const renderStatusBadge = (status: string | undefined) => {
-    const s = (status ?? "unknown").toLowerCase();
-    let Icon = HardDrive;
-    let classes = "bg-muted text-foreground border-muted/60";
-    if (["available", "ready", "success"].includes(s)) {
-      Icon = CheckCircle2;
-      classes =
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-    } else if (
-      ["creating", "in-progress", "processing", "pending"].includes(s)
-    ) {
-      Icon = Clock;
-      classes =
-        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300";
-    } else if (["error", "failed", "deleting"].includes(s)) {
-      Icon = AlertTriangle;
-      classes = "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-    }
-    return (
-      <Badge
-        variant="outline"
-        className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] sm:text-sm",
-          classes,
-        )}
-      >
-        <Icon className="w-4 h-4" />
-        <span className="capitalize">{status ?? "unknown"}</span>
-      </Badge>
-    );
-  };
-
   const handleShowMore = () => {
     setVisibleCount((prev) => prev + 6);
   };
 
   if (isLoading) {
     return (
-      <div className="px-2 space-y-6 sm:px-0">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-          <Skeleton className="w-40 h-4" />
+      <div className="space-y-6 px-2 sm:px-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <Skeleton className="h-4 w-40" />
         </div>
-        <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:items-center">
-          <Skeleton className="w-full max-w-md h-10 rounded-full" />
-          <Skeleton className="w-full h-10 rounded-full sm:w-auto min-w-[140px]" />
+        <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+          <Skeleton className="h-10 w-full max-w-md rounded-full" />
+          <Skeleton className="h-10 w-full min-w-[140px] rounded-full sm:w-auto" />
         </div>
-        <div className="overflow-x-auto w-full">
+        <div className="w-full overflow-x-auto">
           <Table className="w-full">
             <TableHeader>
               <TableRow>
@@ -280,19 +236,19 @@ export function Snapshots() {
               {Array.from({ length: 6 }).map((_, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="py-3">
-                    <Skeleton className="w-40 h-4" />
+                    <Skeleton className="h-4 w-40" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="w-16 h-4" />
+                    <Skeleton className="h-4 w-16" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="w-12 h-4" />
+                    <Skeleton className="h-4 w-12" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="w-32 h-4" />
+                    <Skeleton className="h-4 w-32" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="w-24 h-8" />
+                    <Skeleton className="h-8 w-24" />
                   </TableCell>
                 </TableRow>
               ))}
@@ -300,7 +256,7 @@ export function Snapshots() {
           </Table>
         </div>
         <div className="flex justify-center px-4 sm:px-0">
-          <Skeleton className="w-40 h-9 rounded-full" />
+          <Skeleton className="h-9 w-40 rounded-full" />
         </div>
       </div>
     );
@@ -323,16 +279,16 @@ export function Snapshots() {
         text="Snapshots you create will appear here."
         onRefresh={() => refetch()}
         refreshing={isFetching}
-        icon={<HardDrive className="w-7 h-7 text-muted-foreground" />}
+        icon={<HardDrive className="text-muted-foreground h-7 w-7" />}
         variant="dashed"
       />
     );
   }
 
   return (
-    <div className="px-2 space-y-6 sm:px-0">
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-0 sm:justify-between sm:items-center">
-        <div className="text-sm leading-relaxed text-muted-foreground">
+    <div className="space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="text-muted-foreground text-sm leading-relaxed">
           {totalItems} snapshot{totalItems !== 1 ? "s" : ""} total
           {totalItems > 0 && (
             <>
@@ -350,8 +306,8 @@ export function Snapshots() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 items-stretch sm:flex-row sm:items-center">
-        <div className="flex-1 max-w-full sm:max-w-md">
+      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+        <div className="max-w-full flex-1 sm:max-w-md">
           <XSearch
             value={searchTerm}
             onChange={setSearchTerm}
@@ -362,12 +318,12 @@ export function Snapshots() {
       </div>
 
       {totalItems === 0 ? (
-        <div className="p-8 text-center rounded-2xl border text-muted-foreground">
+        <div className="text-muted-foreground rounded-2xl border p-8 text-center">
           No snapshots match your search.
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto w-full">
+          <div className="w-full overflow-x-auto">
             <Table className="w-full">
               <TableHeader>
                 <TableRow>
@@ -382,36 +338,54 @@ export function Snapshots() {
                 {visibleData.map((s) => (
                   <TableRow key={s.ID}>
                     <TableCell className="py-3">
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <div className="min-w-0">
-                          <button
+                          <Button
                             type="button"
-                            className="inline-flex items-center max-w-full font-medium text-left underline cursor-pointer decoration-muted-foreground/50 truncate underline-offset-2 hover:decoration-current"
-                            onClick={() => handleCardClick(s.ID)}
+                            variant="outline"
+                            className="decoration-muted-foreground/50 inline-flex max-w-full cursor-pointer items-center truncate text-left font-medium underline underline-offset-2 hover:decoration-current"
+                            onClick={() => handleViewDetails(s.ID)}
                             title={s.Name || s.ID}
                           >
                             <span className="truncate">{s.Name || s.ID}</span>
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="py-3">
-                      {renderStatusBadge(s.Status)}
+                      <StatusBadge
+                        status={s.Status}
+                        statusTextMap={{
+                          AVAILABLE: "SUCCESS",
+                          CREATING: "PENDING",
+                          ERROR: "ERROR",
+                          DELETING: "UPDATING",
+                          IN_PROGRESS: "PENDING",
+                          PROCESSING: "PENDING",
+                          PENDING: "PENDING",
+                          READY: "SUCCESS",
+                          STOPPED: "SHUTOFF",
+                          STOPPING: "SHUTOFF",
+                          SUCCESS: "SUCCESS",
+                          UNKNOWN: "SHUTOFF",
+                          UPDATING: "UPDATING",
+                        }}
+                      />
                     </TableCell>
                     <TableCell className="py-3">{s.Size} GB</TableCell>
                     <TableCell className="py-3">{s["Volume Name"]}</TableCell>
                     <TableCell className="py-3 text-right">
-                      <div className="flex gap-2 justify-end">
+                      <div className="flex justify-end gap-2">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant="outline"
                               size="icon"
-                              className="rounded-full cursor-pointer"
+                              className="cursor-pointer rounded-full"
                               onClick={() => handleEditClick(s.ID)}
                               aria-label={`Edit ${s.Name || s.ID}`}
                             >
-                              <Pencil className="w-4 h-4" />
+                              <Pencil className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>Edit</TooltipContent>
@@ -421,11 +395,11 @@ export function Snapshots() {
                             <Button
                               variant="outline"
                               size="icon"
-                              className="rounded-full cursor-pointer"
+                              className="cursor-pointer rounded-full"
                               onClick={() => handleRestoreClick(s.ID)}
                               aria-label={`Restore ${s.Name || s.ID}`}
                             >
-                              <RotateCcw className="w-4 h-4" />
+                              <RotateCcw className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>Restore</TooltipContent>
@@ -435,7 +409,7 @@ export function Snapshots() {
                             <Button
                               variant="destructive"
                               size="icon"
-                              className="text-white rounded-full cursor-pointer"
+                              className="cursor-pointer rounded-full text-white"
                               aria-label={`Delete ${s.Name || s.ID}`}
                               disabled={
                                 deleteMutation.isPending &&
@@ -451,9 +425,9 @@ export function Snapshots() {
                             >
                               {deleteMutation.isPending &&
                               snapshotToDelete?.id === s.ID ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader2 className="h-4 w-4 animate-spin" />
                               ) : (
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="h-4 w-4" />
                               )}
                             </Button>
                           </TooltipTrigger>
@@ -476,122 +450,87 @@ export function Snapshots() {
               variant="outline"
               disabled={!hasMore}
               onClick={handleShowMore}
-              className="py-2 px-4 w-full max-w-xs rounded-full border transition-all duration-200 cursor-pointer sm:px-6 sm:w-auto bg-background text-foreground border-border/50"
+              className="bg-background text-foreground border-border/50 w-full max-w-xs cursor-pointer rounded-full border px-4 py-2 transition-all duration-200 sm:w-auto sm:px-6"
             >
               <span className="truncate">
                 {hasMore
                   ? `Show More (${Math.min(6, remaining)} more)`
                   : "All snapshots loaded"}
               </span>
-              {hasMore && <ChevronDown className="ml-2 w-4 h-4" />}
+              {hasMore && <ChevronDown className="ml-2 h-4 w-4" />}
             </Button>
           </div>
         </>
       )}
 
-      <Dialog
+      <InfoDialog
+        isLoading={snapshotDetailsLoading || snapshotDetailsFetching}
         open={detailsDialogOpen}
         onOpenChange={(open) => {
           setDetailsDialogOpen(open);
           if (!open) {
             setSelectedSnapshotId(undefined);
-            setSnapshotDetails(undefined);
-            setDetailsError(undefined);
           }
         }}
-      >
-        <DialogContent className="sm:max-w-3xl">
-          <DialogHeader>
-            <div className="flex gap-4 items-start">
-              <div className="flex-1">
-                <DialogTitle className="text-lg sm:text-xl">
-                  {snapshotDetails?.Name ?? "Snapshot details"}
-                </DialogTitle>
-                <div className="flex flex-wrap gap-2 items-center mt-2 text-sm">
-                  <Badge variant="secondary" className="py-0 px-2 text-xs">
-                    {snapshotDetails?.Status ?? "unknown"}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <div className="pt-1">
-            {detailsLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="w-44 h-4" />
-                <Skeleton className="w-64 h-4" />
-                <Skeleton className="w-56 h-4" />
-              </div>
-            ) : detailsError ? (
-              <div className="py-6 text-center text-destructive">
-                {detailsError}
-              </div>
-            ) : snapshotDetails ? (
-              <div className="space-y-6 text-base">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Card className="rounded-lg shadow-none border-muted/60">
-                    <CardContent className="p-5">
-                      <div className="text-sm text-muted-foreground">Size</div>
-                      <div className="flex items-center mt-1 font-medium">
-                        <Box className="mr-2 w-5 h-5" />
-                        {snapshotDetails?.Size != undefined
-                          ? `${snapshotDetails.Size} GB`
-                          : "-"}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="rounded-lg shadow-none border-muted/60">
-                    <CardContent className="p-5">
-                      <div className="text-sm text-muted-foreground">
-                        Volume
-                      </div>
-                      <div className="flex items-center mt-1 font-medium">
-                        <HardDrive className="mr-2 w-5 h-5" />
-                        {snapshotDetails?.["Volume Name"] ?? "-"}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="rounded-lg shadow-none border-muted/60">
-                    <CardContent className="p-5">
-                      <div className="flex gap-2 items-center text-sm text-muted-foreground">
-                        <HardDrive className="w-5 h-5" /> Status
-                      </div>
-                      <div className="mt-2 font-medium">
-                        {snapshotDetails?.Status ?? "-"}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="rounded-lg shadow-none border-muted/60">
-                    <CardContent className="p-5">
-                      <div className="text-sm text-muted-foreground">
-                        Created
-                      </div>
-                      <div className="mt-2 font-medium">
-                        {snapshotDetails?.Created ?? "-"}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                <Card className="rounded-lg shadow-none border-muted/60">
-                  <CardContent className="p-5">
-                    <div className="text-sm text-muted-foreground">
-                      Description
-                    </div>
-                    <div className="mt-2 font-medium whitespace-pre-line break-words">
-                      {snapshotDetails?.Description ?? (
-                        <span className="italic text-muted-foreground">
-                          No description
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ) : undefined}
-          </div>
-        </DialogContent>
-      </Dialog>
+        title={snapshotDetails?.Name ?? "Snapshot Details"}
+        badges={
+          <Badge variant="secondary" className="px-2 py-0 text-xs">
+            {snapshotDetails?.Status ?? "unknown"}
+          </Badge>
+        }
+        infoItems={[
+          [
+            {
+              label: "ID",
+              value: snapshotDetails?.ID ?? "N/A",
+              icon: FileText,
+              variant: "gray",
+            },
+            {
+              label: "Description",
+              value: snapshotDetails?.Description ?? "No description",
+              icon: FileText,
+              variant: "blue",
+            },
+            {
+              label: "Status",
+              value: snapshotDetails?.Status ?? "N/A",
+              icon: Server,
+              variant:
+                snapshotDetails?.Status === "available" ? "green" : "gray",
+            },
+            {
+              label: "Size",
+              value: snapshotDetails?.Size
+                ? `${snapshotDetails.Size} GB`
+                : "N/A",
+              icon: HardDrive,
+              variant: "teal",
+            },
+            {
+              label: "Volume Name",
+              value: snapshotDetails?.["Volume Name"] ?? "N/A",
+              icon: HardDrive,
+              variant: "indigo",
+            },
+            {
+              label: "Created",
+              value: snapshotDetails?.Created ?? "N/A",
+              icon: Calendar,
+              variant: "purple",
+            },
+          ],
+        ]}
+        actionButtons={
+          <Button
+            variant="outline"
+            onClick={() => setDetailsDialogOpen(false)}
+            className="rounded-full"
+          >
+            Close
+          </Button>
+        }
+      />
 
       <Dialog
         open={updateDialogOpen}
@@ -607,11 +546,11 @@ export function Snapshots() {
           <DialogHeader>
             <DialogTitle>Edit Snapshot</DialogTitle>
           </DialogHeader>
-          <div className="py-2 space-y-4">
+          <div className="space-y-4 py-2">
             <div>
               <Label
                 htmlFor="update-name"
-                className="mb-1 text-xs font-medium text-muted-foreground"
+                className="text-muted-foreground mb-1 text-xs font-medium"
               >
                 Name
               </Label>
@@ -626,13 +565,13 @@ export function Snapshots() {
             <div>
               <Label
                 htmlFor="update-description"
-                className="mb-1 text-xs font-medium text-muted-foreground"
+                className="text-muted-foreground mb-1 text-xs font-medium"
               >
                 Description
               </Label>
               <Textarea
                 id="update-description"
-                className="py-2 px-3 w-full rounded-md border resize-none bg-background text-foreground"
+                className="bg-background text-foreground w-full resize-none rounded-md border px-3 py-2"
                 value={updateDescription}
                 onChange={(e) => setUpdateDescription(e.target.value)}
                 disabled={updateLoading || updateMutation.isPending}
@@ -640,7 +579,7 @@ export function Snapshots() {
               />
             </div>
             {updateError && (
-              <div className="text-xs text-destructive">{updateError}</div>
+              <div className="text-destructive text-xs">{updateError}</div>
             )}
           </div>
           <DialogFooter className="flex-col gap-3 pt-4 sm:flex-row">
@@ -648,9 +587,9 @@ export function Snapshots() {
               variant="outline"
               onClick={() => setUpdateDialogOpen(false)}
               disabled={updateMutation.isPending}
-              className="order-2 py-2 px-6 w-full rounded-full cursor-pointer sm:order-1 sm:w-auto bg-muted text-foreground"
+              className="bg-muted text-foreground order-2 w-full cursor-pointer rounded-full px-6 py-2 sm:order-1 sm:w-auto"
             >
-              <X className="mr-1.5 w-4 h-4" />
+              <X className="mr-1.5 h-4 w-4" />
               Cancel
             </Button>
             <Button
@@ -664,9 +603,9 @@ export function Snapshots() {
                 })
               }
               disabled={updateMutation.isPending || !updateName}
-              className="flex order-1 justify-center items-center py-2 px-6 w-full rounded-full cursor-pointer sm:order-2 sm:w-auto text-background bg-primary"
+              className="text-background bg-primary order-1 flex w-full cursor-pointer items-center justify-center rounded-full px-6 py-2 sm:order-2 sm:w-auto"
             >
-              <Save className="mr-1.5 w-4 h-4" />
+              <Save className="mr-1.5 h-4 w-4" />
               {updateMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
@@ -687,24 +626,24 @@ export function Snapshots() {
           <DialogHeader>
             <DialogTitle>Restore Snapshot</DialogTitle>
           </DialogHeader>
-          <div className="py-2 space-y-4">
+          <div className="space-y-4 py-2">
             <div>
               <Label
                 htmlFor="restore-name"
-                className="mb-1 text-xs font-medium text-muted-foreground"
+                className="text-muted-foreground mb-1 text-xs font-medium"
               >
                 New Volume Name
               </Label>
               <Input
                 id="restore-name"
-                className="py-2 px-3 w-full rounded-full border bg-background text-foreground"
+                className="bg-background text-foreground w-full rounded-full border px-3 py-2"
                 value={restoreName}
                 onChange={(e) => setRestoreName(e.target.value)}
                 disabled={restoreMutation.isPending}
               />
             </div>
             {restoreError && (
-              <div className="text-xs text-destructive">{restoreError}</div>
+              <div className="text-destructive text-xs">{restoreError}</div>
             )}
           </div>
           <DialogFooter className="flex-col gap-3 pt-4 sm:flex-row">
@@ -712,7 +651,7 @@ export function Snapshots() {
               variant="outline"
               onClick={() => setRestoreDialogOpen(false)}
               disabled={restoreMutation.isPending}
-              className="order-2 py-2 px-6 w-full rounded-full cursor-pointer sm:order-1 sm:w-auto bg-muted text-foreground"
+              className="bg-muted text-foreground order-2 w-full cursor-pointer rounded-full px-6 py-2 sm:order-1 sm:w-auto"
             >
               Cancel
             </Button>
@@ -727,9 +666,9 @@ export function Snapshots() {
                 })
               }
               disabled={restoreMutation.isPending || !restoreName}
-              className="flex order-1 justify-center items-center py-2 px-6 w-full rounded-full cursor-pointer sm:order-2 sm:w-auto text-background bg-primary"
+              className="text-background bg-primary order-1 flex w-full cursor-pointer items-center justify-center rounded-full px-6 py-2 sm:order-2 sm:w-auto"
             >
-              <RotateCcw className="mr-1.5 w-4 h-4" />
+              <RotateCcw className="mr-1.5 h-4 w-4" />
               {restoreMutation.isPending ? "Restoring..." : "Restore"}
             </Button>
           </DialogFooter>
@@ -743,7 +682,7 @@ export function Snapshots() {
         description={
           <>
             Are you sure you want to delete this snapshot{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {snapshotToDelete?.name}
             </span>
             ? This action cannot be undone.

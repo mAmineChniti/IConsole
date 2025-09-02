@@ -25,7 +25,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <TokenExpiration />
-      <body className="h-full antialiased bg-background text-foreground">
+      <body className="bg-background text-foreground h-full antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -30,7 +30,7 @@ export function XSearch({
 
   return (
     <div className={cn("relative flex-1", containerClassName)}>
-      <Search className="absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-muted-foreground" />
+      <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
       <Input
         placeholder={placeholder}
         value={value}
@@ -43,12 +43,12 @@ export function XSearch({
         <Button
           type="button"
           onClick={handleClear}
-          className="absolute right-1.5 top-1/2 w-7 h-7 rounded-full -translate-y-1/2 cursor-pointer"
+          className="absolute top-1/2 right-1.5 h-7 w-7 -translate-y-1/2 cursor-pointer rounded-full"
           variant="ghost"
           size="icon"
           aria-label="Clear search"
         >
-          <X className="w-4 h-4" />
+          <X className="h-4 w-4" />
         </Button>
       )}
     </div>
