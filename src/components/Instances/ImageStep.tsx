@@ -1,6 +1,6 @@
 "use client";
 
-import { GetDistroIcon } from "@/components/GetDistroIcon";
+import { GetDistroIcon } from "@/components/Images/GetDistroIcon";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";

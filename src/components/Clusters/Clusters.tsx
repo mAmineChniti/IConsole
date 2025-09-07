@@ -1,8 +1,8 @@
 "use client";
 
-import { ClusterDetailsDialog } from "@/components/ClusterDetailsDialog";
-import { ClusterTokenDialog } from "@/components/ClusterTokenDialog";
-import { CreateClusterDialog } from "@/components/CreateClusterDialog";
+import { ClusterDetailsDialog } from "@/components/Clusters/ClusterDetailsDialog";
+import { ClusterTokenDialog } from "@/components/Clusters/ClusterTokenDialog";
+import { CreateClusterDialog } from "@/components/Clusters/CreateClusterDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";

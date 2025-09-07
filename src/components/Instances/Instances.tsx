@@ -1,7 +1,8 @@
 "use client";
 
-import { InstanceActions } from "@/components/InstanceActions";
-import InstanceLogs from "@/components/InstanceLogs";
+import { InstanceActions } from "@/components/Instances/InstanceActions";
+import InstanceLogs from "@/components/Instances/InstanceLogs";
+import { VM } from "@/components/Instances/VM";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
@@ -13,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { VM } from "@/components/VM";
 import { InfraService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {

@@ -3,6 +3,7 @@ import { Providers } from "@/components/providers";
 import { TokenExpiration } from "@/components/TokenExpiration";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "IConsole",
@@ -17,15 +18,15 @@ const geist = Geist({
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{ children: ReactNode }>) {
   return (
     <html
       lang="en"
       className={`${geist.variable} h-full`}
       suppressHydrationWarning
     >
-      <TokenExpiration />
       <body className="bg-background text-foreground h-full antialiased">
+        <TokenExpiration />
         <Providers>{children}</Providers>
       </body>
     </html>

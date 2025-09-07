@@ -1,6 +1,6 @@
 "use client";
 
-import { FlavorCreateDialog } from "@/components/FlavorCreateDialog";
+import { FlavorCreateDialog } from "@/components/Flavors/FlavorCreateDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";

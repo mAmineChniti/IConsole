@@ -1,12 +1,12 @@
 "use client";
 
-import { DescribeVMTab } from "@/components/DescribeVMTab";
-import { DetailsStep } from "@/components/DetailsStep";
-import { FlavorStep } from "@/components/FlavorStep";
-import { ImageStep } from "@/components/ImageStep";
-import { NetworkStep } from "@/components/NetworkStep";
+import { DescribeVMTab } from "@/components/Instances/DescribeVMTab";
+import { DetailsStep } from "@/components/Instances/DetailsStep";
+import { FlavorStep } from "@/components/Instances/FlavorStep";
+import { ImageStep } from "@/components/Instances/ImageStep";
+import { NetworkStep } from "@/components/Instances/NetworkStep";
+import { SummaryStep } from "@/components/Instances/SummaryStep";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
-import { SummaryStep } from "@/components/SummaryStep";
 import { Button } from "@/components/ui/button";
 import {
   Card,

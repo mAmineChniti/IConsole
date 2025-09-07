@@ -93,6 +93,7 @@
     "onnxruntime-node",
     "protobufjs",
     "rustywind",
+    "sharp",
     "unrs-resolver"
   ]
 }

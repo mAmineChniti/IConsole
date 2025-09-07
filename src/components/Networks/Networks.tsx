@@ -1,6 +1,6 @@
 "use client";
 
-import { NetworkCreate } from "@/components/NetworkCreate";
+import { NetworkCreate } from "@/components/Networks/NetworkCreate";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
