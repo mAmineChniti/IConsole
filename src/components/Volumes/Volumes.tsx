@@ -23,12 +23,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { VolumeAttachmentsDialog } from "@/components/VolumeAttachmentsDialog";
-import { VolumeChangeTypeDialog } from "@/components/VolumeChangeTypeDialog";
-import { VolumeCreateForm } from "@/components/VolumeCreateForm";
-import { VolumeCreateSnapshotDialog } from "@/components/VolumeCreateSnapshotDialog";
-import { VolumeExtendDialog } from "@/components/VolumeExtendDialog";
-import { VolumeUploadToImageDialog } from "@/components/VolumeUploadToImageDialog";
+import { VolumeAttachmentsDialog } from "@/components/Volumes/VolumeAttachmentsDialog";
+import { VolumeChangeTypeDialog } from "@/components/Volumes/VolumeChangeTypeDialog";
+import { VolumeCreateForm } from "@/components/Volumes/VolumeCreateForm";
+import { VolumeCreateSnapshotDialog } from "@/components/Volumes/VolumeCreateSnapshotDialog";
+import { VolumeExtendDialog } from "@/components/Volumes/VolumeExtendDialog";
+import { VolumeUploadToImageDialog } from "@/components/Volumes/VolumeUploadToImageDialog";
 import { VolumeService } from "@/lib/requests";
 import { parseVolumeSizeGiB } from "@/lib/utils";
 import type { VolumeDeleteRequest } from "@/types/RequestInterfaces";

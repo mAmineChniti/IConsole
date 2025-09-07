@@ -1,10 +1,11 @@
 "use client";
 
-import { GetDistroIcon } from "@/components/GetDistroIcon";
-import { ImageCreateVolumeDialog } from "@/components/ImageCreateVolumeDialog";
-import { ImageEditDialog } from "@/components/ImageEditDialog";
-import { ImportByNameDialog } from "@/components/ImportByNameDialog";
-import { ImportFromUrlDialog } from "@/components/ImportFromUrlDialog";
+import { GetDistroIcon } from "@/components/Images/GetDistroIcon";
+import { ImageCreateVolumeDialog } from "@/components/Images/ImageCreateVolumeDialog";
+import { ImageEditDialog } from "@/components/Images/ImageEditDialog";
+import { ImportByNameDialog } from "@/components/Images/ImportByNameDialog";
+import { ImportFromUrlDialog } from "@/components/Images/ImportFromUrlDialog";
+import { UploadImageDialog } from "@/components/Images/UploadImageDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
@@ -28,7 +29,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { UploadImageDialog } from "@/components/UploadImageDialog";
 import { ImageService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
@@ -491,9 +491,7 @@ export function Images() {
                 },
                 {
                   label: "Size",
-                  value: detailsData?.size
-                    ? `${(detailsData.size / 1024 ** 3).toFixed(2)} GB`
-                    : "-",
+                  value: detailsData?.size,
                   icon: HardDrive,
                   variant: "blue",
                 },

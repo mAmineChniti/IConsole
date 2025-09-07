@@ -1,6 +1,7 @@
 "use client";
 
-import { ProjectFormDialog } from "@/components/ProjectFormDialog";
+import { ProjectFormDialog } from "@/components/Projects/ProjectFormDialog";
+import { UserManagementDialog } from "@/components/Projects/UserManagementDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
@@ -18,7 +19,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { UserManagementDialog } from "@/components/UserManagementDialog";
 import { ProjectService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {

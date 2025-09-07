@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { XSearch } from "@/components/reusable/XSearch";
-import { SecurityGroupCreateDialog } from "@/components/SecurityGroupCreateDialog";
+import { SecurityGroupCreateDialog } from "@/components/SecurityGroups/SecurityGroupCreateDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

@@ -58,7 +58,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export function ImportVM() {
+export function MigrateVM() {
   const [importFile, setImportFile] = useState<File | undefined>(undefined);
   const queryClient = useQueryClient();
 

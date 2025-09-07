@@ -1,7 +1,7 @@
 "use client";
 
-import { InstanceFlavorSelectDialog } from "@/components/InstanceFlavorSelectDialog";
-import { InstanceVolumeDialog } from "@/components/InstanceVolumeDialog";
+import { InstanceFlavorSelectDialog } from "@/components/Instances/InstanceFlavorSelectDialog";
+import { InstanceVolumeDialog } from "@/components/Instances/InstanceVolumeDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { Button } from "@/components/ui/button";
 import {

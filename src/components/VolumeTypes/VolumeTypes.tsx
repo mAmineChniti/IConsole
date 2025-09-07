@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { VolumeTypeCreateDialog } from "@/components/VolumeTypeCreateDialog";
+import { VolumeTypeCreateDialog } from "@/components/VolumeTypes/VolumeTypeCreateDialog";
 import { VolumeService } from "@/lib/requests";
 import type { VolumeTypeUpdateRequest } from "@/types/RequestInterfaces";
 import { VolumeTypeUpdateRequestSchema } from "@/types/RequestSchemas";

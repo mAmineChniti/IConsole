@@ -1,7 +1,7 @@
 "use client";
 
-import { KeyPairCreateDialog } from "@/components/KeyPairCreateDialog";
-import { KeyPairImportDialog } from "@/components/KeyPairImportDialog";
+import { KeyPairCreateDialog } from "@/components/Keypairs/KeyPairCreateDialog";
+import { KeyPairImportDialog } from "@/components/Keypairs/KeyPairImportDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";

@@ -14,8 +14,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { UserCreateForm } from "@/components/UserCreateForm";
-import { UserEditForm } from "@/components/UserEditForm";
+import { UserCreateForm } from "@/components/Users/UserCreateForm";
+import { UserEditForm } from "@/components/Users/UserEditForm";
 import { UserService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import type {
