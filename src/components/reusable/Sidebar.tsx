@@ -22,26 +22,38 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { AuthService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import {
-  ArrowRight,
+  Camera,
   ChevronDown,
+  Component,
   Cpu,
-  Expand,
+  Database,
+  Disc3,
   Folder,
   Globe,
   HardDrive,
   Home,
-  Key,
+  KeyRound,
+  Link as LinkIcon,
   LogOut,
-  Monitor,
   Moon,
+  MoveRight,
+  Network,
+  Router,
+  Scaling,
+  Server,
   Shield,
   Sun,
-  UserCircle2,
+  Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -49,90 +61,85 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const firstSidebarItems = [
-  {
-    title: "Overview",
-    icon: Home,
-    href: "/dashboard/overview",
-  },
-  {
-    title: "Users",
-    icon: UserCircle2,
-    href: "/dashboard/users",
-  },
+const identitySubItems = [
   {
     title: "Projects",
     icon: Folder,
     href: "/dashboard/projects",
   },
-] as const;
-
-const secondSidebarItems = [
   {
-    title: "Images",
-    icon: HardDrive,
-    href: "/dashboard/images",
-  },
-  {
-    title: "Key Pairs",
-    icon: Key,
-    href: "/dashboard/keypairs",
-  },
-  {
-    title: "Security Groups",
-    icon: Shield,
-    href: "/dashboard/security-groups",
-  },
-  {
-    title: "Networks",
-    icon: Globe,
-    href: "/dashboard/networks",
-  },
-  {
-    title: "Scaling",
-    icon: Expand,
-    href: "/dashboard/scale",
-  },
-  {
-    title: "Clusters",
-    icon: Monitor,
-    href: "/dashboard/clusters",
+    title: "Users",
+    icon: Users,
+    href: "/dashboard/users",
   },
 ] as const;
 
 const computeSubItems = [
   {
     title: "Instances",
-    icon: Monitor,
+    icon: Server,
     href: "/dashboard/instances",
-  },
-  {
-    title: "Migrate VM",
-    icon: ArrowRight,
-    href: "/dashboard/migrate-vm",
   },
   {
     title: "Flavors",
     icon: Cpu,
     href: "/dashboard/flavors",
   },
+  {
+    title: "Images",
+    icon: Disc3,
+    href: "/dashboard/images",
+  },
+  {
+    title: "Key Pairs",
+    icon: KeyRound,
+    href: "/dashboard/keypairs",
+  },
+  {
+    title: "Migrate VM",
+    icon: MoveRight,
+    href: "/dashboard/migrate-vm",
+  },
 ] as const;
 
-const volumesSubItems = [
+const storageSubItems = [
   {
     title: "Volumes",
-    icon: HardDrive,
+    icon: Database,
     href: "/dashboard/volumes",
   },
   {
     title: "Snapshots",
-    icon: Monitor,
+    icon: Camera,
     href: "/dashboard/snapshots",
   },
   {
     title: "Volume Types",
-    icon: HardDrive,
+    icon: Component,
     href: "/dashboard/volume-types",
+  },
+] as const;
+
+const networksSubItems = [
+  {
+    title: "Networks",
+    icon: Network,
+    href: "/dashboard/networks",
+  },
+  {
+    title: "Routers",
+    icon: Router,
+    href: "/dashboard/routers",
+  },
+  {
+    title: "Floating IPs",
+    icon: LinkIcon,
+    href: "/dashboard/floating-ips",
+  },
+  {
+    title: "Security Groups",
+    icon: Shield,
+    href: "/dashboard/security-groups",
   },
 ] as const;
 
@@ -149,10 +156,20 @@ export function Sidebar() {
   );
   const [computeOpen, setComputeOpen] = useState(initialComputeOpen);
 
-  const initialVolumeOpen = volumesSubItems.some(
+  const initialStorageOpen = storageSubItems.some(
     (item) => pathname === item.href,
   );
-  const [volumeOpen, setVolumeOpen] = useState(initialVolumeOpen);
+  const [storageOpen, setStorageOpen] = useState(initialStorageOpen);
+
+  const initialNetworksOpen = networksSubItems.some(
+    (item) => pathname === item.href,
+  );
+  const [networksOpen, setNetworksOpen] = useState(initialNetworksOpen);
+
+  const [computeTooltipOpen, setComputeTooltipOpen] = useState(false);
+  const [storageTooltipOpen, setStorageTooltipOpen] = useState(false);
+  const [networksTooltipOpen, setNetworksTooltipOpen] = useState(false);
+
   const [selectedProject, setSelectedProject] = useState<string>("");
 
   useEffect(() => {
@@ -399,29 +416,52 @@ export function Sidebar() {
               </Combobox>
             </SidebarMenuItem>
 
-            {firstSidebarItems.map((item) => {
-              const isActive = pathname === item.href;
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className={cn(
+                  "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                  pathname === "/dashboard/overview" && "rounded-full",
+                )}
+              >
+                <Link
+                  href="/dashboard/overview"
+                  className={cn(
+                    "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                    pathname === "/dashboard/overview"
+                      ? "bg-accent text-accent-foreground rounded-full font-bold"
+                      : "text-sidebar-foreground",
+                  )}
+                >
+                  <Home className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate text-sm font-medium">Overview</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            {identitySubItems.map((subItem) => {
+              const isSubActive = pathname === subItem.href;
               return (
-                <SidebarMenuItem key={item.href}>
+                <SidebarMenuItem key={subItem.href}>
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                      isActive && "rounded-full",
+                      "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                      isSubActive && "rounded-full",
                     )}
                   >
                     <Link
-                      href={item.href}
+                      href={subItem.href}
                       className={cn(
                         "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                        isActive
+                        isSubActive
                           ? "bg-accent text-accent-foreground rounded-full font-bold"
                           : "text-sidebar-foreground",
                       )}
                     >
-                      <item.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
                       <span className="truncate text-sm font-medium">
-                        {item.title}
+                        {subItem.title}
                       </span>
                     </Link>
                   </SidebarMenuButton>
@@ -430,33 +470,48 @@ export function Sidebar() {
             })}
 
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                className={cn(
-                  "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                  computeOpen && "rounded-full",
-                )}
+              <Tooltip
+                open={computeTooltipOpen && !computeOpen}
+                onOpenChange={setComputeTooltipOpen}
               >
-                <Button
-                  variant="ghost"
-                  onClick={() => setComputeOpen(!computeOpen)}
-                  className={cn(
-                    "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                    computeOpen && "rounded-full",
-                  )}
-                >
-                  <Cpu className="mr-3 h-4 w-4 flex-shrink-0" />
-                  <span className="flex-1 truncate text-left text-sm font-medium">
-                    Compute
-                  </span>
-                  <ChevronDown
+                <TooltipTrigger asChild>
+                  <SidebarMenuButton
+                    asChild
                     className={cn(
-                      "h-4 w-4 flex-shrink-0 transition-transform",
-                      computeOpen && "rotate-180",
+                      "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                      computeOpen && "rounded-full",
                     )}
-                  />
-                </Button>
-              </SidebarMenuButton>
+                  >
+                    <Button
+                      variant="ghost"
+                      onClick={() => setComputeOpen(!computeOpen)}
+                      className={cn(
+                        "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                        computeOpen && "rounded-full",
+                      )}
+                    >
+                      <Cpu className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="flex-1 truncate text-left text-sm font-medium">
+                        Compute
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 flex-shrink-0 transition-transform",
+                          computeOpen && "rotate-180",
+                        )}
+                      />
+                    </Button>
+                  </SidebarMenuButton>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  className="text-xs"
+                  avoidCollisions={true}
+                  onMouseEnter={() => setComputeTooltipOpen(false)}
+                >
+                  <p>Instances, Flavors, Images, Key Pairs, VM Migration</p>
+                </TooltipContent>
+              </Tooltip>
 
               {computeOpen && (
                 <SidebarMenuSub className="mt-1 ml-4 space-y-1 border-l-0 pl-0">
@@ -492,67 +547,54 @@ export function Sidebar() {
                 </SidebarMenuSub>
               )}
             </SidebarMenuItem>
-            {secondSidebarItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <SidebarMenuItem key={item.href}>
+
+            <SidebarMenuItem>
+              <Tooltip
+                open={storageTooltipOpen && !storageOpen}
+                onOpenChange={setStorageTooltipOpen}
+              >
+                <TooltipTrigger asChild>
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                      isActive && "rounded-full",
+                      "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                      storageOpen && "rounded-full",
                     )}
                   >
-                    <Link
-                      href={item.href}
+                    <Button
+                      variant="ghost"
+                      onClick={() => setStorageOpen(!storageOpen)}
                       className={cn(
-                        "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                        isActive
-                          ? "bg-accent text-accent-foreground rounded-full font-bold"
-                          : "text-sidebar-foreground",
+                        "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                        storageOpen && "rounded-full",
                       )}
                     >
-                      <item.icon className="mr-3 h-4 w-4 flex-shrink-0" />
-                      <span className="truncate text-sm font-medium">
-                        {item.title}
+                      <HardDrive className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="flex-1 truncate text-left text-sm font-medium">
+                        Storage
                       </span>
-                    </Link>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 flex-shrink-0 transition-transform",
+                          storageOpen && "rotate-180",
+                        )}
+                      />
+                    </Button>
                   </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                className={cn(
-                  "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                  volumeOpen && "rounded-full",
-                )}
-              >
-                <Button
-                  variant="ghost"
-                  onClick={() => setVolumeOpen(!volumeOpen)}
-                  className={cn(
-                    "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                    volumeOpen && "rounded-full",
-                  )}
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  className="text-xs"
+                  avoidCollisions={true}
+                  onMouseEnter={() => setStorageTooltipOpen(false)}
                 >
-                  <HardDrive className="mr-3 h-4 w-4 flex-shrink-0" />
-                  <span className="flex-1 truncate text-left text-sm font-medium">
-                    Volumes
-                  </span>
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 flex-shrink-0 transition-transform",
-                      volumeOpen && "rotate-180",
-                    )}
-                  />
-                </Button>
-              </SidebarMenuButton>
+                  <p>Volumes, Snapshots, Volume Types</p>
+                </TooltipContent>
+              </Tooltip>
 
-              {volumeOpen && (
+              {storageOpen && (
                 <SidebarMenuSub className="mt-1 ml-4 space-y-1 border-l-0 pl-0">
-                  {volumesSubItems.map((subItem) => {
+                  {storageSubItems.map((subItem) => {
                     const isSubActive = pathname === subItem.href;
                     return (
                       <SidebarMenuItem key={subItem.href}>
@@ -583,6 +625,131 @@ export function Sidebar() {
                   })}
                 </SidebarMenuSub>
               )}
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <Tooltip
+                open={networksTooltipOpen && !networksOpen}
+                onOpenChange={setNetworksTooltipOpen}
+              >
+                <TooltipTrigger asChild>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                      networksOpen && "rounded-full",
+                    )}
+                  >
+                    <Button
+                      variant="ghost"
+                      onClick={() => setNetworksOpen(!networksOpen)}
+                      className={cn(
+                        "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                        networksOpen && "rounded-full",
+                      )}
+                    >
+                      <Globe className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="flex-1 truncate text-left text-sm font-medium">
+                        Networks
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 flex-shrink-0 transition-transform",
+                          networksOpen && "rotate-180",
+                        )}
+                      />
+                    </Button>
+                  </SidebarMenuButton>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  className="text-xs"
+                  avoidCollisions={true}
+                  onMouseEnter={() => setNetworksTooltipOpen(false)}
+                >
+                  <p>Networks, Routers, Floating IPs, Security Groups</p>
+                </TooltipContent>
+              </Tooltip>
+
+              {networksOpen && (
+                <SidebarMenuSub className="mt-1 ml-4 space-y-1 border-l-0 pl-0">
+                  {networksSubItems.map((subItem) => {
+                    const isSubActive = pathname === subItem.href;
+                    return (
+                      <SidebarMenuItem key={subItem.href}>
+                        <SidebarMenuButton
+                          asChild
+                          className={cn(
+                            "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                            isSubActive && "rounded-full",
+                          )}
+                        >
+                          <Link
+                            href={subItem.href}
+                            className={cn(
+                              "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                              isSubActive
+                                ? "bg-accent text-accent-foreground rounded-full font-bold"
+                                : "text-sidebar-foreground",
+                            )}
+                          >
+                            <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate text-sm font-medium">
+                              {subItem.title}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenuSub>
+              )}
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className={cn(
+                  "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                  pathname === "/dashboard/clusters" && "rounded-full",
+                )}
+              >
+                <Link
+                  href="/dashboard/clusters"
+                  className={cn(
+                    "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                    pathname === "/dashboard/clusters"
+                      ? "bg-accent text-accent-foreground rounded-full font-bold"
+                      : "text-sidebar-foreground",
+                  )}
+                >
+                  <Server className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate text-sm font-medium">Clusters</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className={cn(
+                  "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                  pathname === "/dashboard/scale" && "rounded-full",
+                )}
+              >
+                <Link
+                  href="/dashboard/scale"
+                  className={cn(
+                    "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                    pathname === "/dashboard/scale"
+                      ? "bg-accent text-accent-foreground rounded-full font-bold"
+                      : "text-sidebar-foreground",
+                  )}
+                >
+                  <Scaling className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate text-sm font-medium">Scaling</span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>

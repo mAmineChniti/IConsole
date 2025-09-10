@@ -6,10 +6,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VolumeService } from "@/lib/requests";
-import { useState } from "react";
+import type { VolumeSnapshotCreateRequest } from "@/types/RequestInterfaces";
+import { VolumeSnapshotCreateRequestSchema } from "@/types/RequestSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function VolumeCreateSnapshotDialog({
@@ -23,88 +36,122 @@ export function VolumeCreateSnapshotDialog({
   volumeId: string | undefined;
   onSuccess?: () => void;
 }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const reset = () => {
-    setName("");
-    setDescription("");
+  const form = useForm<Omit<VolumeSnapshotCreateRequest, "volume_id">>({
+    resolver: zodResolver(
+      VolumeSnapshotCreateRequestSchema.omit({ volume_id: true }),
+    ),
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  });
+
+  const createSnapshotMutation = useMutation({
+    mutationFn: (data: VolumeSnapshotCreateRequest) =>
+      VolumeService.createSnapshot(data),
+    onSuccess: async () => {
+      toast.success("Snapshot creation started");
+      form.reset();
+      onOpenChange(false);
+      await queryClient.invalidateQueries({
+        queryKey: ["snapshots", "list"],
+      });
+      onSuccess?.();
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to create snapshot");
+    },
+  });
+
+  const onSubmit = (values: Omit<VolumeSnapshotCreateRequest, "volume_id">) => {
+    if (!volumeId) return;
+    createSnapshotMutation.mutate({
+      volume_id: volumeId,
+      name: values.name.trim(),
+      description: values.description?.trim() ?? undefined,
+    });
   };
 
-  const handleCreate = async () => {
-    if (!volumeId || name.trim().length === 0) return;
-    setLoading(true);
-    try {
-      await VolumeService.createSnapshot({
-        volume_id: volumeId,
-        name: name.trim(),
-        description: description.trim() || undefined,
-      });
-      toast.success("Snapshot creation started");
-      onOpenChange(false);
-      reset();
-      onSuccess?.();
-    } catch (e: unknown) {
-      toast.error((e as Error).message);
-    } finally {
-      setLoading(false);
+  const handleOpenChange = (open: boolean) => {
+    onOpenChange(open);
+    if (!open) {
+      form.reset();
     }
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        onOpenChange(o);
-        if (!o) reset();
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Snapshot</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium">Name</label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Snapshot name"
-              className="w-full rounded-full"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Snapshot name"
+                      className="w-full rounded-full"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Description
-            </label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional description"
-              className="w-full"
-              rows={3}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Optional description"
+                      className="w-full"
+                      rows={3}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
-            className="cursor-pointer rounded-full"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            onClick={handleCreate}
-            disabled={loading || name.trim().length === 0}
-            className="cursor-pointer rounded-full"
-          >
-            {loading ? "Creating..." : "Create Snapshot"}
-          </Button>
-        </DialogFooter>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleOpenChange(false)}
+                disabled={createSnapshotMutation.isPending}
+                className="cursor-pointer rounded-full"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={createSnapshotMutation.isPending}
+                className="cursor-pointer rounded-full"
+              >
+                {createSnapshotMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Snapshot"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

@@ -609,15 +609,15 @@ export function Overview() {
                       <StatusBadge
                         status={service.status}
                         statusTextMap={{
-                          enabled: "ACTIVE",
-                          disabled: "SHUTOFF",
+                          ENABLED: "ACTIVE",
+                          DISABLED: "SHUTOFF",
                         }}
                       />
                       <StatusBadge
                         status={service.state}
                         statusTextMap={{
-                          up: "ACTIVE",
-                          down: "ERROR",
+                          UP: "ACTIVE",
+                          DOWN: "ERROR",
                         }}
                       />
                     </div>

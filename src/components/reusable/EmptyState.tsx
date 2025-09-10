@@ -6,27 +6,12 @@ import { cn } from "@/lib/utils";
 import { Inbox, Plus, RefreshCw } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
-export type EmptyPrimaryAction = {
+type EmptyPrimaryAction = {
   label: string;
   onClick: () => void;
   disabled?: boolean;
   icon?: ReactNode;
   className?: string;
-};
-
-export type EmptyStateProps = {
-  text: string;
-  onRefresh: () => void;
-  refreshing?: boolean;
-  primaryLabel?: string;
-  onPrimary?: () => void;
-  primaryDisabled?: boolean;
-  title?: string;
-  icon?: ReactNode;
-  variant?: "elevated" | "subtle" | "dashed";
-  compact?: boolean;
-
-  primaryActions?: EmptyPrimaryAction[];
 };
 
 export function EmptyState({
@@ -41,7 +26,20 @@ export function EmptyState({
   variant = "elevated",
   compact = false,
   primaryActions,
-}: EmptyStateProps) {
+}: {
+  text: string;
+  onRefresh: () => void;
+  refreshing?: boolean;
+  primaryLabel?: string;
+  onPrimary?: () => void;
+  primaryDisabled?: boolean;
+  title?: string;
+  icon?: ReactNode;
+  variant?: "elevated" | "subtle" | "dashed";
+  compact?: boolean;
+
+  primaryActions?: EmptyPrimaryAction[];
+}) {
   const padding = compact ? "p-5 sm:p-6" : "p-6 sm:p-8 lg:p-10";
   const minH = compact ? "min-h-[180px]" : "min-h-[220px]";
   const cardBase =

@@ -2,6 +2,7 @@
 
 import { InstanceFlavorSelectDialog } from "@/components/Instances/InstanceFlavorSelectDialog";
 import { InstanceVolumeDialog } from "@/components/Instances/InstanceVolumeDialog";
+import { SnapshotDialog } from "@/components/Instances/SnapshotDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +57,7 @@ export function InstanceActions({
   const isDisabled = disabled || status === "BUILD";
   const [isResizeDialogOpen, setIsResizeDialogOpen] = useState(false);
   const [isVolumeDialogOpen, setIsVolumeDialogOpen] = useState(false);
+  const [showSnapshotDialog, setShowSnapshotDialog] = useState(false);
 
   const {
     data: consoleData,
@@ -247,22 +249,6 @@ export function InstanceActions({
             : "An unexpected error occurred";
       toast.error(message);
     },
-  });
-
-  const createSnapshotMutation = useMutation({
-    mutationFn: () =>
-      InfraService.createSnapshot({
-        instance_id: instance.id,
-        snapshot_name: `snapshot-${instance.instance_name.slice(0, 8)}-${Date.now()}`,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["snapshots", "list"] });
-      toast.success("Snapshot created successfully");
-    },
-    onError: (err: unknown) =>
-      toast.error(
-        err instanceof Error ? err.message : "Failed to create snapshot",
-      ),
   });
 
   const canStart = status === "SHUTOFF" && !isDisabled;
@@ -472,16 +458,15 @@ export function InstanceActions({
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
-                    createSnapshotMutation.mutate();
+                    setShowSnapshotDialog(true);
                   }}
-                  disabled={createSnapshotMutation.isPending || isDisabled}
+                  disabled={isDisabled}
                 >
                   <Camera className="mr-2 h-4 w-4" /> Create Snapshot
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem
                 onClick={(e) => {
-                  e.preventDefault();
                   e.stopPropagation();
                   setIsVolumeDialogOpen(true);
                 }}
@@ -543,6 +528,15 @@ export function InstanceActions({
           onOpenChange={setIsResizeDialogOpen}
           currentFlavorId={currentFlavorId}
           onSelect={handleResize}
+        />
+      </div>
+      <div onClick={(e) => e.stopPropagation()}>
+        <SnapshotDialog
+          open={showSnapshotDialog}
+          onOpenChange={setShowSnapshotDialog}
+          instanceId={instance.id}
+          instanceName={instance.instance_name}
+          disabled={isDisabled}
         />
       </div>
     </div>

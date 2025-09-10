@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Plus, RefreshCw } from "lucide-react";
 import type { ReactNode } from "react";
 
-export type HeaderActionsMainButton = {
+type HeaderActionsMainButton = {
   onClick: () => void;
   label: string;
   shortLabel?: string;
@@ -18,19 +18,6 @@ export type HeaderActionsMainButton = {
   disabled?: boolean;
   tooltip?: string;
   className?: string;
-};
-
-export type HeaderActionsProps = {
-  onRefresh: () => void;
-  isRefreshing?: boolean;
-  refreshTooltip?: string;
-  refreshAriaLabel?: string;
-  className?: string;
-  refreshButtonClassName?: string;
-
-  mainButton?: HeaderActionsMainButton;
-
-  mainButtons?: HeaderActionsMainButton[];
 };
 
 export function HeaderActions({
@@ -42,7 +29,18 @@ export function HeaderActions({
   refreshButtonClassName,
   mainButton,
   mainButtons,
-}: HeaderActionsProps) {
+}: {
+  onRefresh: () => void;
+  isRefreshing?: boolean;
+  refreshTooltip?: string;
+  refreshAriaLabel?: string;
+  className?: string;
+  refreshButtonClassName?: string;
+
+  mainButton?: HeaderActionsMainButton;
+
+  mainButtons?: HeaderActionsMainButton[];
+}) {
   return (
     <div
       className={cn(

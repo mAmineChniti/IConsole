@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { VolumeService } from "@/lib/requests";
 import type { VolumeAttachmentsDetailsResponse } from "@/types/ResponseInterfaces";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -28,6 +28,8 @@ export function VolumeAttachmentsDialog({
   onOpenChange: (open: boolean) => void;
   volumeId: string | undefined;
 }) {
+  const queryClient = useQueryClient();
+
   const { data, isLoading, error, refetch } = useQuery<
     VolumeAttachmentsDetailsResponse | undefined
   >({
@@ -38,10 +40,12 @@ export function VolumeAttachmentsDialog({
     },
     enabled: !!volumeId,
   });
+
   const [selectedInstance, setSelectedInstance] = useState<
     string | undefined
   >();
   const [attaching, setAttaching] = useState(false);
+
   const {
     data: instances,
     isLoading: isLoadingInstances,
@@ -58,18 +62,26 @@ export function VolumeAttachmentsDialog({
           }),
     enabled: !!volumeId,
   });
-  const [detachingId, setDetachingId] = useState<string | undefined>(undefined);
-  const handleDetach = async (attachmentId: string) => {
-    setDetachingId(attachmentId);
-    try {
-      await VolumeService.detach({ attachment_id: attachmentId });
+
+  const detachMutation = useMutation({
+    mutationFn: ({ attachment_id }: { attachment_id: string }) =>
+      VolumeService.detach({ attachment_id }),
+    onSuccess: async () => {
       toast.success("Volume detached successfully");
-      await refetch();
-    } catch (e: unknown) {
-      toast.error((e as Error).message || "Failed to detach volume");
-    } finally {
-      setDetachingId(undefined);
-    }
+      await queryClient.invalidateQueries({
+        queryKey: ["volume-attachments", volumeId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["volumes"],
+      });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to detach volume");
+    },
+  });
+
+  const handleDetach = (attachmentId: string) => {
+    detachMutation.mutate({ attachment_id: attachmentId });
   };
 
   return (
@@ -178,9 +190,11 @@ export function VolumeAttachmentsDialog({
                         variant="destructive"
                         className="cursor-pointer rounded-full"
                         onClick={() => handleDetach(att.attachment_id)}
-                        disabled={!!detachingId}
+                        disabled={detachMutation.isPending}
                       >
-                        {detachingId === att.attachment_id
+                        {detachMutation.isPending &&
+                        detachMutation.variables?.attachment_id ===
+                          att.attachment_id
                           ? "Detaching..."
                           : "Detach"}
                       </Button>

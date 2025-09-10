@@ -528,10 +528,7 @@ export function Volumes() {
       )}
       <InfoDialog
         open={detailsDialogOpen}
-        onOpenChange={(open) => {
-          setDetailsDialogOpen(open);
-          if (!open) setSelectedVolumeId(undefined);
-        }}
+        onOpenChange={setDetailsDialogOpen}
         isLoading={volumeDetailsLoading}
         title={volumeDetails?.Nom ?? "Volume Details"}
         badges={<StatusBadge status={selectedVolumeItem?.Status ?? ""} />}

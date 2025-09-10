@@ -46,11 +46,6 @@ export function UsersManager() {
     { id: string; name?: string } | undefined
   >(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  useEffect(() => {
-    if (!deleteDialogOpen) {
-      setUserToDelete(undefined);
-    }
-  }, [deleteDialogOpen]);
   const [visibleCount, setVisibleCount] = useState(6);
 
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
@@ -328,12 +323,7 @@ export function UsersManager() {
           <InfoDialog
             open={detailsDialogOpen}
             isLoading={detailsLoading}
-            onOpenChange={(open) => {
-              setDetailsDialogOpen(open);
-              if (!open) {
-                setSelectedUser(undefined);
-              }
-            }}
+            onOpenChange={setDetailsDialogOpen}
             title={selectedUser?.name ?? "User Details"}
             infoItems={
               selectedUser

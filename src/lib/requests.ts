@@ -2,6 +2,7 @@ import { env } from "@/env";
 import { createSearchParams } from "@/lib/utils";
 import type {
   AssignUserToProjectRequest,
+  AttachPrivateNetworkRequest,
   ClusterActionRequest,
   ClusterCreateRequest,
   ClusterTokenRequest,
@@ -10,6 +11,9 @@ import type {
   FlavorCreateRequest,
   FlavorDeleteRequest,
   FlavorUpdateRequest,
+  FloatingIPAssociateRequest,
+  FloatingIPCreateRequest,
+  FloatingIPIdRequest,
   FloatingIPRequest,
   IdRequest,
   ImageCreateVolumeRequest,
@@ -29,13 +33,14 @@ import type {
   KeyPairImportFromFileRequest,
   LoginRequest,
   NetworkCreateRequest,
-  NetworkDeleteRequest,
+  NetworkIdRequest,
   ProjectCreateRequest,
   ProjectUpdateRequest,
+  RemoveRouterInterfaceRequest,
   RemoveUserFromProjectRequest,
   ResizeRequest,
-  RouterAddInterfaceRequest,
   RouterCreateRequest,
+  RouterIdRequest,
   ScaleNodeRequest,
   SecurityGroupCreateRequest,
   SecurityGroupDeleteRequest,
@@ -76,6 +81,8 @@ import type {
   DebugRoleAssignmentsResponse,
   FlavorActionResponse,
   FlavorDetails,
+  FlavorListResponse,
+  FloatingIpsListResponse,
   GetLogsResponse,
   ImageDeleteResponse,
   ImageDetails,
@@ -93,18 +100,22 @@ import type {
   LogoutResponse,
   NetworkCreateResponse,
   NetworkDeleteResponse,
+  NetworkDetails,
   NetworkListResponse,
   NovaActionResponse,
   ProjectDeleteResponse,
   ProjectDetailsResponse,
   ProjectListResponse,
   ProjectsResponse,
+  PublicPrivateNetworksResponse,
   QemuImgCheckResponse,
   RemoveUserResponse,
   ResourcesResponse,
   RolesResponse,
-  RouterAddInterfaceResponse,
   RouterCreateResponse,
+  RouterDetails,
+  RouterInterfacesResponse,
+  RouterListResponse,
   ScaleHealthResponse,
   ScaleNodeResponse,
   SecurityGroup,
@@ -112,7 +123,6 @@ import type {
   SecurityGroupDeleteResponse,
   SecurityGroupListResponse,
   SecurityGroupRuleCreateResponse,
-  SecurityGroupRuleDeleteResponse,
   SecurityGroupRuleListResponse,
   UnassignedUsersResponse,
   UpdateUserRolesResponse,
@@ -121,6 +131,7 @@ import type {
   UserDetailsResponse,
   UserListResponse,
   VMCreateResponse,
+  VMListResponse,
   VMwareImportResponse,
   VolumeActionResponse,
   VolumeAttachedInstancesResponse,
@@ -128,6 +139,7 @@ import type {
   VolumeAvailableInstancesResponse,
   VolumeDetails,
   VolumeGetDetails,
+  VolumeListResponse,
   VolumeSnapshotDetails,
   VolumeSnapshotListResponse,
   VolumeType,
@@ -216,11 +228,15 @@ const API_CONFIG = {
     VOLUMES: "/image/volumes",
   },
   NETWORK: {
+    BASE: "/network/network",
+    NETWORKS: "/network/networks",
     LIST: "/network/list",
     CREATE: "/network/networks/create",
-    ROUTER_CREATE: "/network/router/create",
-    ROUTER_ADD_INTERFACE: "/network/router/",
-    DELETE: "/network/delete/",
+    DELETE: "/network/delete",
+    ROUTER: "/network/router",
+    ROUTERS: "/network/routers",
+    FLOATING_IPS: "/network/floatingips",
+    VMS: "/network/vms",
   },
   SCALE: {
     HEALTH: "/scale/",
@@ -557,7 +573,7 @@ export const ImageService = {
     const url =
       API_CONFIG.BASE_URL +
       API_CONFIG.IMAGE.IMPORT_FROM_NAME +
-      `?description=${encodeURIComponent(params.description)}${params.visibility ? `&visibility=${params.visibility}` : ""}`;
+      `?description=${encodeURIComponent(params.description)}${params.visibility ? `&visibility=${params.visibility}` : ""}&protected=${params.protected}`;
     const result = await client.post<ImageImportFromNameResponse>(
       url,
       {
@@ -667,6 +683,16 @@ export const NetworkService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
+  async get(data: NetworkIdRequest): Promise<NetworkDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<NetworkDetails>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.BASE + `/${data.network_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
   async create(data: NetworkCreateRequest): Promise<NetworkCreateResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
@@ -678,45 +704,176 @@ export const NetworkService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
+  async delete(data: NetworkIdRequest): Promise<NetworkDeleteResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.delete<NetworkDeleteResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.DELETE + `/${data.network_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async publicNetworks(): Promise<PublicPrivateNetworksResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<PublicPrivateNetworksResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.NETWORKS + "/public",
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async privateNetworks(): Promise<PublicPrivateNetworksResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<PublicPrivateNetworksResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.NETWORKS + "/private",
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
   async createRouter(data: RouterCreateRequest): Promise<RouterCreateResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<RouterCreateResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.ROUTER_CREATE,
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.ROUTER + "/create",
       { type: "json", data },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
-  async addRouterInterface(
-    routerId: string,
-    data: RouterAddInterfaceRequest,
-  ): Promise<RouterAddInterfaceResponse> {
+  async attachPrivateNetwork(
+    data: AttachPrivateNetworkRequest,
+  ): Promise<unknown> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<RouterAddInterfaceResponse>(
+    const result = await client.post<unknown>(
       API_CONFIG.BASE_URL +
-        API_CONFIG.NETWORK.ROUTER_ADD_INTERFACE +
-        `${routerId}/add-interface`,
+        API_CONFIG.NETWORK.ROUTER +
+        "/attach-private-network",
       { type: "json", data },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
-  async delete(data: NetworkDeleteRequest): Promise<NetworkDeleteResponse> {
+  async routersList(): Promise<RouterListResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.delete<NetworkDeleteResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.DELETE + data.network_id,
+    const result = await client.get<RouterListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.ROUTERS,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async getRouter(data: RouterIdRequest): Promise<RouterDetails> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<RouterDetails>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.ROUTER + `/${data.router_id}`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async getRouterInterfaces(
+    data: RouterIdRequest,
+  ): Promise<RouterInterfacesResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<RouterInterfacesResponse>(
+      API_CONFIG.BASE_URL +
+        API_CONFIG.NETWORK.ROUTER +
+        `/${data.router_id}/interfaces`,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async removeRouterInterface(
+    data: RemoveRouterInterfaceRequest,
+  ): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.ROUTER + "/remove-interface",
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async listFloatingIPs(): Promise<FloatingIpsListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<FloatingIpsListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async createFloatingIP(data: FloatingIPCreateRequest): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/create",
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async deleteFloatingIP(data: FloatingIPIdRequest): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/delete",
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async listVMS(): Promise<VMListResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.get<VMListResponse>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.VMS,
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async dissociateFloatingIP(data: FloatingIPIdRequest): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/dissociate",
+      { type: "json", data },
+      { headers: token },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
+  },
+  async associateFloatingIP(
+    data: FloatingIPAssociateRequest,
+  ): Promise<unknown> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const result = await client.post<unknown>(
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/associate",
+      { type: "json", data },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
 };
-
 export const InfraService = {
   async listInstances(): Promise<InstanceListResponse> {
     const token = authHeaders();
@@ -1156,10 +1313,10 @@ export const FlavorService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
-  async list(): Promise<FlavorDetails[]> {
+  async list(): Promise<FlavorListResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.get<FlavorDetails[]>(
+    const result = await client.get<FlavorListResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.FLAVOR.BASE,
       { headers: token },
     );
@@ -1218,10 +1375,10 @@ export const FlavorService = {
 };
 
 export const VolumeService = {
-  async list(): Promise<VolumeDetails[]> {
+  async list(): Promise<VolumeListResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.get<VolumeDetails[]>(
+    const result = await client.get<VolumeListResponse>(
       API_CONFIG.BASE_URL + API_CONFIG.VOLUME.BASE,
       { headers: token },
     );
@@ -1592,12 +1749,10 @@ export const SecurityGroupService = {
     if (result.error) throw new Error(result.error.message);
     return result.data!;
   },
-  async deleteRule(
-    data: SecurityGroupRuleDeleteRequest,
-  ): Promise<SecurityGroupRuleDeleteResponse> {
+  async deleteRule(data: SecurityGroupRuleDeleteRequest): Promise<unknown> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.delete<SecurityGroupRuleDeleteResponse>(
+    const result = await client.delete<unknown>(
       API_CONFIG.BASE_URL +
         `${API_CONFIG.SECURITY_GROUP.DELETE_RULE}${data.rule_id}`,
       { headers: token },

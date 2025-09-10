@@ -6,42 +6,34 @@ import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
+import { InfoDialog } from "@/components/reusable/InfoDialog";
 import { StatusBadge } from "@/components/reusable/StatusBadge";
 import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NetworkService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
-import type { RouterCreateRequest } from "@/types/RequestInterfaces";
-import { RouterCreateRequestSchema } from "@/types/RequestSchemas";
 import type {
+  NetworkDetails,
   NetworkListItem,
   NetworkListResponse,
-  RouterCreateResponse,
 } from "@/types/ResponseInterfaces";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Network, Plus, Router, Trash2 } from "lucide-react";
+import {
+  FolderGit,
+  Gauge,
+  Globe,
+  Hash,
+  Network,
+  Plus,
+  Power,
+  Share2,
+  Trash2,
+  Waypoints,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function Networks() {
@@ -49,27 +41,20 @@ export function Networks() {
   const [showCreate, setShowCreate] = useState(false);
   const [visibleCount, setVisibleCount] = useState(6);
   const [search, setSearch] = useState("");
-  const [showRouterDialog, setShowRouterDialog] = useState(false);
-  const [selectedNetworkId, setSelectedNetworkId] = useState<
-    string | undefined
-  >(undefined);
   const [networkToDelete, setNetworkToDelete] = useState<
     NetworkListItem | undefined
   >(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [selectedNetwork, setSelectedNetwork] = useState<
+    NetworkListItem | undefined
+  >(undefined);
+
   useEffect(() => {
     if (!deleteDialogOpen) {
       setNetworkToDelete(undefined);
     }
   }, [deleteDialogOpen]);
-
-  const routerForm = useForm<RouterCreateRequest>({
-    resolver: zodResolver(RouterCreateRequestSchema),
-    defaultValues: {
-      router_name: "",
-      external_network_id: "",
-    },
-  });
 
   const {
     data: networks,
@@ -84,50 +69,18 @@ export function Networks() {
     staleTime: 15000,
   });
 
+  const { data: networkDetails, isLoading: isLoadingDetails } =
+    useQuery<NetworkDetails>({
+      queryKey: ["networks", "details", selectedNetwork?.id],
+      queryFn: () => NetworkService.get({ network_id: selectedNetwork!.id }),
+      enabled: !!selectedNetwork && detailsDialogOpen,
+    });
+
   const networkList: NetworkListResponse = networks ?? [];
 
   useEffect(() => {
     setVisibleCount(6);
   }, [search]);
-
-  const createRouterMutation = useMutation({
-    mutationFn: async (data: RouterCreateRequest) => {
-      return NetworkService.createRouter(data);
-    },
-    onSuccess: async (router: RouterCreateResponse) => {
-      if (selectedNetworkId) {
-        const current =
-          queryClient.getQueryData<NetworkListResponse>(["networks", "list"]) ??
-          [];
-        const net = current.find((n) => n.id === selectedNetworkId);
-        const firstSubnetId = net?.subnets?.[0];
-        if (firstSubnetId) {
-          try {
-            await NetworkService.addRouterInterface(router.id, {
-              subnet_id: firstSubnetId,
-            });
-          } catch {
-            toast.error(
-              "Router created but failed to attach first subnet (attach manually)",
-            );
-          }
-        }
-      }
-      toast.success("Router created");
-      setShowRouterDialog(false);
-      routerForm.reset();
-      await queryClient.invalidateQueries({ queryKey: ["networks", "list"] });
-    },
-    onError: (err: unknown) => {
-      const message =
-        err instanceof Error
-          ? err.message
-          : typeof err === "string"
-            ? err
-            : "An unexpected error occurred";
-      toast.error(message);
-    },
-  });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => NetworkService.delete({ network_id: id }),
@@ -311,14 +264,19 @@ export function Networks() {
                   <InfoCard
                     key={n.id}
                     title={n.name}
+                    onClick={() => {
+                      setSelectedNetwork(n);
+                      setDetailsDialogOpen(true);
+                    }}
+                    className="cursor-pointer"
                     badges={
                       <>
                         <StatusBadge status={n.status} />
                         <Badge
-                          variant={n.is_external ? "default" : "secondary"}
+                          variant={n.external ? "default" : "secondary"}
                           className="rounded-full px-2 py-1 text-xs"
                         >
-                          {n.is_external ? "External" : "Internal"}
+                          {n.external ? "External" : "Internal"}
                         </Badge>
                       </>
                     }
@@ -328,25 +286,32 @@ export function Networks() {
                           label: "Subnets",
                           value: n.subnets?.length?.toString() || "0",
                           icon: Network,
-                          variant: "purple",
+                          variant: "purple" as const,
+                        },
+                        {
+                          label: "Admin State",
+                          value: n.admin_state ? "Up" : "Down",
+                          icon: Power,
+                          variant: "sky" as const,
+                        },
+                      ],
+                      [
+                        {
+                          label: "Shared",
+                          value: n.shared ? "Yes" : "No",
+                          icon: Share2,
+                          variant: "amber" as const,
+                        },
+                        {
+                          label: "Availability Zones",
+                          value: n.availability_zones.join(", ") || "N/A",
+                          icon: Globe,
+                          variant: "green" as const,
                         },
                       ],
                     ]}
                     actionButtons={
                       <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="cursor-pointer rounded-full"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedNetworkId(n.id);
-                            setShowRouterDialog(true);
-                          }}
-                        >
-                          <Router className="h-3 w-3 sm:h-4 sm:w-4" />
-                          Add Router
-                        </Button>
                         <Button
                           size="sm"
                           variant="destructive"
@@ -359,7 +324,7 @@ export function Networks() {
                           disabled={deleteMutation.isPending}
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                          Delete Network
+                          Delete
                         </Button>
                       </>
                     }
@@ -409,97 +374,98 @@ export function Networks() {
         }
       />
 
-      <Dialog open={showRouterDialog} onOpenChange={setShowRouterDialog}>
-        <DialogContent className="bg-card text-card-foreground border-border mx-4 max-w-[calc(100vw-2rem)] overflow-hidden border shadow-lg sm:mx-0 sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="truncate text-lg font-semibold">
-              Create Router
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
-              Attach a router to an external network (then interface).
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...routerForm}>
-            <form
-              onSubmit={routerForm.handleSubmit((data) =>
-                createRouterMutation.mutate(data),
-              )}
-              className="space-y-4"
-            >
-              <FormField
-                control={routerForm.control}
-                name="router_name"
-                render={({ field }) => (
-                  <div className="space-y-2">
-                    <FormLabel className="text-sm font-medium">
-                      Router Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="router-name"
-                        className={cn(
-                          "bg-input text-foreground h-10 w-full rounded-full",
-                          routerForm.formState.errors.router_name &&
-                            "border-destructive",
-                        )}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                )}
-              />
-              <FormField
-                control={routerForm.control}
-                name="external_network_id"
-                render={({ field }) => (
-                  <div className="space-y-2">
-                    <FormLabel className="text-sm font-medium">
-                      External Network ID
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="external-network-id"
-                        className={cn(
-                          "bg-input text-foreground h-10 w-full rounded-full",
-                          routerForm.formState.errors.external_network_id &&
-                            "border-destructive",
-                        )}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                )}
-              />
-              <DialogFooter className="flex flex-col gap-2 pt-4 sm:flex-row sm:gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowRouterDialog(false)}
-                  className={cn(
-                    "bg-background text-foreground border-border order-2 w-full cursor-pointer rounded-full border sm:order-1 sm:w-auto",
-                  )}
-                >
-                  <span className="truncate">Cancel</span>
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createRouterMutation.isPending}
-                  className={cn(
-                    "bg-primary text-primary-foreground order-1 w-full min-w-[100px] cursor-pointer rounded-full sm:order-2 sm:w-auto",
-                    createRouterMutation.isPending && "opacity-70",
-                  )}
-                >
-                  <span className="truncate">
-                    {createRouterMutation.isPending ? "Creating..." : "Create"}
-                  </span>
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      <InfoDialog
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
+        isLoading={isLoadingDetails}
+        title={selectedNetwork?.name ?? "Loading..."}
+        description={`Details for network: ${selectedNetwork?.name}`}
+        badges={
+          networkDetails && (
+            <>
+              <StatusBadge status={networkDetails.status} />
+              <Badge
+                variant={networkDetails.is_external ? "default" : "secondary"}
+              >
+                {networkDetails.is_external ? "External" : "Internal"}
+              </Badge>
+            </>
+          )
+        }
+        infoItems={
+          networkDetails
+            ? [
+                [
+                  {
+                    label: "Project Name",
+                    value: networkDetails.project_name,
+                    icon: FolderGit,
+                    variant: "green" as const,
+                  },
+                  {
+                    label: "Admin State",
+                    value: networkDetails.is_admin_state_up ? "Up" : "Down",
+                    icon: Power,
+                    variant: "sky" as const,
+                  },
+                  {
+                    label: "Shared",
+                    value: networkDetails.shared ? "Yes" : "No",
+                    icon: Share2,
+                    variant: "amber" as const,
+                  },
+                  {
+                    label: "MTU",
+                    value: networkDetails.mtu.toString(),
+                    icon: Gauge,
+                    variant: "cyan" as const,
+                  },
+                  {
+                    label: "Network Type",
+                    value: networkDetails.provider.network_type,
+                    icon: Waypoints,
+                    variant: "blue" as const,
+                  },
+                  networkDetails.provider.physical_network
+                    ? {
+                        label: "Physical Network",
+                        value: networkDetails.provider.physical_network,
+                        icon: Globe,
+                        variant: "rose" as const,
+                      }
+                    : undefined,
+                  networkDetails.provider.segmentation_id !== null
+                    ? {
+                        label: "Segmentation ID",
+                        value:
+                          networkDetails.provider.segmentation_id.toString(),
+                        icon: Hash,
+                        variant: "indigo" as const,
+                      }
+                    : undefined,
+                  {
+                    label: "Subnets",
+                    value:
+                      networkDetails.subnets
+                        .map((s) => `${s.name} (${s.cidr})`)
+                        .join(", ") || "N/A",
+                    icon: Network,
+                    variant: "purple" as const,
+                  },
+                ].filter((item): item is NonNullable<typeof item> => !!item),
+              ]
+            : []
+        }
+        actionButtons={
+          <Button
+            variant="outline"
+            className="cursor-pointer rounded-full"
+            onClick={() => setDetailsDialogOpen(false)}
+          >
+            Close
+          </Button>
+        }
+      />
     </div>
   );
 }
