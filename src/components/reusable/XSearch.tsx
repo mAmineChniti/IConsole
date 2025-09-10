@@ -4,14 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Search, X } from "lucide-react";
-import * as React from "react";
-
-export type XSearchProps = {
-  value: string;
-  onChange: (value: string) => void;
-  onClear?: () => void;
-  containerClassName?: string;
-} & Omit<React.ComponentProps<typeof Input>, "value" | "onChange">;
+import type { ComponentProps } from "react";
 
 export function XSearch({
   value,
@@ -22,7 +15,12 @@ export function XSearch({
   containerClassName,
   "aria-label": ariaLabel,
   ...props
-}: XSearchProps) {
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onClear?: () => void;
+  containerClassName?: string;
+} & Omit<ComponentProps<typeof Input>, "value" | "onChange">) {
   const handleClear = () => {
     onChange("");
     onClear?.();

@@ -70,11 +70,6 @@ export function Snapshots() {
   >(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   useEffect(() => {
-    if (!deleteDialogOpen) {
-      setSnapshotToDelete(undefined);
-    }
-  }, [deleteDialogOpen]);
-  useEffect(() => {
     setVisibleCount(6);
   }, [searchTerm]);
   const [updateName, setUpdateName] = useState("");
@@ -466,12 +461,7 @@ export function Snapshots() {
       <InfoDialog
         isLoading={snapshotDetailsLoading || snapshotDetailsFetching}
         open={detailsDialogOpen}
-        onOpenChange={(open) => {
-          setDetailsDialogOpen(open);
-          if (!open) {
-            setSelectedSnapshotId(undefined);
-          }
-        }}
+        onOpenChange={setDetailsDialogOpen}
         title={snapshotDetails?.Name ?? "Snapshot Details"}
         badges={
           <Badge variant="secondary" className="px-2 py-0 text-xs">

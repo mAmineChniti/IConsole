@@ -409,8 +409,8 @@ export function Projects() {
                     <StatusBadge
                       status={project.enabled ? "Enabled" : "Disabled"}
                       statusTextMap={{
-                        Enabled: "ACTIVE",
-                        Disabled: "SHUTOFF",
+                        ENABLED: "ACTIVE",
+                        DISABLED: "SHUTOFF",
                       }}
                     />
                   </div>

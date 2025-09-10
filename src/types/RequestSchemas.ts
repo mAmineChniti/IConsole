@@ -38,9 +38,8 @@ export const VolumeCreateRequestSchema = z.object({
 
 export const VolumeSnapshotCreateRequestSchema = z.object({
   volume_id: z.uuid("Invalid volume ID format"),
-  name: z.string().min(1).max(64).trim(),
-  description: z.string().max(255).trim().optional(),
-  force: z.boolean().optional(),
+  name: z.string().min(1, "Name is required").max(64, "Name too long").trim(),
+  description: z.string().max(255, "Description too long").trim().optional(),
 });
 
 export const SecurityGroupCreateRequestSchema = z.object({
@@ -328,7 +327,8 @@ export const ImageImportFromNameRequestSchema = z.object({
     .min(10, "Description must be at least 10 characters")
     .max(500, "Description too long")
     .trim(),
-  visibility: z.enum(["private", "public"]).default("private").optional(),
+  visibility: z.enum(["private", "public"]).optional(),
+  protected: z.boolean(),
 });
 
 export const AllocationPoolSchema = z
@@ -449,6 +449,28 @@ export const RouterCreateRequestSchema = z.object({
 
 export const RouterAddInterfaceRequestSchema = z.object({
   subnet_id: z.uuid("Invalid subnet ID format"),
+});
+
+export const AttachPrivateNetworkRequestSchema = z.object({
+  router_id: z.uuid("Invalid router ID format"),
+  private_network_id: z.uuid("Invalid network ID format"),
+});
+
+export const RemoveRouterInterfaceRequestSchema = z.object({
+  router_id: z.uuid("Invalid router ID format"),
+  network_name: z.string().min(1, "Network name is required"),
+});
+
+export const RouterIdRequestSchema = z.object({
+  router_id: z.uuid("Invalid router ID format"),
+});
+
+export const NetworkIdRequestSchema = z.object({
+  network_id: z.uuid("Invalid network ID format"),
+});
+
+export const FloatingIPIdRequestSchema = z.object({
+  floating_ip_id: z.uuid("Invalid floating IP ID format"),
 });
 
 export const flavorSchema = z.object({
@@ -602,6 +624,7 @@ export const NetworkCreateRequestSchema = z.object({
   port_security_enabled: z.boolean(),
   availability_zone_hints: z.array(z.string().min(1).trim()),
   subnet: SubnetCreateRequestSchema,
+  is_external: z.boolean(),
 });
 
 export const KeyPairCreateRequestSchema = z.object({
@@ -873,4 +896,19 @@ export const ClusterCreateRequestSchema = z.object({
     .int("Worker count must be an integer")
     .min(0, "Worker count cannot be negative"),
   node_config: ClusterNodeConfigSchema,
+});
+
+export const FloatingIpCreateRequestSchema = z.object({
+  external_network_name: z.string().min(1, "External network name is required"),
+  floating_ip: z.string().optional(),
+  description: z.string().optional(),
+});
+
+export const AssociateIpSchema = z.object({
+  vm_id: z.uuid("Invalid VM ID format"),
+});
+
+export const FloatingIPAssociateRequestSchema = z.object({
+  floating_ip_id: z.uuid("Invalid floating IP ID format"),
+  vm_id: z.uuid("Invalid VM ID format"),
 });

@@ -12,17 +12,6 @@ import {
 import { cn } from "@/lib/utils";
 import { RefreshCw, Trash2 } from "lucide-react";
 
-export interface ConfirmDeleteDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title?: string;
-  description?: React.ReactNode;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  confirming?: boolean;
-  onConfirm: () => void;
-}
-
 export function ConfirmDeleteDialog({
   open,
   onOpenChange,
@@ -32,7 +21,16 @@ export function ConfirmDeleteDialog({
   cancelLabel = "Cancel",
   confirming = false,
   onConfirm,
-}: ConfirmDeleteDialogProps) {
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title?: string;
+  description?: React.ReactNode;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  confirming?: boolean;
+  onConfirm: () => void;
+}) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="rounded-2xl sm:max-w-md">

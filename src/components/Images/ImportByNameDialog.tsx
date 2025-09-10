@@ -39,17 +39,23 @@ export function ImportByNameDialog({
     defaultValues: {
       description: "",
       visibility: "private",
+      protected: false,
     },
   });
 
   const importByNameMutation = useMutation({
-    mutationFn: (data: ImageImportFromNameRequest) =>
-      ImageService.importFromName(data),
+    mutationFn: (data: ImageImportFromNameRequest) => {
+      return ImageService.importFromName(data);
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["images"] });
       toast.success("Image imported successfully");
       onOpenChange(false);
-      importByNameForm.reset();
+      importByNameForm.reset({
+        description: "",
+        visibility: "private",
+        protected: false,
+      });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to import image");
@@ -106,9 +112,32 @@ export function ImportByNameDialog({
                     <Switch
                       className="cursor-pointer"
                       checked={field.value === "public"}
-                      onCheckedChange={(c) =>
-                        field.onChange(c ? "public" : "private")
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked ? "public" : "private")
                       }
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={importByNameForm.control}
+              name="protected"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border px-3 py-2">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm font-medium">
+                      Protected
+                    </FormLabel>
+                    <p className="text-muted-foreground text-xs">
+                      Prevent accidental deletion of this image
+                    </p>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      className="cursor-pointer"
+                      checked={field.value || false}
+                      onCheckedChange={field.onChange}
                     />
                   </FormControl>
                 </FormItem>

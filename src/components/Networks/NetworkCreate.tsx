@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -18,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { NetworkService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
@@ -75,6 +75,7 @@ export function NetworkCreate({
         allocation_pools: [],
         host_routes: [],
       },
+      is_external: false,
     },
   });
 
@@ -121,6 +122,7 @@ export function NetworkCreate({
           dns_nameservers: formData.subnet.dns_nameservers.map((d) => d.trim()),
           host_routes: formData.subnet.host_routes.map((r) => r.trim()),
         },
+        is_external: formData.is_external,
       };
       return NetworkService.create(payload);
     },
@@ -257,18 +259,12 @@ export function NetworkCreate({
                     </div>
                   )}
                 />
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:col-span-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:col-span-2">
                   <FormField
                     control={form.control}
                     name="shared"
                     render={({ field }) => (
                       <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="shared"
-                          checked={!!field.value}
-                          onCheckedChange={(c) => field.onChange(Boolean(c))}
-                          className="cursor-pointer"
-                        />
                         <FormLabel
                           htmlFor="shared"
                           className="flex items-center gap-2 text-sm font-medium"
@@ -278,6 +274,13 @@ export function NetworkCreate({
                           </span>
                           Shared
                         </FormLabel>
+                        <Switch
+                          checked={!!field.value}
+                          onCheckedChange={(c: boolean) =>
+                            field.onChange(Boolean(c))
+                          }
+                          className="cursor-pointer"
+                        />
                         <FormMessage />
                       </div>
                     )}
@@ -287,12 +290,6 @@ export function NetworkCreate({
                     name="port_security_enabled"
                     render={({ field }) => (
                       <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="port_security"
-                          checked={!!field.value}
-                          onCheckedChange={(c) => field.onChange(Boolean(c))}
-                          className="cursor-pointer"
-                        />
                         <FormLabel
                           htmlFor="port_security"
                           className="flex items-center gap-2 text-sm font-medium"
@@ -302,6 +299,38 @@ export function NetworkCreate({
                           </span>
                           Port Security
                         </FormLabel>
+                        <Switch
+                          checked={!!field.value}
+                          onCheckedChange={(c: boolean) =>
+                            field.onChange(Boolean(c))
+                          }
+                          className="cursor-pointer"
+                        />
+                        <FormMessage />
+                      </div>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="is_external"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-2">
+                        <FormLabel
+                          htmlFor="is_external"
+                          className="flex items-center gap-2 text-sm font-medium"
+                        >
+                          <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                            <Globe className="text-muted-foreground h-4 w-4" />
+                          </span>
+                          External
+                        </FormLabel>
+                        <Switch
+                          checked={!!field.value}
+                          onCheckedChange={(c: boolean) =>
+                            field.onChange(Boolean(c))
+                          }
+                          className="cursor-pointer"
+                        />
                         <FormMessage />
                       </div>
                     )}
@@ -413,12 +442,6 @@ export function NetworkCreate({
                   name="subnet.enable_dhcp"
                   render={({ field }) => (
                     <div className="flex items-center gap-2 pt-7">
-                      <Checkbox
-                        id="enable_dhcp"
-                        checked={!!field.value}
-                        onCheckedChange={(c) => field.onChange(Boolean(c))}
-                        className="cursor-pointer"
-                      />
                       <FormLabel
                         htmlFor="enable_dhcp"
                         className="flex items-center gap-2 text-sm font-medium"
@@ -428,6 +451,13 @@ export function NetworkCreate({
                         </span>
                         Enable DHCP
                       </FormLabel>
+                      <Switch
+                        checked={!!field.value}
+                        onCheckedChange={(c: boolean) =>
+                          field.onChange(Boolean(c))
+                        }
+                        className="cursor-pointer"
+                      />
                       <FormMessage />
                     </div>
                   )}
