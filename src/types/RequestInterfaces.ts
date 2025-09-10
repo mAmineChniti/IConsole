@@ -99,10 +99,8 @@ export interface VolumeSnapshotCreateRequest {
 export interface VolumeUploadToImageRequest {
   volume_id: string;
   image_name: string;
-  disk_format?: string;
-  container_format?: string;
-  visibility?: "private" | "public";
-  protected?: boolean;
+  disk_format?: "raw" | "qcow2" | "vmdk" | "vdi";
+  container_format?: "bare" | "ovf" | "ova";
 }
 
 /**
@@ -359,7 +357,6 @@ export interface InstanceStopRequest {
  */
 export interface InstanceRebootRequest {
   server_id: string;
-  type?: "SOFT" | "HARD";
 }
 
 /**

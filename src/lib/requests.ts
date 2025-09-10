@@ -1040,7 +1040,7 @@ export const InfraService = {
       API_CONFIG.BASE_URL +
         API_CONFIG.INFRA.REBOOT_INSTANCE +
         `/${data.server_id}`,
-      { type: "json", data: { type: data.type ?? "SOFT" } },
+      { type: "json", data: {} },
       { headers: token },
     );
     if (result.error) {

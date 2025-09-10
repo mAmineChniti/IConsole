@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
+import { XSearch } from "@/components/reusable/XSearch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -31,15 +32,7 @@ import { VolumeTypeUpdateRequestSchema } from "@/types/RequestSchemas";
 import type { VolumeType } from "@/types/ResponseInterfaces";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Edit,
-  Eye,
-  HardDrive,
-  Lock,
-  RefreshCw,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { Edit, Eye, HardDrive, Lock, RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -311,12 +304,12 @@ export function VolumeTypes() {
         </div>
 
         <div className="relative max-w-full sm:max-w-md">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 flex-shrink-0 -translate-y-1/2" />
-          <Input
+          <XSearch
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={setSearch}
+            onClear={() => setSearch("")}
             placeholder="Search (name, description, visibility)"
-            className="h-10 w-full rounded-full pl-10"
+            aria-label="Search volume types"
           />
         </div>
       </div>

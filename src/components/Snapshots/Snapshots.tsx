@@ -16,8 +16,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -35,9 +42,18 @@ import {
 } from "@/components/ui/tooltip";
 import { VolumeService } from "@/lib/requests";
 import type {
+  VolumeCreateFromSnapshotRequest,
+  VolumeSnapshotUpdateRequest,
+} from "@/types/RequestInterfaces";
+import {
+  VolumeCreateFromSnapshotRequestSchema,
+  VolumeSnapshotUpdateRequestSchema,
+} from "@/types/RequestSchemas";
+import type {
   VolumeSnapshotDetails,
   VolumeSnapshotListResponse,
 } from "@/types/ResponseInterfaces";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Calendar,
@@ -53,6 +69,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function Snapshots() {
@@ -69,17 +86,30 @@ export function Snapshots() {
     { id: string; name?: string } | undefined
   >(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Form for updating snapshot
+  const updateForm = useForm<VolumeSnapshotUpdateRequest>({
+    resolver: zodResolver(VolumeSnapshotUpdateRequestSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  });
+
+  const restoreForm = useForm<VolumeCreateFromSnapshotRequest>({
+    resolver: zodResolver(VolumeCreateFromSnapshotRequestSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      description: "",
+      snapshot_id: "",
+    },
+  });
+
   useEffect(() => {
     setVisibleCount(6);
   }, [searchTerm]);
-  const [updateName, setUpdateName] = useState("");
-  const [updateDescription, setUpdateDescription] = useState("");
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [updateError, setUpdateError] = useState<string | undefined>(undefined);
-  const [restoreName, setRestoreName] = useState("");
-  const [restoreError, setRestoreError] = useState<string | undefined>(
-    undefined,
-  );
 
   const {
     data: snapshots,
@@ -110,42 +140,38 @@ export function Snapshots() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      name,
-      description,
-    }: {
-      id: string;
-      name: string;
-      description: string;
-    }) => VolumeService.updateSnapshot({ name, description }, id),
+    mutationFn: async (data: VolumeSnapshotUpdateRequest & { id: string }) =>
+      VolumeService.updateSnapshot(
+        { name: data.name, description: data.description },
+        data.id,
+      ),
     onSuccess: async () => {
       toast.success("Snapshot updated successfully");
       setUpdateDialogOpen(false);
       setSelectedSnapshotId(undefined);
+      updateForm.reset();
       await queryClient.invalidateQueries({ queryKey: ["snapshots", "list"] });
     },
     onError: (err: unknown) => {
       const message =
         err instanceof Error ? err.message : "An unexpected error occurred";
-      setUpdateError(message);
       toast.error(message);
     },
   });
 
   const restoreMutation = useMutation({
-    mutationFn: async ({ id, name }: { id: string; name: string }) =>
-      VolumeService.createVolumeFromSnapshot({ snapshot_id: id, name }),
+    mutationFn: async (data: VolumeCreateFromSnapshotRequest) =>
+      VolumeService.createVolumeFromSnapshot(data),
     onSuccess: async () => {
       toast.success("Volume restore started");
       setRestoreDialogOpen(false);
       setSelectedSnapshotId(undefined);
+      restoreForm.reset();
       await queryClient.invalidateQueries({ queryKey: ["snapshots", "list"] });
     },
     onError: (err: unknown) => {
       const message =
         err instanceof Error ? err.message : "An unexpected error occurred";
-      setRestoreError(message);
       toast.error(message);
     },
   });
@@ -167,26 +193,28 @@ export function Snapshots() {
   const handleEditClick = async (id: string) => {
     setSelectedSnapshotId(id);
     setUpdateDialogOpen(true);
-    setUpdateLoading(true);
-    setUpdateError(undefined);
+
     try {
       const details = await VolumeService.getSnapshotDetails(id);
-      setUpdateName(details.Name ?? "");
-      setUpdateDescription(details.Description ?? "");
+      updateForm.reset({
+        name: details.Name ?? "",
+        description: details.Description ?? "",
+      });
     } catch (err) {
-      setUpdateError(
-        err instanceof Error ? err.message : "Failed to load snapshot details",
-      );
-    } finally {
-      setUpdateLoading(false);
+      const message =
+        err instanceof Error ? err.message : "Failed to load snapshot details";
+      toast.error(message);
     }
   };
 
   const handleRestoreClick = (id: string) => {
     setSelectedSnapshotId(id);
     setRestoreDialogOpen(true);
-    setRestoreName("");
-    setRestoreError(undefined);
+    restoreForm.reset({
+      name: "",
+      description: "",
+      snapshot_id: id,
+    });
   };
 
   const filteredSnapshots = (snapshots ?? []).filter((s) => {
@@ -526,9 +554,9 @@ export function Snapshots() {
         open={updateDialogOpen}
         onOpenChange={(open) => {
           setUpdateDialogOpen(open);
-          setUpdateError(undefined);
           if (!open) {
             setSelectedSnapshotId(undefined);
+            updateForm.reset();
           }
         }}
       >
@@ -536,69 +564,87 @@ export function Snapshots() {
           <DialogHeader>
             <DialogTitle>Edit Snapshot</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <Label
-                htmlFor="update-name"
-                className="text-muted-foreground mb-1 text-xs font-medium"
-              >
-                Name
-              </Label>
-              <Input
-                id="update-name"
-                className="bg-background text-foreground !h-10 w-full rounded-full border px-3 py-2"
-                value={updateName}
-                onChange={(e) => setUpdateName(e.target.value)}
-                disabled={updateLoading || updateMutation.isPending}
-              />
-            </div>
-            <div>
-              <Label
-                htmlFor="update-description"
-                className="text-muted-foreground mb-1 text-xs font-medium"
-              >
-                Description
-              </Label>
-              <Textarea
-                id="update-description"
-                className="bg-background text-foreground w-full resize-none rounded-md border px-3 py-2"
-                value={updateDescription}
-                onChange={(e) => setUpdateDescription(e.target.value)}
-                disabled={updateLoading || updateMutation.isPending}
-                rows={3}
-              />
-            </div>
-            {updateError && (
-              <div className="text-destructive text-xs">{updateError}</div>
-            )}
-          </div>
-          <DialogFooter className="flex-col gap-3 pt-4 sm:flex-row">
-            <Button
-              variant="outline"
-              onClick={() => setUpdateDialogOpen(false)}
-              disabled={updateMutation.isPending}
-              className="bg-muted text-foreground order-2 w-full cursor-pointer rounded-full px-6 py-2 sm:order-1 sm:w-auto"
+          <Form {...updateForm}>
+            <form
+              onSubmit={updateForm.handleSubmit(
+                (data) =>
+                  selectedSnapshotId &&
+                  updateMutation.mutate({
+                    ...data,
+                    id: selectedSnapshotId,
+                  }),
+              )}
+              className="space-y-4 py-2"
             >
-              <X className="mr-1.5 h-4 w-4" />
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              onClick={() =>
-                selectedSnapshotId &&
-                updateMutation.mutate({
-                  id: selectedSnapshotId,
-                  name: updateName,
-                  description: updateDescription,
-                })
-              }
-              disabled={updateMutation.isPending || !updateName}
-              className="text-background bg-primary order-1 flex w-full cursor-pointer items-center justify-center rounded-full px-6 py-2 sm:order-2 sm:w-auto"
-            >
-              <Save className="mr-1.5 h-4 w-4" />
-              {updateMutation.isPending ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
+              <FormField
+                control={updateForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground text-xs font-medium">
+                      Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="bg-background text-foreground !h-10 w-full rounded-full border px-3 py-2"
+                        disabled={updateMutation.isPending}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={updateForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground text-xs font-medium">
+                      Description
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        value={field.value ?? ""}
+                        className="bg-background text-foreground w-full resize-none rounded-md border px-3 py-2"
+                        disabled={updateMutation.isPending}
+                        rows={3}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter className="flex-col gap-3 pt-4 sm:flex-row">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setUpdateDialogOpen(false)}
+                  disabled={updateMutation.isPending}
+                  className="bg-muted text-foreground order-2 w-full cursor-pointer rounded-full px-6 py-2 sm:order-1 sm:w-auto"
+                >
+                  <X className="mr-1.5 h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="default"
+                  disabled={
+                    updateMutation.isPending || !updateForm.formState.isValid
+                  }
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 order-1 w-full cursor-pointer rounded-full px-6 py-2 sm:order-2 sm:w-auto"
+                >
+                  {updateMutation.isPending ? (
+                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-1.5 h-4 w-4" />
+                  )}
+                  {updateMutation.isPending ? "Updating..." : "Update"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -606,9 +652,9 @@ export function Snapshots() {
         open={restoreDialogOpen}
         onOpenChange={(open) => {
           setRestoreDialogOpen(open);
-          setRestoreError(undefined);
           if (!open) {
             setSelectedSnapshotId(undefined);
+            restoreForm.reset();
           }
         }}
       >
@@ -616,52 +662,86 @@ export function Snapshots() {
           <DialogHeader>
             <DialogTitle>Restore Snapshot</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <Label
-                htmlFor="restore-name"
-                className="text-muted-foreground mb-1 text-xs font-medium"
-              >
-                New Volume Name
-              </Label>
-              <Input
-                id="restore-name"
-                className="bg-background text-foreground w-full rounded-full border px-3 py-2"
-                value={restoreName}
-                onChange={(e) => setRestoreName(e.target.value)}
-                disabled={restoreMutation.isPending}
+          <Form {...restoreForm}>
+            <form
+              onSubmit={restoreForm.handleSubmit((data) =>
+                restoreMutation.mutate(data),
+              )}
+              className="space-y-4 py-2"
+            >
+              <FormField
+                control={restoreForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground text-xs font-medium">
+                      New Volume Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="bg-background text-foreground w-full rounded-full border px-3 py-2"
+                        disabled={restoreMutation.isPending}
+                        placeholder="Enter volume name..."
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-            </div>
-            {restoreError && (
-              <div className="text-destructive text-xs">{restoreError}</div>
-            )}
-          </div>
-          <DialogFooter className="flex-col gap-3 pt-4 sm:flex-row">
-            <Button
-              variant="outline"
-              onClick={() => setRestoreDialogOpen(false)}
-              disabled={restoreMutation.isPending}
-              className="bg-muted text-foreground order-2 w-full cursor-pointer rounded-full px-6 py-2 sm:order-1 sm:w-auto"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              onClick={() =>
-                selectedSnapshotId &&
-                restoreName &&
-                restoreMutation.mutate({
-                  id: selectedSnapshotId,
-                  name: restoreName,
-                })
-              }
-              disabled={restoreMutation.isPending || !restoreName}
-              className="text-background bg-primary order-1 flex w-full cursor-pointer items-center justify-center rounded-full px-6 py-2 sm:order-2 sm:w-auto"
-            >
-              <RotateCcw className="mr-1.5 h-4 w-4" />
-              {restoreMutation.isPending ? "Restoring..." : "Restore"}
-            </Button>
-          </DialogFooter>
+              <FormField
+                control={restoreForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground text-xs font-medium">
+                      Description (Optional)
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        value={field.value ?? ""}
+                        className="bg-background text-foreground w-full resize-none rounded-md border px-3 py-2"
+                        disabled={restoreMutation.isPending}
+                        rows={3}
+                        placeholder="Enter description..."
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter className="flex-col gap-3 pt-4 sm:flex-row">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setRestoreDialogOpen(false)}
+                  disabled={restoreMutation.isPending}
+                  className="bg-muted text-foreground order-2 w-full cursor-pointer rounded-full px-6 py-2 sm:order-1 sm:w-auto"
+                >
+                  <X className="mr-1.5 h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="default"
+                  disabled={
+                    restoreMutation.isPending || !restoreForm.formState.isValid
+                  }
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 order-1 w-full cursor-pointer rounded-full px-6 py-2 sm:order-2 sm:w-auto"
+                >
+                  {restoreMutation.isPending ? (
+                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                  ) : (
+                    <RotateCcw className="mr-1.5 h-4 w-4" />
+                  )}
+                  {restoreMutation.isPending
+                    ? "Restoring..."
+                    : "Restore Volume"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 

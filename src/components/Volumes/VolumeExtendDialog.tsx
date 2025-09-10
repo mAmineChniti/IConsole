@@ -6,10 +6,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { VolumeService } from "@/lib/requests";
+import type { VolumeExtendRequest } from "@/types/RequestInterfaces";
+import { VolumeExtendRequestSchema } from "@/types/RequestSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function VolumeExtendDialog({
@@ -27,7 +38,13 @@ export function VolumeExtendDialog({
 }) {
   const queryClient = useQueryClient();
   const safeCurrentSize = Number.isFinite(currentSize) ? currentSize : 1;
-  const [newSize, setNewSize] = useState(safeCurrentSize + 1);
+
+  const form = useForm<Omit<VolumeExtendRequest, "volume_id">>({
+    resolver: zodResolver(VolumeExtendRequestSchema),
+    defaultValues: {
+      new_size: safeCurrentSize + 1,
+    },
+  });
 
   const extendMutation = useMutation({
     mutationFn: ({
@@ -48,10 +65,9 @@ export function VolumeExtendDialog({
     },
   });
 
-  const handleExtend = async () => {
-    if (!volumeId || !Number.isInteger(newSize) || newSize <= safeCurrentSize)
-      return;
-    extendMutation.mutate({ volume_id: volumeId, new_size: newSize });
+  const onSubmit = (data: Omit<VolumeExtendRequest, "volume_id">) => {
+    if (!volumeId || data.new_size <= safeCurrentSize) return;
+    extendMutation.mutate({ volume_id: volumeId, new_size: data.new_size });
   };
 
   return (
@@ -60,48 +76,60 @@ export function VolumeExtendDialog({
         <DialogHeader>
           <DialogTitle>Extend Volume</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              New Size (GB)
-            </label>
-            <Input
-              type="number"
-              min={safeCurrentSize + 1}
-              step={1}
-              value={newSize}
-              onChange={(e) =>
-                setNewSize(parseInt(e.target.value, 10) || safeCurrentSize + 1)
-              }
-              className="w-full rounded-full"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="new_size"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New Size (GB)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={safeCurrentSize + 1}
+                      step={1}
+                      placeholder={(safeCurrentSize + 1).toString()}
+                      className="w-full rounded-full"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(
+                          parseInt(e.target.value, 10) || safeCurrentSize + 1,
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <div className="text-muted-foreground mt-1 text-xs">
+                    Current size: {safeCurrentSize} GB
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <div className="text-muted-foreground mt-1 text-xs">
-              Current size: {safeCurrentSize} GB
-            </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={extendMutation.isPending}
-            className="cursor-pointer rounded-full"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            onClick={handleExtend}
-            disabled={
-              extendMutation.isPending ||
-              !Number.isInteger(newSize) ||
-              newSize <= safeCurrentSize
-            }
-            className="rounded-full"
-          >
-            {extendMutation.isPending ? "Extending..." : "Extend"}
-          </Button>
-        </DialogFooter>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={extendMutation.isPending}
+                className="cursor-pointer rounded-full"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={
+                  extendMutation.isPending ||
+                  form.watch("new_size") <= safeCurrentSize
+                }
+                className="rounded-full"
+              >
+                {extendMutation.isPending ? "Extending..." : "Extend"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

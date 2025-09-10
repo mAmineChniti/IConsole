@@ -22,6 +22,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FlavorService, InfraService } from "@/lib/requests";
+import type {
+  IdRequest,
+  InstanceDeleteRequest,
+  InstanceRebootRequest,
+  InstanceStartRequest,
+  InstanceStopRequest,
+  ResizeRequest,
+} from "@/types/RequestInterfaces";
 import type { InstanceListItem } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -98,7 +106,7 @@ export function InstanceActions({
   };
 
   const pauseMutation = useMutation({
-    mutationFn: () => InfraService.pause({ instance_id: instance.id }),
+    mutationFn: (data: IdRequest) => InfraService.pause(data),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
@@ -111,7 +119,7 @@ export function InstanceActions({
   });
 
   const suspendMutation = useMutation({
-    mutationFn: () => InfraService.suspend({ instance_id: instance.id }),
+    mutationFn: (data: IdRequest) => InfraService.suspend(data),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
@@ -124,7 +132,7 @@ export function InstanceActions({
   });
 
   const shelveMutation = useMutation({
-    mutationFn: () => InfraService.shelve({ instance_id: instance.id }),
+    mutationFn: (data: IdRequest) => InfraService.shelve(data),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
@@ -137,7 +145,7 @@ export function InstanceActions({
   });
 
   const rescueMutation = useMutation({
-    mutationFn: () => InfraService.rescue({ instance_id: instance.id }),
+    mutationFn: (data: IdRequest) => InfraService.rescue(data),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
@@ -150,11 +158,7 @@ export function InstanceActions({
   });
 
   const resizeMutation = useMutation({
-    mutationFn: (newFlavorId: string) =>
-      InfraService.resize({
-        instance_id: instance.id,
-        new_flavor: newFlavorId,
-      }),
+    mutationFn: (data: ResizeRequest) => InfraService.resize(data),
     onSuccess: async () => {
       toast.success("Instance resize started successfully");
       await Promise.all([
@@ -169,13 +173,17 @@ export function InstanceActions({
 
   const handleResize = (flavorId: string) => {
     if (flavorId) {
-      resizeMutation.mutate(flavorId);
+      resizeMutation.mutate({
+        instance_id: instance.id,
+        new_flavor: flavorId,
+      });
     }
   };
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => InfraService.deleteInstance({ server_id: id }),
+    mutationFn: (data: InstanceDeleteRequest) =>
+      InfraService.deleteInstance(data),
     onSuccess: async () => {
       setShowDeleteDialog(false);
       await Promise.all([
@@ -192,7 +200,8 @@ export function InstanceActions({
   });
 
   const startMutation = useMutation({
-    mutationFn: (id: string) => InfraService.startInstance({ server_id: id }),
+    mutationFn: (data: InstanceStartRequest) =>
+      InfraService.startInstance(data),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
@@ -212,7 +221,7 @@ export function InstanceActions({
   });
 
   const stopMutation = useMutation({
-    mutationFn: (id: string) => InfraService.stopInstance({ server_id: id }),
+    mutationFn: (data: InstanceStopRequest) => InfraService.stopInstance(data),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
@@ -232,7 +241,8 @@ export function InstanceActions({
   });
 
   const rebootMutation = useMutation({
-    mutationFn: (id: string) => InfraService.rebootInstance({ server_id: id }),
+    mutationFn: (data: InstanceRebootRequest) =>
+      InfraService.rebootInstance(data),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["instances"] }),
@@ -265,7 +275,7 @@ export function InstanceActions({
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                startMutation.mutate(instance.id);
+                startMutation.mutate({ server_id: instance.id });
               }}
               disabled={startMutation.isPending || isDisabled}
               size="sm"
@@ -288,7 +298,7 @@ export function InstanceActions({
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                stopMutation.mutate(instance.id);
+                stopMutation.mutate({ server_id: instance.id });
               }}
               disabled={stopMutation.isPending || isDisabled}
               size="sm"
@@ -311,7 +321,7 @@ export function InstanceActions({
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                rebootMutation.mutate(instance.id);
+                rebootMutation.mutate({ server_id: instance.id });
               }}
               disabled={rebootMutation.isPending || isDisabled}
               size="sm"
@@ -352,7 +362,7 @@ export function InstanceActions({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                pauseMutation.mutate();
+                pauseMutation.mutate({ instance_id: instance.id });
               }}
               disabled={isDisabled || status !== "ACTIVE"}
             >
@@ -363,7 +373,7 @@ export function InstanceActions({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                suspendMutation.mutate();
+                suspendMutation.mutate({ instance_id: instance.id });
               }}
               disabled={isDisabled || status !== "ACTIVE"}
             >
@@ -374,7 +384,7 @@ export function InstanceActions({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                shelveMutation.mutate();
+                shelveMutation.mutate({ instance_id: instance.id });
               }}
               disabled={isDisabled || status !== "ACTIVE"}
             >
@@ -385,7 +395,7 @@ export function InstanceActions({
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                rescueMutation.mutate();
+                rescueMutation.mutate({ instance_id: instance.id });
               }}
               disabled={isDisabled || status !== "ACTIVE"}
             >
@@ -511,7 +521,7 @@ export function InstanceActions({
             deleteMutation.isPending ? "Deleting..." : "Delete Instance"
           }
           confirming={deleteMutation.isPending}
-          onConfirm={() => deleteMutation.mutate(instance.id)}
+          onConfirm={() => deleteMutation.mutate({ server_id: instance.id })}
         />
       </div>
       <div onClick={(e) => e.stopPropagation()}>
