@@ -11,7 +11,7 @@ export const FlavorCreateRequestSchema = z.object({
 });
 
 export const FlavorUpdateRequestSchema = z.object({
-  flavor_id: z.uuid("Invalid flavor ID format"),
+  flavor_id: z.string().min(1, "Flavor ID is required"),
   name: z.string().min(1).max(64).optional(),
   vcpus: z.number().min(1).optional(),
   ram: z.number().min(1).optional(),
@@ -22,13 +22,12 @@ export const FlavorUpdateRequestSchema = z.object({
   description: z.string().max(255).optional(),
 });
 
-export const FlavorDeleteRequestSchema = z.object({
-  flavor_id: z.uuid("Invalid flavor ID format"),
-});
-
 export const VolumeCreateRequestSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
-  size: z.number().min(1, "Size must be at least 1 GiB"),
+  size: z
+    .number()
+    .int("Size must be an integer")
+    .min(1, "Size must be at least 1 GiB"),
   description: z.string().max(255, "Description too long").optional(),
   volume_type: z.string().default("__DEFAULT__"),
   availability_zone: z.string().default("nova"),
@@ -119,44 +118,6 @@ export const LoginRequestSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export const SwitchProjectRequestSchema = z.object({
-  project_id: z.uuid("Invalid project ID format"),
-});
-
-export const VMCreateRequestSchema = z.object({
-  name: z
-    .string()
-    .min(1, "VM name is required")
-    .max(63, "VM name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
-      "VM name must start and end with alphanumeric characters",
-    )
-    .trim(),
-  image_id: z.uuid("Invalid image ID format"),
-  flavor_id: z.string().min(1, "Flavor ID is required"),
-  network_id: z.uuid("Invalid network ID format"),
-  key_name: z
-    .string()
-    .min(1, "Key pair name is required")
-    .max(64, "Key pair name too long"),
-  security_group: z
-    .string()
-    .min(1, "Security group name is required")
-    .max(64, "Security group name too long"),
-  admin_password: z
-    .string()
-    .min(8, "Admin password must be at least 8 characters")
-    .max(72, "Admin password too long")
-    .optional(),
-  admin_username: z
-    .string()
-    .min(1, "Admin username is required")
-    .max(32, "Admin username too long")
-    .regex(/^[a-zA-Z][a-zA-Z0-9_-]*$/, "Invalid username format")
-    .optional(),
-});
-
 export const CreateFromDescriptionRequestSchema = z.object({
   description: z.string().min(1, "Description is required").trim(),
   vm_name: z
@@ -168,14 +129,10 @@ export const CreateFromDescriptionRequestSchema = z.object({
       "VM name must start and end with alphanumeric characters",
     )
     .trim(),
-  timeout: z.number().int().min(1).default(300).optional(),
+  timeout: z.number().int().min(1).default(300),
 });
 
-export const InstanceActionRequestSchema = z.object({
-  instance_id: z.uuid("Invalid instance ID format"),
-});
-
-export const ProjectAssignmentSchema = z.object({
+const ProjectAssignmentSchema = z.object({
   user_id: z.uuid("Invalid user ID format"),
   roles: z
     .array(
@@ -203,47 +160,6 @@ export const ProjectCreateRequestSchema = z.object({
   assignments: z.array(ProjectAssignmentSchema).default([]),
 });
 
-export const ProjectUpdateRequestSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Project name is required")
-    .max(64, "Project name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
-      "Project name must start and end with alphanumeric characters",
-    )
-    .trim()
-    .optional(),
-  description: z.string().max(500, "Description too long").trim().optional(),
-  enabled: z.boolean().optional(),
-});
-
-export const AssignUserToProjectRequestSchema = z.object({
-  user_id: z.uuid("Invalid user ID format"),
-  project_id: z.uuid("Invalid project ID format"),
-  role_names: z
-    .array(
-      z
-        .string()
-        .min(1, "Role name cannot be empty")
-        .max(64, "Role name too long"),
-    )
-    .min(1, "At least one role must be assigned"),
-});
-
-export const RemoveUserFromProjectRequestSchema = z.object({
-  user_id: z.uuid("Invalid user ID format"),
-  project_id: z.uuid("Invalid project ID format"),
-});
-
-export const UpdateUserRolesRequestSchema = z.object({
-  user_id: z.uuid("Invalid user ID format"),
-  project_id: z.uuid("Invalid project ID format"),
-  role_ids: z
-    .array(z.uuid("Invalid role ID format"))
-    .min(1, "At least one role must be assigned"),
-});
-
 export const UserCreateRequestSchema = z.object({
   name: z
     .string()
@@ -263,7 +179,7 @@ export const UserCreateRequestSchema = z.object({
   roles: z.array(z.string().min(1, "Role name cannot be empty")).optional(),
 });
 
-export const UserProjectAssignmentSchema = z.object({
+const UserProjectAssignmentSchema = z.object({
   project_id: z.uuid("Invalid project ID format"),
   roles: z
     .array(
@@ -318,7 +234,7 @@ export const ImageImportFromUrlRequestSchema = z.object({
       "Image name must start with alphanumeric character",
     )
     .trim(),
-  visibility: z.enum(["private", "public"]).default("private").optional(),
+  visibility: z.enum(["private", "public"]).default("private"),
 });
 
 export const ImageImportFromNameRequestSchema = z.object({
@@ -331,7 +247,7 @@ export const ImageImportFromNameRequestSchema = z.object({
   protected: z.boolean(),
 });
 
-export const AllocationPoolSchema = z
+const AllocationPoolSchema = z
   .object({
     start: z
       .string()
@@ -378,7 +294,7 @@ export const AllocationPoolSchema = z
     { message: "Start IP must be less than or equal to end IP", path: ["end"] },
   );
 
-export const SubnetCreateRequestSchema = z.object({
+const SubnetCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Subnet name is required")
@@ -447,34 +363,13 @@ export const RouterCreateRequestSchema = z.object({
   external_network_id: z.uuid("Invalid external network ID format"),
 });
 
-export const RouterAddInterfaceRequestSchema = z.object({
-  subnet_id: z.uuid("Invalid subnet ID format"),
-});
-
 export const AttachPrivateNetworkRequestSchema = z.object({
   router_id: z.uuid("Invalid router ID format"),
   private_network_id: z.uuid("Invalid network ID format"),
 });
 
-export const RemoveRouterInterfaceRequestSchema = z.object({
-  router_id: z.uuid("Invalid router ID format"),
-  network_name: z.string().min(1, "Network name is required"),
-});
-
-export const RouterIdRequestSchema = z.object({
-  router_id: z.uuid("Invalid router ID format"),
-});
-
-export const NetworkIdRequestSchema = z.object({
-  network_id: z.uuid("Invalid network ID format"),
-});
-
-export const FloatingIPIdRequestSchema = z.object({
-  floating_ip_id: z.uuid("Invalid floating IP ID format"),
-});
-
 export const flavorSchema = z.object({
-  flavor_id: z.string().min(1, "Flavor ID is required"),
+  flavor_id: z.string().min(1, "Flavor selection is required"),
 });
 
 export const imageSchema = z.object({
@@ -653,45 +548,6 @@ export const KeyPairImportFromFileRequestSchema = z.object({
   public_key: z.instanceof(File, { message: "Public key file is required" }),
 });
 
-export const KeyPairDeleteRequestSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Key pair name is required")
-    .max(64, "Key pair name too long")
-    .trim(),
-});
-
-export const VolumeDeleteRequestSchema = z.object({
-  volume_id: z.uuid("Invalid volume ID format"),
-});
-
-export const VolumeExtendRequestSchema = z.object({
-  new_size: z
-    .number()
-    .int("Size must be an integer")
-    .min(1, "New size must be at least 1 GB"),
-});
-
-export const VolumeChangeTypeRequestSchema = z.object({
-  volume_type: z
-    .string()
-    .min(1, "Volume type is required")
-    .max(64, "Volume type name too long"),
-});
-
-export const VolumeAttachRequestSchema = z.object({
-  volume_id: z.uuid("Invalid volume ID format"),
-  instance_id: z.uuid("Invalid instance ID format"),
-});
-
-export const VolumeDetachRequestSchema = z.object({
-  attachment_id: z.uuid("Invalid attachment ID format"),
-});
-
-export const VolumeSnapshotDeleteRequestSchema = z.object({
-  snapshot_id: z.uuid("Invalid snapshot ID format"),
-});
-
 export const VolumeCreateFromSnapshotRequestSchema = z.object({
   name: z
     .string()
@@ -715,15 +571,14 @@ export const VolumeSnapshotUpdateRequestSchema = z.object({
 });
 
 export const VolumeUploadToImageRequestSchema = z.object({
+  volume_id: z.uuid("Invalid volume ID format"),
   image_name: z
     .string()
     .min(1, "Image name is required")
     .max(64, "Image name too long")
     .trim(),
-  disk_format: z.enum(["raw", "qcow2", "vmdk", "vdi"]).optional(),
-  container_format: z.enum(["bare", "ovf", "ova"]).optional(),
-  visibility: z.enum(["private", "public"]).optional(),
-  protected: z.boolean().optional(),
+  disk_format: z.enum(["raw", "qcow2", "vmdk", "vdi"]).default("qcow2"),
+  container_format: z.enum(["bare", "ovf", "ova"]).default("bare"),
 });
 
 export const VolumeTypeCreateRequestSchema = z.object({
@@ -747,59 +602,6 @@ export const VolumeTypeUpdateRequestSchema = z.object({
   description: z.string().max(255, "Description too long").trim().optional(),
 });
 
-export const InstanceStartRequestSchema = z.object({
-  server_id: z.uuid("Invalid server ID format"),
-});
-
-export const InstanceStopRequestSchema = z.object({
-  server_id: z.uuid("Invalid server ID format"),
-});
-
-export const InstanceRebootRequestSchema = z.object({
-  server_id: z.uuid("Invalid server ID format"),
-  type: z.enum(["SOFT", "HARD"]).optional(),
-});
-
-export const InstanceDeleteRequestSchema = z.object({
-  server_id: z.uuid("Invalid server ID format"),
-});
-
-export const ResizeRequestSchema = z.object({
-  instance_id: z.uuid("Invalid instance ID format"),
-  new_flavor: z.string().min(1, "New flavor is required"),
-});
-
-export const IdRequestSchema = z.object({
-  instance_id: z.uuid("Invalid instance ID format"),
-});
-
-export const FloatingIPRequestSchema = z.object({
-  instance_id: z.uuid("Invalid instance ID format"),
-});
-
-export const InterfaceRequestSchema = z.object({
-  instance_id: z.uuid("Invalid instance ID format"),
-  network_id: z.uuid("Invalid network ID format"),
-});
-
-export const VolumeRequestSchema = z.object({
-  instance_id: z.uuid("Invalid instance ID format"),
-  volume_id: z.uuid("Invalid volume ID format"),
-});
-
-export const CreateSnapshotRequestSchema = z.object({
-  instance_id: z.uuid("Invalid instance ID format"),
-  snapshot_name: z.string().min(1, "Snapshot name is required").max(64).trim(),
-});
-
-export const SecurityGroupDeleteRequestSchema = z.object({
-  security_group_id: z.uuid("Invalid security group ID format"),
-});
-
-export const SecurityGroupRuleDeleteRequestSchema = z.object({
-  rule_id: z.uuid("Invalid rule ID format"),
-});
-
 export const SecurityGroupUpdateRequestSchema = z.object({
   name: z
     .string()
@@ -810,8 +612,15 @@ export const SecurityGroupUpdateRequestSchema = z.object({
   description: z.string().max(255, "Description too long").trim().optional(),
 });
 
-export const ImageDeleteRequestSchema = z.object({
-  image_id: z.uuid("Invalid image ID format"),
+export const VolumeExtendRequestSchema = z.object({
+  new_size: z
+    .number()
+    .int("Size must be an integer")
+    .min(1, "Size must be at least 1 GB"),
+});
+
+export const CreateSnapshotRequestSchema = z.object({
+  snapshot_name: z.string().trim().min(1, "Snapshot name is required"),
 });
 
 export const ImageUpdateRequestSchema = z.object({
@@ -836,7 +645,7 @@ export const ImageImportFromUploadRequestSchema = z.object({
     .min(1, "Image name is required")
     .max(64, "Image name too long")
     .trim(),
-  visibility: z.enum(["private", "public"]).default("private").optional(),
+  visibility: z.enum(["private", "public"]).default("private"),
   protected: z.boolean().optional(),
 });
 
@@ -854,20 +663,11 @@ export const ImageCreateVolumeRequestSchema = z.object({
   volume_type: z.string().max(64).optional(),
   visibility: z
     .enum(["private", "public", "shared", "community"])
-    .default("private")
-    .optional(),
-  protected: z.boolean().default(false).optional(),
+    .default("private"),
+  protected: z.boolean().default(false),
 });
 
-export const NetworkDeleteRequestSchema = z.object({
-  network_id: z.uuid("Invalid network ID format"),
-});
-
-export const RouterDeleteRequestSchema = z.object({
-  router_id: z.uuid("Invalid router ID format"),
-});
-
-export const ClusterNodeConfigSchema = z.object({
+const ClusterNodeConfigSchema = z.object({
   name_prefix: z.string(),
   image_id: z.uuid("Invalid image ID format"),
   flavor_id: z.string(),
@@ -902,10 +702,6 @@ export const FloatingIpCreateRequestSchema = z.object({
   external_network_name: z.string().min(1, "External network name is required"),
   floating_ip: z.string().optional(),
   description: z.string().optional(),
-});
-
-export const AssociateIpSchema = z.object({
-  vm_id: z.uuid("Invalid VM ID format"),
 });
 
 export const FloatingIPAssociateRequestSchema = z.object({

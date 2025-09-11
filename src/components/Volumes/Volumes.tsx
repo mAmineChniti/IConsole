@@ -638,14 +638,16 @@ export function Volumes() {
         currentSize={extendDialog.currentSize ?? 1}
         onSuccess={refetch}
       />
-      <VolumeUploadToImageDialog
-        open={uploadDialog.open}
-        onOpenChange={(open) =>
-          setUploadDialog({ open, volumeId: uploadDialog.volumeId })
-        }
-        volumeId={uploadDialog.volumeId}
-        onSuccess={refetch}
-      />
+      {uploadDialog.volumeId && (
+        <VolumeUploadToImageDialog
+          open={uploadDialog.open}
+          onOpenChange={(open) =>
+            setUploadDialog({ open, volumeId: uploadDialog.volumeId })
+          }
+          volumeId={uploadDialog.volumeId}
+          onSuccess={refetch}
+        />
+      )}
       <VolumeChangeTypeDialog
         open={changeTypeDialog.open}
         onOpenChange={(open) =>

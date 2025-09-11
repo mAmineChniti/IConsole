@@ -6,9 +6,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { VolumeService } from "@/lib/requests";
-import { useState } from "react";
+import type { VolumeUploadToImageRequest } from "@/types/RequestInterfaces";
+import { VolumeUploadToImageRequestSchema } from "@/types/RequestSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function VolumeUploadToImageDialog({
@@ -19,28 +38,51 @@ export function VolumeUploadToImageDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  volumeId: string | undefined;
+  volumeId: string;
   onSuccess?: () => void;
 }) {
-  const [imageName, setImageName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleUpload = async () => {
-    if (!volumeId || !imageName) return;
-    setLoading(true);
-    try {
-      await VolumeService.uploadToImage({
-        volume_id: volumeId,
-        image_name: imageName,
-      });
+  const form = useForm<Omit<VolumeUploadToImageRequest, "volume_id">>({
+    resolver: zodResolver(
+      VolumeUploadToImageRequestSchema.omit({ volume_id: true }),
+    ),
+    defaultValues: {
+      image_name: "",
+      disk_format: "qcow2",
+      container_format: "bare",
+    },
+  });
+
+  const uploadToImageMutation = useMutation({
+    mutationFn: (data: VolumeUploadToImageRequest) =>
+      VolumeService.uploadToImage(data),
+    onSuccess: async () => {
       toast.success("Volume uploaded to image successfully");
       onOpenChange(false);
+      form.reset();
+      await queryClient.invalidateQueries({ queryKey: ["images"] });
+      await queryClient.invalidateQueries({ queryKey: ["volumes"] });
       onSuccess?.();
-    } catch (e: unknown) {
-      toast.error((e as Error).message);
-    } finally {
-      setLoading(false);
+    },
+    onError: (error: unknown) => {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to upload volume to image",
+      );
+    },
+  });
+
+  const onSubmit = (data: Omit<VolumeUploadToImageRequest, "volume_id">) => {
+    if (!volumeId) {
+      return;
     }
+    const submitData: VolumeUploadToImageRequest = {
+      volume_id: volumeId,
+      ...data,
+    };
+    uploadToImageMutation.mutate(submitData);
   };
 
   return (
@@ -49,34 +91,94 @@ export function VolumeUploadToImageDialog({
         <DialogHeader>
           <DialogTitle>Upload Volume to Image</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium">Image Name</label>
-            <Input
-              value={imageName}
-              className="w-full rounded-full"
-              onChange={(e) => setImageName(e.target.value)}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="image_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Enter a name for the new image"
+                      className="rounded-full"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            className="cursor-pointer rounded-full"
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            className="cursor-pointer rounded-full"
-            onClick={handleUpload}
-            disabled={loading || !imageName}
-          >
-            {loading ? "Uploading..." : "Upload"}
-          </Button>
-        </DialogFooter>
+
+            <FormField
+              control={form.control}
+              name="disk_format"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Disk Format (Optional)</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="rounded-full">
+                        <SelectValue placeholder="Select disk format (default: qcow2)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="raw">RAW</SelectItem>
+                        <SelectItem value="qcow2">QCOW2 (default)</SelectItem>
+                        <SelectItem value="vmdk">VMDK</SelectItem>
+                        <SelectItem value="vdi">VDI</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="container_format"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Container Format (Optional)</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="rounded-full">
+                        <SelectValue placeholder="Select container format (default: bare)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="bare">Bare (default)</SelectItem>
+                        <SelectItem value="ovf">OVF</SelectItem>
+                        <SelectItem value="ova">OVA</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                className="cursor-pointer rounded-full"
+                onClick={() => onOpenChange(false)}
+                disabled={uploadToImageMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                className="cursor-pointer rounded-full"
+                disabled={uploadToImageMutation.isPending}
+              >
+                {uploadToImageMutation.isPending ? "Uploading..." : "Upload"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

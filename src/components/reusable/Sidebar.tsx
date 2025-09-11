@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/tooltip";
 import { AuthService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
+import type { SwitchProjectRequest } from "@/types/RequestInterfaces";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import {
@@ -213,9 +214,9 @@ export function Sidebar() {
   }, [selectedProject, projects]);
 
   const switchProjectMutation = useMutation({
-    mutationFn: (projectId: string) =>
-      AuthService.switchProject({ project_id: projectId }),
-    onSuccess: async (response, projectId) => {
+    mutationFn: (request: SwitchProjectRequest) =>
+      AuthService.switchProject(request),
+    onSuccess: async (response, variables) => {
       const now = Date.now();
       const expiresAtMs =
         response.expires_at_ts > 1e12
@@ -260,8 +261,8 @@ export function Sidebar() {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
       });
-      setSelectedProject(projectId);
-      localStorage.setItem("selectedProject", projectId);
+      setSelectedProject(variables.project_id);
+      localStorage.setItem("selectedProject", variables.project_id);
 
       toast.success("Project switched successfully!");
     },
@@ -279,7 +280,7 @@ export function Sidebar() {
   const handleProjectChange = (projectId: string) => {
     if (switchProjectMutation.isPending || projectId === selectedProject)
       return;
-    switchProjectMutation.mutate(projectId);
+    switchProjectMutation.mutate({ project_id: projectId });
   };
   const logoutMutation = useMutation({
     mutationFn: () => AuthService.logout(),

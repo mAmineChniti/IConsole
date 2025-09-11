@@ -182,7 +182,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
       return InfraService.createFromDescription({
         vm_name,
         description,
-        timeout: 300,
+        timeout: 1000,
       });
     },
     onSuccess: async (response) => {
