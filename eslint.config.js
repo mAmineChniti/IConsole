@@ -6,6 +6,7 @@ import prettierPlugin from "eslint-plugin-prettier";
 import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import unicornPlugin from "eslint-plugin-unicorn";
+import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
 const compat = new FlatCompat({
@@ -14,7 +15,7 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [".next", "node_modules", ".vercel", "**/*.d.ts"],
   },
@@ -32,6 +33,7 @@ export default tseslint.config(
       "jsx-a11y": jsxA11yPlugin,
       unicorn: unicornPlugin,
       prettier: prettierPlugin,
+      // @ts-expect-error - TanStack Query plugin has type compatibility issues with new ESLint types
       "@tanstack/query": pluginQuery,
     },
     rules: {

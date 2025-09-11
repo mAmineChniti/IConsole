@@ -1,6 +1,7 @@
 "use client";
 
 import { ErrorCard } from "@/components/reusable/ErrorCard";
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,17 +25,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InfraService } from "@/lib/requests";
-import { makeDupSafeSelect } from "@/lib/utils";
 import type { ImportVMwareRequest } from "@/types/RequestInterfaces";
 import { ImportVMwareRequestSchema } from "@/types/RequestSchemas";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
@@ -138,7 +131,7 @@ export function MigrateVM() {
 
   if (resourcesLoading)
     return (
-      <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+      <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="bg-muted rounded-full p-2">
@@ -274,7 +267,7 @@ export function MigrateVM() {
     );
 
   return (
-    <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+    <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <div className="bg-muted rounded-full p-2">
@@ -492,20 +485,21 @@ export function MigrateVM() {
                       </span>
                       Flavor
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full cursor-pointer rounded-full">
-                          <SelectValue placeholder="Select flavor" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {resources?.flavors.map((flavor) => (
-                          <SelectItem key={flavor.id} value={flavor.id}>
-                            {flavor.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <XCombobox
+                        type="flavor"
+                        data={
+                          resources?.flavors.map((flavor) => ({
+                            label: flavor.name,
+                            value: flavor.id,
+                          })) ?? []
+                        }
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select flavor"
+                        className="w-full"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -522,20 +516,21 @@ export function MigrateVM() {
                       </span>
                       Network
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full cursor-pointer rounded-full">
-                          <SelectValue placeholder="Select network" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {resources?.networks.map((network) => (
-                          <SelectItem key={network.id} value={network.id}>
-                            {network.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <XCombobox
+                        type="network"
+                        data={
+                          resources?.networks.map((network) => ({
+                            label: network.name,
+                            value: network.id,
+                          })) ?? []
+                        }
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select network"
+                        className="w-full"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -546,83 +541,63 @@ export function MigrateVM() {
               <FormField
                 control={importForm.control}
                 name="key_name"
-                render={({ field }) => {
-                  const kpItems = resources?.keypairs ?? [];
-                  const { options, toForm, fromForm } = makeDupSafeSelect(
-                    kpItems,
-                    (k) => k.name,
-                    (k) => k.name,
-                  );
-                  return (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                          <KeyRound className="text-muted-foreground h-4 w-4" />
-                        </span>
-                        Key Pair
-                      </FormLabel>
-                      <Select
-                        onValueChange={(val) => field.onChange(toForm(val))}
-                        value={fromForm(field.value)}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full cursor-pointer rounded-full">
-                            <SelectValue placeholder="Select key pair" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {options.map((opt) => (
-                            <SelectItem key={`kp-${opt.key}`} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <KeyRound className="text-muted-foreground h-4 w-4" />
+                      </span>
+                      Key Pair
+                    </FormLabel>
+                    <FormControl>
+                      <XCombobox
+                        type="key pair"
+                        data={
+                          resources?.keypairs.map((kp) => ({
+                            label: kp.name,
+                            value: kp.name,
+                          })) ?? []
+                        }
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select key pair"
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
 
               <FormField
                 control={importForm.control}
                 name="security_group"
-                render={({ field }) => {
-                  const sgItems = resources?.security_groups ?? [];
-                  const { options, toForm, fromForm } = makeDupSafeSelect(
-                    sgItems,
-                    (g) => g.name,
-                    (g) => g.name,
-                  );
-                  return (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                          <ShieldCheck className="text-muted-foreground h-4 w-4" />
-                        </span>
-                        Security Group
-                      </FormLabel>
-                      <Select
-                        onValueChange={(val) => field.onChange(toForm(val))}
-                        value={fromForm(field.value)}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full cursor-pointer rounded-full">
-                            <SelectValue placeholder="Select security group" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {options.map((opt) => (
-                            <SelectItem key={`sg-${opt.key}`} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <ShieldCheck className="text-muted-foreground h-4 w-4" />
+                      </span>
+                      Security Group
+                    </FormLabel>
+                    <FormControl>
+                      <XCombobox
+                        type="security group"
+                        data={
+                          resources?.security_groups.map((sg) => ({
+                            label: sg.name,
+                            value: sg.name,
+                          })) ?? []
+                        }
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select security group"
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -10,13 +11,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { NetworkService } from "@/lib/requests";
@@ -158,7 +152,7 @@ export function NetworkCreate({
         )}
       </div>
 
-      <Card className="bg-card text-card-foreground border-border/50 overflow-hidden rounded-xl border shadow-lg">
+      <Card className="text-card-foreground border-border/50 overflow-hidden rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
         <CardHeader className="space-y-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <div className="bg-primary/10 flex-shrink-0 rounded-full p-2">
@@ -417,22 +411,20 @@ export function NetworkCreate({
                         </span>
                         IP Version
                       </FormLabel>
-                      <Select
-                        value={String(field.value)}
-                        onValueChange={(v) =>
-                          field.onChange(Number(v) as 4 | 6)
-                        }
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
-                            <SelectValue placeholder="Select IP Version" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="4">IPv4</SelectItem>
-                          <SelectItem value="6">IPv6</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <XCombobox
+                          type="IP version"
+                          clearable={false}
+                          data={[
+                            { label: "IPv4", value: "4" },
+                            { label: "IPv6", value: "6" },
+                          ]}
+                          value={String(field.value)}
+                          onChange={(v) => field.onChange(Number(v) as 4 | 6)}
+                          placeholder="Select IP Version"
+                          className="w-full"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </div>
                   )}

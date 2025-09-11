@@ -1,3 +1,4 @@
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,13 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { ImageService } from "@/lib/requests";
 import type { ImageUpdateRequest } from "@/types/RequestInterfaces";
@@ -152,19 +146,23 @@ export function ImageEditDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Visibility</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
-                        <SelectValue placeholder="Select visibility" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="private">private</SelectItem>
-                      <SelectItem value="public">public</SelectItem>
-                      <SelectItem value="shared">shared</SelectItem>
-                      <SelectItem value="community">community</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <XCombobox
+                      type="visibility"
+                      data={[
+                        { label: "private", value: "private" },
+                        { label: "public", value: "public" },
+                        { label: "shared", value: "shared" },
+                        { label: "community", value: "community" },
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select visibility"
+                      searchPlaceholder="Search visibility..."
+                      emptyText="No visibility options"
+                      className="w-full"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

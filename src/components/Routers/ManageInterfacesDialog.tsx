@@ -118,7 +118,6 @@ export function ManageInterfacesDialog({
                         <StatusBadge status={iface.status} />
                       </div>
 
-                      {/* Interface Details Grid */}
                       <div className="grid grid-cols-1 gap-2 text-sm">
                         <div className="text-muted-foreground flex items-center gap-2">
                           <Globe className="h-3.5 w-3.5" />

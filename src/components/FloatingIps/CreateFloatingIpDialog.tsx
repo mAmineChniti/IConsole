@@ -1,16 +1,7 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxGroup,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -147,32 +138,17 @@ export function CreateFloatingIpDialog({
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Network</FormLabel>
-                  <Combobox
-                    data={comboboxData}
-                    type="network"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <ComboboxTrigger
-                        className="w-full cursor-pointer rounded-full"
-                        disabled={isLoadingNetworks}
-                      />
-                    </FormControl>
-                    <ComboboxContent>
-                      <ComboboxInput />
-                      <ComboboxList>
-                        <ComboboxEmpty />
-                        <ComboboxGroup>
-                          {comboboxData.map((net) => (
-                            <ComboboxItem key={net.value} value={net.value}>
-                              {net.label}
-                            </ComboboxItem>
-                          ))}
-                        </ComboboxGroup>
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
+                  <FormControl>
+                    <XCombobox
+                      data={comboboxData}
+                      type="network"
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select network"
+                      disabled={isLoadingNetworks}
+                      className="w-full cursor-pointer rounded-full"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

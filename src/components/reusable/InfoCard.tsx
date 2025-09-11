@@ -7,67 +7,67 @@ import type { MouseEventHandler, ReactNode } from "react";
 
 const iconVariants = {
   gray: {
-    bg: "bg-gray-100 dark:bg-gray-800",
-    text: "text-gray-600 dark:text-gray-300",
+    bg: "bg-slate-100 dark:bg-slate-800/50",
+    text: "text-slate-600 dark:text-slate-400",
   },
   blue: {
-    bg: "bg-blue-100 dark:bg-blue-900/30",
+    bg: "bg-blue-50 dark:bg-blue-900/20",
     text: "text-blue-600 dark:text-blue-400",
   },
   sky: {
-    bg: "bg-sky-100 dark:bg-sky-900/30",
+    bg: "bg-sky-50 dark:bg-sky-900/20",
     text: "text-sky-600 dark:text-sky-400",
   },
   indigo: {
-    bg: "bg-indigo-100 dark:bg-indigo-900/30",
+    bg: "bg-indigo-50 dark:bg-indigo-900/20",
     text: "text-indigo-600 dark:text-indigo-400",
   },
   green: {
-    bg: "bg-green-100 dark:bg-green-900/30",
-    text: "text-green-600 dark:text-green-400",
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
+    text: "text-emerald-600 dark:text-emerald-400",
   },
   emerald: {
-    bg: "bg-emerald-100 dark:bg-emerald-900/30",
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
     text: "text-emerald-600 dark:text-emerald-400",
   },
   teal: {
-    bg: "bg-teal-100 dark:bg-teal-900/30",
+    bg: "bg-teal-50 dark:bg-teal-900/20",
     text: "text-teal-600 dark:text-teal-400",
   },
   amber: {
-    bg: "bg-amber-100 dark:bg-amber-900/30",
-    text: "text-amber-600 dark:text-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-900/20",
+    text: "text-amber-600 dark:text-amber-500",
   },
   orange: {
-    bg: "bg-orange-100 dark:bg-orange-900/30",
+    bg: "bg-orange-50 dark:bg-orange-900/20",
     text: "text-orange-600 dark:text-orange-400",
   },
   red: {
-    bg: "bg-red-100 dark:bg-red-900/30",
+    bg: "bg-red-50 dark:bg-red-900/20",
     text: "text-red-600 dark:text-red-400",
   },
   rose: {
-    bg: "bg-rose-100 dark:bg-rose-900/30",
+    bg: "bg-rose-50 dark:bg-rose-900/20",
     text: "text-rose-600 dark:text-rose-400",
   },
   purple: {
-    bg: "bg-purple-100 dark:bg-purple-900/30",
+    bg: "bg-purple-50 dark:bg-purple-900/20",
     text: "text-purple-600 dark:text-purple-400",
   },
   violet: {
-    bg: "bg-violet-100 dark:bg-violet-900/30",
+    bg: "bg-violet-50 dark:bg-violet-900/20",
     text: "text-violet-600 dark:text-violet-400",
   },
   cyan: {
-    bg: "bg-cyan-100 dark:bg-cyan-900/30",
+    bg: "bg-cyan-50 dark:bg-cyan-900/20",
     text: "text-cyan-600 dark:text-cyan-400",
   },
   pink: {
-    bg: "bg-pink-100 dark:bg-pink-900/30",
+    bg: "bg-pink-50 dark:bg-pink-900/20",
     text: "text-pink-600 dark:text-pink-400",
   },
   fuchsia: {
-    bg: "bg-fuchsia-100 dark:bg-fuchsia-900/30",
+    bg: "bg-fuchsia-50 dark:bg-fuchsia-900/20",
     text: "text-fuchsia-600 dark:text-fuchsia-400",
   },
 } as const;
@@ -107,14 +107,24 @@ export function InfoCard({
   return (
     <Card
       className={cn(
-        "flex h-full flex-col",
+        "flex flex-col bg-neutral-50 dark:bg-neutral-900",
+        infoItems && infoItems.length > 0 ? "h-full py-6" : "h-auto py-2",
         onClick && "cursor-pointer",
         className,
       )}
       onClick={onClick}
     >
-      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-        <div className="space-y-1">
+      <CardHeader
+        className={cn(
+          "flex flex-row items-start justify-between space-y-0",
+          infoItems && infoItems.length > 0 ? "px-6 pb-2" : "px-4 pb-0",
+        )}
+      >
+        <div
+          className={cn(
+            infoItems && infoItems.length > 0 ? "space-y-1" : "space-y-0.5",
+          )}
+        >
           <CardTitle className="text-base font-medium">
             {isLoading ? <Skeleton className="h-5 w-32" /> : title}
           </CardTitle>
@@ -133,7 +143,12 @@ export function InfoCard({
         ) : undefined}
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col pt-0">
+      <CardContent
+        className={cn(
+          "flex flex-1 flex-col pt-0",
+          infoItems && infoItems.length > 0 ? "px-6" : "px-4",
+        )}
+      >
         <div className="flex-1 space-y-3">
           {isLoading ? (
             <div className="flex flex-row items-center gap-3">
@@ -198,11 +213,22 @@ export function InfoCard({
           )}
         </div>
         {actionButtons && (
-          <div className="relative mt-4 w-full pt-0">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={cn(
+              "relative w-full pt-0",
+              infoItems && infoItems.length > 0 ? "mt-4" : "mt-2",
+            )}
+          >
             <div className="absolute top-0 right-0 left-0">
               <Separator className="m-0" />
             </div>
-            <div className="flex w-full flex-wrap items-center justify-center gap-2 pt-4">
+            <div
+              className={cn(
+                "flex w-full flex-wrap items-center justify-center gap-2",
+                infoItems && infoItems.length > 0 ? "pt-4" : "pt-2",
+              )}
+            >
               {actionButtons}
             </div>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,12 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 import { VolumeService } from "@/lib/requests";
 import type { VolumeType } from "@/types/ResponseInterfaces";
 import { useQuery } from "@tanstack/react-query";
@@ -74,34 +69,22 @@ export function VolumeChangeTypeDialog({
           ) : error ? (
             <div className="text-destructive">Failed to load types</div>
           ) : (
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger
-                className="w-full cursor-pointer rounded-full"
-                aria-label="Select type"
-              >
-                {selectedType
-                  ? (types?.find((type) => type.ID === selectedType)?.Name ??
-                    "Select type")
-                  : "Select type"}
-              </SelectTrigger>
-              <SelectContent>
-                {types && types.length > 0 ? (
-                  types.map((type: VolumeType) => (
-                    <SelectItem key={type.ID} value={type.ID}>
-                      {type.Name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem
-                    value="no-types"
-                    disabled
-                    className="text-muted-foreground"
-                  >
-                    No types found
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
+            <XCombobox
+              data={
+                types && types.length > 0
+                  ? types.map((type: VolumeType) => ({
+                      label: type.Name,
+                      value: type.ID,
+                    }))
+                  : []
+              }
+              value={selectedType}
+              onChange={setSelectedType}
+              type="volume type"
+              placeholder="Select type"
+              emptyText="No types found"
+              className="w-full"
+            />
           )}
         </div>
         <DialogFooter>

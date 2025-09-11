@@ -120,7 +120,7 @@ export function Instances() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground border-border/50 cursor-pointer rounded-xl border shadow-lg"
+              className="text-card-foreground border-border/50 cursor-pointer rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -263,7 +263,7 @@ export function Instances() {
             <InfoCard
               key={instance.id}
               title={instance.instance_name}
-              className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg"
+              className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
               onClick={() => handleCardClick(instance)}
               badges={
                 <>

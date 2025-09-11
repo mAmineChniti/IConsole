@@ -1,16 +1,9 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
 import {
   Form,
   FormControl,
@@ -98,7 +91,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
   };
 
   return (
-    <div className="mx-auto min-h-[80vh] max-w-6xl space-y-8 py-8">
+    <div className="min-h-[80vh] w-full space-y-8 py-8">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex items-center gap-4">
@@ -128,7 +121,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+            <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
               <CardHeader>
                 <CardTitle className="text-foreground text-lg font-semibold">
                   Basic Information
@@ -213,7 +206,7 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+            <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
                   <Shield className="text-primary h-5 w-5" />
@@ -230,74 +223,26 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                         <FormLabel className="font-semibold">
                           Default Project
                         </FormLabel>
-                        <div className="flex items-center gap-2">
-                          <Combobox
-                            data={(availableProjects?.projects ?? []).map(
-                              (p) => ({
-                                label: p.project_name,
-                                value: p.project_id,
-                              }),
-                            )}
-                            type="project"
-                            value={field.value}
-                            onValueChange={(v: string) =>
-                              field.onChange(v || undefined)
-                            }
-                          >
-                            <ComboboxTrigger
-                              className="!h-10 flex-1 cursor-pointer rounded-full"
-                              disabled={
-                                isProjectsLoading ||
-                                (availableProjects?.projects?.length ?? 0) === 0
-                              }
-                            />
-                            <ComboboxContent
-                              popoverOptions={{
-                                className:
-                                  "w-[--radix-popover-trigger-width] p-0 border-border shadow-lg",
-                              }}
-                            >
-                              <ComboboxInput
-                                placeholder="Search projects..."
-                                className="text-foreground rounded-none border-0 px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
-                              />
-                              <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
-                                {isProjectsLoading ? (
-                                  <ComboboxItem disabled value="__loading">
-                                    Loading projects…
-                                  </ComboboxItem>
-                                ) : (availableProjects?.projects?.length ??
-                                    0) === 0 ? (
-                                  <ComboboxItem disabled value="__no-projects">
-                                    No projects available
-                                  </ComboboxItem>
-                                ) : (
-                                  (availableProjects?.projects ?? []).map(
-                                    (p) => (
-                                      <ComboboxItem
-                                        key={p.project_id}
-                                        value={p.project_id}
-                                      >
-                                        {p.project_name}
-                                      </ComboboxItem>
-                                    ),
-                                  )
-                                )}
-                              </ComboboxList>
-                            </ComboboxContent>
-                          </Combobox>
-                          {field.value && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => field.onChange(undefined)}
-                              className="h-10 flex-shrink-0 rounded-full px-3"
-                            >
-                              Clear
-                            </Button>
+                        <XCombobox
+                          data={(availableProjects?.projects ?? []).map(
+                            (p) => ({
+                              label: p.project_name,
+                              value: p.project_id,
+                            }),
                           )}
-                        </div>
+                          type="project"
+                          value={field.value}
+                          onChange={(v: string | undefined) =>
+                            field.onChange(v ?? undefined)
+                          }
+                          placeholder="Select default project"
+                          searchPlaceholder="Search projects..."
+                          disabled={
+                            isProjectsLoading ||
+                            (availableProjects?.projects?.length ?? 0) === 0
+                          }
+                          className="!h-10 flex-1 cursor-pointer rounded-full"
+                        />
                         <FormDescription>
                           The primary project this user will have access to
                         </FormDescription>

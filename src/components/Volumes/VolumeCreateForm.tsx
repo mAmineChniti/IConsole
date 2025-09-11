@@ -1,5 +1,6 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,12 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { VolumeService } from "@/lib/requests";
 import type { VolumeCreateRequest } from "@/types/RequestInterfaces";
@@ -41,12 +36,10 @@ import {
   FileText,
   HardDrive,
   Layers,
-  Loader2,
   MapPin,
   Plus,
   Server,
   Users,
-  X,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -140,7 +133,7 @@ export function VolumeCreateForm({
           Back to Volumes
         </Button>
       </div>
-      <Card className="bg-card text-card-foreground border-border/50 mx-auto w-full rounded-xl border shadow-lg">
+      <Card className="text-card-foreground border-border/50 mx-auto w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="bg-muted rounded-full p-2">
@@ -236,55 +229,32 @@ export function VolumeCreateForm({
                         Source Volume
                       </FormLabel>
                       <FormControl>
-                        <div className="relative w-full">
-                          <Select
-                            value={field.value ?? ""}
-                            onValueChange={(v) =>
-                              field.onChange(v || undefined)
-                            }
-                            disabled={isLoadingVolumes}
-                          >
-                            <SelectTrigger className="bg-input text-foreground w-full cursor-pointer rounded-full">
-                              {isLoadingVolumes ? (
-                                <span className="flex items-center gap-2">
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                  Loading volumes...
-                                </span>
-                              ) : isErrorVolumes ? (
-                                "Error loading volumes"
-                              ) : field.value ? (
-                                <span className="pr-6">
-                                  {volumes.find((v) => v.ID === field.value)
-                                    ?.Name ?? field.value}
-                                </span>
-                              ) : (
-                                "Select a source volume (optional)"
-                              )}
-                            </SelectTrigger>
-                            <SelectContent>
-                              {volumes.map((volume) => (
-                                <SelectItem key={volume.ID} value={volume.ID}>
-                                  {volume.Name} ({volume.Size} GB)
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {field.value &&
-                            !isLoadingVolumes &&
-                            !isErrorVolumes && (
-                              <Button
-                                variant="outline"
-                                type="button"
-                                className="hover:bg-accent absolute top-1/2 right-10 -translate-y-1/2 rounded-full p-1"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  field.onChange(undefined);
-                                }}
-                              >
-                                <X className="h-4 w-4 opacity-50 hover:opacity-100" />
-                              </Button>
-                            )}
-                        </div>
+                        <XCombobox
+                          type="volume"
+                          data={volumes.map((volume) => ({
+                            label: `${volume.Name} (${volume.Size} GB)`,
+                            value: volume.ID,
+                          }))}
+                          value={field.value}
+                          onChange={(value) =>
+                            field.onChange(value ?? undefined)
+                          }
+                          placeholder={
+                            isLoadingVolumes
+                              ? "Loading volumes..."
+                              : isErrorVolumes
+                                ? "Error loading volumes"
+                                : "Select a source volume (optional)"
+                          }
+                          searchPlaceholder="Search volumes..."
+                          emptyText="No volumes found."
+                          disabled={
+                            isLoadingVolumes ||
+                            (isErrorVolumes && volumes.length === 0)
+                          }
+                          className="w-full"
+                          clearable
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -325,40 +295,32 @@ export function VolumeCreateForm({
                         Volume Type
                       </FormLabel>
                       <FormControl>
-                        <Select
-                          value={field.value ?? ""}
-                          onValueChange={(value) =>
-                            field.onChange(value || undefined)
+                        <XCombobox
+                          type="volume type"
+                          data={typesData.map((type: VolumeType) => ({
+                            label: type.Name,
+                            value: type.ID,
+                          }))}
+                          value={field.value}
+                          onChange={(value) =>
+                            field.onChange(value ?? undefined)
                           }
-                          disabled={isLoadingTypes || isErrorTypes}
-                        >
-                          <SelectTrigger className="bg-input text-foreground w-full cursor-pointer rounded-full">
-                            {isLoadingTypes
+                          placeholder={
+                            isLoadingTypes
                               ? "Loading..."
                               : isErrorTypes
                                 ? "Error loading types"
-                                : (typesData.find(
-                                    (t: VolumeType) => t.ID === field.value,
-                                  )?.Name ?? field.value)}
-                          </SelectTrigger>
-                          <SelectContent>
-                            {isLoadingTypes ? (
-                              <SelectItem value="__none__" disabled>
-                                Loading types...
-                              </SelectItem>
-                            ) : isErrorTypes ? (
-                              <SelectItem value="__none__" disabled>
-                                Error loading types
-                              </SelectItem>
-                            ) : (
-                              typesData.map((type: VolumeType) => (
-                                <SelectItem key={type.ID} value={type.ID}>
-                                  {type.Name}
-                                </SelectItem>
-                              ))
-                            )}
-                          </SelectContent>
-                        </Select>
+                                : "Select volume type (optional)"
+                          }
+                          searchPlaceholder="Search volume types..."
+                          emptyText="No volume types found."
+                          disabled={
+                            isLoadingTypes ||
+                            (isErrorTypes && typesData.length === 0)
+                          }
+                          className="w-full"
+                          clearable
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -44,7 +44,7 @@ export function Overview() {
           {Array.from({ length: 4 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg"
+              className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
             >
               <CardContent>
                 <div className="mb-3 flex items-center gap-3">
@@ -64,7 +64,7 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg"
+              className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg"
+              className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -148,7 +148,7 @@ export function Overview() {
           {Array.from({ length: 2 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg"
+              className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
             >
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -228,7 +228,7 @@ export function Overview() {
         />
       </div>
       <div className="grid gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-4 xl:grid-cols-4">
-        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardContent>
             <div className="mb-3 flex items-center gap-3">
               <div className="bg-primary/10 rounded-full p-3">
@@ -249,7 +249,7 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardContent>
             <div className="mb-3 flex items-center gap-3">
               <div className="bg-primary/10 rounded-full p-3">
@@ -268,7 +268,7 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardContent>
             <div className="mb-3 flex items-center gap-3">
               <div className="bg-primary/10 rounded-full p-3">
@@ -287,7 +287,7 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardContent>
             <div className="mb-3 flex items-center gap-3">
               <div
@@ -323,7 +323,7 @@ export function Overview() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-2">
-        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className="bg-primary/10 rounded-full p-2">
@@ -363,7 +363,7 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className="bg-primary/10 rounded-full p-2">
@@ -405,7 +405,7 @@ export function Overview() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-2">
-        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className="bg-primary/10 rounded-full p-2">
@@ -478,7 +478,7 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className="bg-primary/10 rounded-full p-2">
@@ -548,7 +548,7 @@ export function Overview() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-2">
-        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -628,7 +628,7 @@ export function Overview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border/50 w-full rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">

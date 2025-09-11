@@ -30,7 +30,6 @@ import { VolumeCreateSnapshotDialog } from "@/components/Volumes/VolumeCreateSna
 import { VolumeExtendDialog } from "@/components/Volumes/VolumeExtendDialog";
 import { VolumeUploadToImageDialog } from "@/components/Volumes/VolumeUploadToImageDialog";
 import { VolumeService } from "@/lib/requests";
-import { parseVolumeSizeGiB } from "@/lib/utils";
 import type { VolumeDeleteRequest } from "@/types/RequestInterfaces";
 import type {
   VolumeDetails,
@@ -179,7 +178,7 @@ export function Volumes() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={`skeleton-${i}`}
-              className="bg-card text-card-foreground border-border/50 group flex h-full cursor-pointer flex-col rounded-xl border shadow-lg transition-all duration-200 hover:shadow-xl"
+              className="text-card-foreground border-border/50 group flex h-full cursor-pointer flex-col rounded-xl border bg-neutral-50 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-neutral-900"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -443,7 +442,19 @@ export function Volumes() {
                           setExtendDialog({
                             open: true,
                             volumeId: volume.ID,
-                            currentSize: parseVolumeSizeGiB(volume.Size),
+                            currentSize: (() => {
+                              if (
+                                typeof volume.Size === "number" &&
+                                Number.isFinite(volume.Size)
+                              ) {
+                                return volume.Size;
+                              }
+                              const s = String(volume.Size ?? "").trim();
+                              const regex = /([\d.]+)/;
+                              const m = regex.exec(s);
+                              const n = m?.[1] ? parseFloat(m[1]) : NaN;
+                              return Number.isFinite(n) ? Math.ceil(n) : 1;
+                            })(),
                           });
                         }}
                       >

@@ -129,7 +129,7 @@ export function Networks() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card border-border/50 overflow-hidden rounded-xl border shadow-sm"
+              className="border-border/50 overflow-hidden rounded-xl border bg-neutral-50 shadow-sm dark:bg-neutral-900"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2 sm:items-center">

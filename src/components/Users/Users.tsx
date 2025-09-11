@@ -149,7 +149,7 @@ export function UsersManager() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="bg-card text-card-foreground border-border/50 rounded-xl border p-6 shadow-lg"
+              className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 p-6 shadow-lg dark:bg-neutral-900"
             >
               <div className="flex items-center gap-4">
                 <Skeleton className="h-12 w-12 rounded-full" />
@@ -267,7 +267,7 @@ export function UsersManager() {
               key={user.id}
               title={user.name}
               onClick={() => handleCardClick(user.id)}
-              className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg"
+              className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
               badges={
                 <div className="flex items-center gap-2">
                   <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">

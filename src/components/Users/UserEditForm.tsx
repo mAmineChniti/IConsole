@@ -1,16 +1,9 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
 import {
   Form,
   FormControl,
@@ -164,7 +157,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
 
   if (isLoading) {
     return (
-      <div className="mx-auto min-h-[80vh] max-w-6xl space-y-8 py-8">
+      <div className="min-h-[80vh] w-full space-y-8 py-8">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -189,7 +182,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           <Skeleton className="mt-2 h-6 w-40 rounded-full" />
         </div>
         <div className="grid items-start gap-6 lg:grid-cols-2">
-          <Card className="bg-card text-card-foreground border-border/50 flex flex-col rounded-xl border shadow-lg">
+          <Card className="text-card-foreground border-border/50 flex flex-col rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
             <CardHeader>
               <Skeleton className="h-6 w-32" />
             </CardHeader>
@@ -201,7 +194,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-card text-card-foreground border-border/50 flex flex-col rounded-xl border shadow-lg">
+          <Card className="text-card-foreground border-border/50 flex flex-col rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Skeleton className="h-5 w-5 rounded-full" />
@@ -257,7 +250,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
 
   if (!userDetails) {
     return (
-      <div className="mx-auto max-w-2xl space-y-6">
+      <div className="w-full space-y-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={onBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -272,7 +265,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
   }
 
   return (
-    <div className="mx-auto min-h-[80vh] max-w-6xl space-y-8 py-8">
+    <div className="min-h-[80vh] w-full space-y-8 py-8">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -301,7 +294,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
         </div>
       </div>
       <div className="grid items-start gap-6 lg:grid-cols-2">
-        <Card className="bg-card text-card-foreground border-border/50 flex flex-col rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 flex flex-col rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="text-lg">Basic Information</CardTitle>
           </CardHeader>
@@ -381,7 +374,7 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border/50 flex flex-col rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border/50 flex flex-col rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Shield className="text-primary h-5 w-5" />
@@ -435,14 +428,14 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                       >
                         Project
                       </Label>
-                      <Combobox
+                      <XCombobox
                         data={(availableProjects?.projects ?? []).map((p) => ({
                           label: p.project_name,
                           value: p.project_id,
                         }))}
                         type="project"
                         value={field.project_id}
-                        onValueChange={(value: string) => {
+                        onChange={(value: string | undefined) => {
                           if (
                             value &&
                             projectFields.some(
@@ -454,55 +447,20 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                           }
                           const updatedField = {
                             ...field,
-                            project_id: value,
-                            ...(value === "" && { roles: [] }),
+                            project_id: value ?? "",
+                            ...((!value || value === "") && { roles: [] }),
                           };
                           updateProject(index, updatedField);
                           setProjectsModified(true);
                         }}
-                      >
-                        <ComboboxTrigger
-                          id={`project-select-${index}`}
-                          aria-labelledby={`project-label-${index}`}
-                          className="bg-muted/40 border-border/50 mt-1 !h-9 w-full cursor-pointer rounded-full border text-sm"
-                          disabled={
-                            isProjectsLoading ||
-                            (availableProjects?.projects?.length ?? 0) === 0
-                          }
-                        />
-                        <ComboboxContent
-                          popoverOptions={{
-                            className:
-                              "w-[--radix-popover-trigger-width] p-0 border-border shadow-lg",
-                          }}
-                        >
-                          <ComboboxInput
-                            placeholder="Search projects..."
-                            className="text-foreground rounded-none border-0 px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
-                          />
-                          <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
-                            {isProjectsLoading ? (
-                              <ComboboxItem disabled value="__loading">
-                                Loading projects…
-                              </ComboboxItem>
-                            ) : (availableProjects?.projects?.length ?? 0) ===
-                              0 ? (
-                              <ComboboxItem disabled value="__no-projects">
-                                No projects available
-                              </ComboboxItem>
-                            ) : (
-                              (availableProjects?.projects ?? []).map((p) => (
-                                <ComboboxItem
-                                  key={p.project_id}
-                                  value={p.project_id}
-                                >
-                                  {p.project_name}
-                                </ComboboxItem>
-                              ))
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
+                        placeholder="Select project"
+                        searchPlaceholder="Search projects..."
+                        disabled={
+                          isProjectsLoading ||
+                          (availableProjects?.projects?.length ?? 0) === 0
+                        }
+                        className="bg-muted/40 border-border/50 mt-1 !h-9 w-full cursor-pointer rounded-full border text-sm"
+                      />
                     </div>
 
                     <div>

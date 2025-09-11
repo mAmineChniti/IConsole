@@ -1,3 +1,4 @@
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -6,13 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FlavorService } from "@/lib/requests";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -74,8 +68,6 @@ export function InstanceFlavorSelectDialog({
   }
 
   const flavorOptions = Array.isArray(flavors) ? flavors : [];
-  const selectedFlavorName =
-    flavors?.find((f) => f.id === selectedFlavor)?.name ?? "";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -90,20 +82,17 @@ export function InstanceFlavorSelectDialog({
             </div>
           ) : (
             <>
-              <Select value={selectedFlavor} onValueChange={setSelectedFlavor}>
-                <SelectTrigger className="w-full cursor-pointer rounded-full">
-                  <SelectValue placeholder="Select a flavor...">
-                    {selectedFlavorName || "Select a flavor..."}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {flavorOptions.map((flavor) => (
-                    <SelectItem key={flavor.id} value={flavor.id}>
-                      {flavor.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <XCombobox
+                data={flavorOptions.map((flavor) => ({
+                  label: flavor.name,
+                  value: flavor.id,
+                }))}
+                value={selectedFlavor}
+                onChange={(value) => setSelectedFlavor(value ?? "")}
+                type="flavor"
+                placeholder="Select a flavor..."
+                className="w-full"
+              />
               <div className="flex justify-end space-x-2 pt-4">
                 <Button
                   variant="outline"

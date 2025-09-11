@@ -39,7 +39,7 @@ export function SummaryStep({
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Cpu className="text-primary h-5 w-5" />
@@ -97,7 +97,7 @@ export function SummaryStep({
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HardDrive className="text-primary h-5 w-5" />
@@ -114,7 +114,7 @@ export function SummaryStep({
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Network className="text-primary h-5 w-5" />
@@ -139,7 +139,7 @@ export function SummaryStep({
           </CardContent>
         </Card>
 
-        <Card className="bg-card text-card-foreground border-border rounded-xl border shadow-lg">
+        <Card className="text-card-foreground border-border rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Settings className="text-primary h-5 w-5" />
