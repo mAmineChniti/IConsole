@@ -396,7 +396,9 @@ export function Snapshots() {
                       />
                     </TableCell>
                     <TableCell className="py-3">{s.Size} GB</TableCell>
-                    <TableCell className="py-3">{s["Volume Name"]}</TableCell>
+                    <TableCell className="py-3">
+                      {s["Volume Name"]?.trim() || "N/A"}
+                    </TableCell>
                     <TableCell className="py-3 text-right">
                       <div className="flex justify-end gap-2">
                         <Tooltip>

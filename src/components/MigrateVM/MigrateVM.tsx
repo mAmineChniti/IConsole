@@ -270,14 +270,20 @@ export function MigrateVM() {
     <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <div className="bg-muted rounded-full p-2">
-            <Upload className="text-primary h-5 w-5" />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-400 p-3">
+              <Upload className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="mb-1 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-2xl font-bold tracking-tight text-transparent dark:from-blue-400 dark:to-indigo-400">
+                Import Virtual Machine
+              </h1>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Import an existing VM from a VMDK file or external source
+              </p>
+            </div>
           </div>
-          Import Virtual Machine
         </CardTitle>
-        <CardDescription>
-          Import an existing VM from a VMDK file or external source
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...importForm}>
@@ -288,345 +294,353 @@ export function MigrateVM() {
             className="space-y-6"
           >
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">VMDK File</label>
-                <div className="mt-2">
-                  <Dropzone
-                    src={importFile ? [importFile] : undefined}
-                    maxFiles={1}
-                    accept={{
-                      "application/octet-stream": [".vmdk"],
-                      "application/x-vmdk": [".vmdk"],
-                      "*/*": [".vmdk"],
-                    }}
-                    onDrop={(accepted) => {
-                      const file = accepted?.[0];
-                      if (!file) return;
-                      if (!file.name.toLowerCase().endsWith(".vmdk")) {
-                        toast.error("Invalid file type", {
-                          description: "Please select a valid VMDK file",
-                        });
-                        importForm.setError("vmdk_file", {
-                          type: "validate",
-                          message: "Only .vmdk files are supported",
-                        });
-                        return;
-                      }
-                      setImportFile(file);
-                      importForm.setValue("vmdk_file", file, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      });
-                      importForm.clearErrors("vmdk_file");
-                    }}
-                    className="h-32 cursor-pointer"
-                  >
-                    <DropzoneEmptyState>
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-md">
-                          <Upload size={16} />
-                        </div>
-                        <p className="my-2 w-full truncate text-sm font-medium text-wrap">
-                          Upload a file
-                        </p>
-                        <p className="text-muted-foreground w-full truncate text-xs text-wrap">
-                          Drag and drop or click to upload
-                        </p>
-                        <p className="text-muted-foreground text-xs text-wrap">
-                          Accepts .vmdk
-                        </p>
-                      </div>
-                    </DropzoneEmptyState>
-                    <DropzoneContent />
-                  </Dropzone>
-                  {importForm.formState.errors.vmdk_file && (
-                    <p className="text-destructive mt-2 text-sm">
-                      {importForm.formState.errors.vmdk_file.message?.toString() ??
-                        "Please select a VMDK file"}
-                    </p>
+              <h3 className="text-foreground text-lg font-semibold">
+                VM Configuration
+              </h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField
+                  control={importForm.control}
+                  name="vm_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <Server className="text-muted-foreground h-4 w-4" />
+                        </span>
+                        VM Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter VM name"
+                          className="bg-input text-foreground rounded-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
+
+                <FormField
+                  control={importForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <FileText className="text-muted-foreground h-4 w-4" />
+                        </span>
+                        Description (Optional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Brief description"
+                          className="bg-input text-foreground rounded-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <FormField
+                  control={importForm.control}
+                  name="min_disk"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <HardDrive className="text-muted-foreground h-4 w-4" />
+                        </span>
+                        Minimum Disk (GB)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min={0}
+                          step={1}
+                          inputMode="numeric"
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v === "") return field.onChange("");
+                            const n = Number(v);
+                            field.onChange(
+                              Number.isFinite(n)
+                                ? Math.max(0, Math.floor(n))
+                                : undefined,
+                            );
+                          }}
+                          className="bg-input text-foreground rounded-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={importForm.control}
+                  name="min_ram"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <MemoryStick className="text-muted-foreground h-4 w-4" />
+                        </span>
+                        Minimum RAM (MB)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min={0}
+                          step={1}
+                          inputMode="numeric"
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v === "") return field.onChange("");
+                            const n = Number(v);
+                            field.onChange(
+                              Number.isFinite(n)
+                                ? Math.max(0, Math.floor(n))
+                                : undefined,
+                            );
+                          }}
+                          className="bg-input text-foreground rounded-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <FormField
+                  control={importForm.control}
+                  name="flavor_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <IceCream className="text-muted-foreground h-4 w-4 rotate-45" />
+                        </span>
+                        Flavor
+                      </FormLabel>
+                      <FormControl>
+                        <XCombobox
+                          type="flavor"
+                          data={
+                            resources?.flavors.map((flavor) => ({
+                              label: flavor.name,
+                              value: flavor.id,
+                            })) ?? []
+                          }
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select flavor"
+                          className="w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={importForm.control}
+                  name="network_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <Network className="text-muted-foreground h-4 w-4" />
+                        </span>
+                        Network
+                      </FormLabel>
+                      <FormControl>
+                        <XCombobox
+                          type="network"
+                          data={
+                            resources?.networks.map((network) => ({
+                              label: network.name,
+                              value: network.id,
+                            })) ?? []
+                          }
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select network"
+                          className="w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <FormField
+                  control={importForm.control}
+                  name="key_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <KeyRound className="text-muted-foreground h-4 w-4" />
+                        </span>
+                        Key Pair
+                      </FormLabel>
+                      <FormControl>
+                        <XCombobox
+                          type="key pair"
+                          data={
+                            resources?.keypairs.map((kp) => ({
+                              label: kp.name,
+                              value: kp.name,
+                            })) ?? []
+                          }
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select key pair"
+                          className="w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={importForm.control}
+                  name="security_group"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                          <ShieldCheck className="text-muted-foreground h-4 w-4" />
+                        </span>
+                        Security Group
+                      </FormLabel>
+                      <FormControl>
+                        <XCombobox
+                          type="security group"
+                          data={
+                            resources?.security_groups.map((sg) => ({
+                              label: sg.name,
+                              value: sg.name,
+                            })) ?? []
+                          }
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select security group"
+                          className="w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={importForm.control}
+                name="admin_password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
+                        <UserCog className="text-muted-foreground h-4 w-4" />
+                      </span>
+                      Admin Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="Enter admin password"
+                        className="bg-input text-foreground rounded-full"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Password for the imported VM&apos;s admin user
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="border-t pt-6">
+              <div className="space-y-4">
+                <h3 className="text-foreground text-lg font-semibold">
+                  VMDK File Upload
+                </h3>
+                <div>
+                  <label className="text-sm font-medium">VMDK File</label>
+                  <div className="mt-2">
+                    <Dropzone
+                      src={importFile ? [importFile] : undefined}
+                      maxFiles={1}
+                      accept={{
+                        "application/octet-stream": [".vmdk"],
+                        "application/x-vmdk": [".vmdk"],
+                        "*/*": [".vmdk"],
+                      }}
+                      onDrop={(accepted) => {
+                        const file = accepted?.[0];
+                        if (!file) return;
+                        if (!file.name.toLowerCase().endsWith(".vmdk")) {
+                          toast.error("Invalid file type", {
+                            description: "Please select a valid VMDK file",
+                          });
+                          importForm.setError("vmdk_file", {
+                            type: "validate",
+                            message: "Only .vmdk files are supported",
+                          });
+                          return;
+                        }
+                        setImportFile(file);
+                        importForm.setValue("vmdk_file", file, {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        });
+                        importForm.clearErrors("vmdk_file");
+                      }}
+                      className="h-32 cursor-pointer"
+                    >
+                      <DropzoneEmptyState>
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-md">
+                            <Upload size={16} />
+                          </div>
+                          <p className="my-2 w-full truncate text-sm font-medium text-wrap">
+                            Upload a file
+                          </p>
+                          <p className="text-muted-foreground w-full truncate text-xs text-wrap">
+                            Drag and drop or click to upload
+                          </p>
+                          <p className="text-muted-foreground text-xs text-wrap">
+                            Accepts .vmdk
+                          </p>
+                        </div>
+                      </DropzoneEmptyState>
+                      <DropzoneContent />
+                    </Dropzone>
+                    {importForm.formState.errors.vmdk_file && (
+                      <p className="text-destructive mt-2 text-sm">
+                        {importForm.formState.errors.vmdk_file.message?.toString() ??
+                          "Please select a VMDK file"}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-
-            <Separator />
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <FormField
-                control={importForm.control}
-                name="vm_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <Server className="text-muted-foreground h-4 w-4" />
-                      </span>
-                      VM Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter VM name"
-                        className="bg-input text-foreground rounded-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={importForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <FileText className="text-muted-foreground h-4 w-4" />
-                      </span>
-                      Description (Optional)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Brief description"
-                        className="bg-input text-foreground rounded-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <FormField
-                control={importForm.control}
-                name="min_disk"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <HardDrive className="text-muted-foreground h-4 w-4" />
-                      </span>
-                      Minimum Disk (GB)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min={0}
-                        step={1}
-                        inputMode="numeric"
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          if (v === "") return field.onChange(undefined);
-                          const n = Number(v);
-                          field.onChange(
-                            Number.isFinite(n)
-                              ? Math.max(0, Math.floor(n))
-                              : undefined,
-                          );
-                        }}
-                        className="bg-input text-foreground rounded-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={importForm.control}
-                name="min_ram"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <MemoryStick className="text-muted-foreground h-4 w-4" />
-                      </span>
-                      Minimum RAM (MB)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min={0}
-                        step={1}
-                        inputMode="numeric"
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          if (v === "") return field.onChange(undefined);
-                          const n = Number(v);
-                          field.onChange(
-                            Number.isFinite(n)
-                              ? Math.max(0, Math.floor(n))
-                              : undefined,
-                          );
-                        }}
-                        className="bg-input text-foreground rounded-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <FormField
-                control={importForm.control}
-                name="flavor_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <IceCream className="text-muted-foreground h-4 w-4 rotate-45" />
-                      </span>
-                      Flavor
-                    </FormLabel>
-                    <FormControl>
-                      <XCombobox
-                        type="flavor"
-                        data={
-                          resources?.flavors.map((flavor) => ({
-                            label: flavor.name,
-                            value: flavor.id,
-                          })) ?? []
-                        }
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select flavor"
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={importForm.control}
-                name="network_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <Network className="text-muted-foreground h-4 w-4" />
-                      </span>
-                      Network
-                    </FormLabel>
-                    <FormControl>
-                      <XCombobox
-                        type="network"
-                        data={
-                          resources?.networks.map((network) => ({
-                            label: network.name,
-                            value: network.id,
-                          })) ?? []
-                        }
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select network"
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <FormField
-                control={importForm.control}
-                name="key_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <KeyRound className="text-muted-foreground h-4 w-4" />
-                      </span>
-                      Key Pair
-                    </FormLabel>
-                    <FormControl>
-                      <XCombobox
-                        type="key pair"
-                        data={
-                          resources?.keypairs.map((kp) => ({
-                            label: kp.name,
-                            value: kp.name,
-                          })) ?? []
-                        }
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select key pair"
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={importForm.control}
-                name="security_group"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                        <ShieldCheck className="text-muted-foreground h-4 w-4" />
-                      </span>
-                      Security Group
-                    </FormLabel>
-                    <FormControl>
-                      <XCombobox
-                        type="security group"
-                        data={
-                          resources?.security_groups.map((sg) => ({
-                            label: sg.name,
-                            value: sg.name,
-                          })) ?? []
-                        }
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select security group"
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={importForm.control}
-              name="admin_password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <span className="bg-muted flex items-center justify-center rounded-full p-1">
-                      <UserCog className="text-muted-foreground h-4 w-4" />
-                    </span>
-                    Admin Password
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="Enter admin password"
-                      className="bg-input text-foreground rounded-full"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Password for the imported VM&apos;s admin user
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <Separator />
 

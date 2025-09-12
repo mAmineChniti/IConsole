@@ -6,6 +6,7 @@ import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
 import { XSearch } from "@/components/reusable/XSearch";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -314,30 +315,46 @@ export function VolumeTypes() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredTypes.map((vt) => (
           <InfoCard
             key={vt.ID}
-            title={vt.Name}
-            description={vt.Description || "No description"}
-            className="h-full"
-            badges={
-              <Badge
-                variant="secondary"
-                className="inline-flex h-5 items-center gap-1 rounded-full px-2 text-xs"
-              >
-                {vt.Is_Public ? (
-                  <>
-                    <Eye className="h-3.5 w-3.5" />
-                    Public
-                  </>
-                ) : (
-                  <>
-                    <Lock className="h-3.5 w-3.5" />
-                    Private
-                  </>
+            title={
+              <div className="flex flex-col items-center gap-2">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-blue-400 text-white dark:from-blue-600 dark:to-blue-400">
+                    <HardDrive className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-xl font-semibold">{vt.Name}</span>
+                {vt.Description && (
+                  <p className="text-muted-foreground text-center text-sm">
+                    {vt.Description}
+                  </p>
                 )}
-              </Badge>
+              </div>
+            }
+            centerTitle={true}
+            className="text-card-foreground border-border/50 h-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
+            badges={
+              <div className="mt-2 flex justify-center">
+                <Badge
+                  variant="secondary"
+                  className="inline-flex h-5 items-center gap-1 rounded-full px-2 text-xs"
+                >
+                  {vt.Is_Public ? (
+                    <>
+                      <Eye className="h-3.5 w-3.5" />
+                      Public
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="h-3.5 w-3.5" />
+                      Private
+                    </>
+                  )}
+                </Badge>
+              </div>
             }
             actionButtons={
               <>
