@@ -106,29 +106,31 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
             </Button>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="bg-primary/10 flex items-center justify-center rounded-full p-3">
-              <User className="text-primary h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-foreground mb-1 text-2xl font-bold tracking-tight">
-                Create New User
-              </h1>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Add a new user to your system with project and role assignments
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
-              <CardHeader>
-                <CardTitle className="text-foreground text-lg font-semibold">
-                  Basic Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+          <Card className="text-card-foreground border-border/50 mx-auto w-full rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary/10 flex items-center justify-center rounded-full p-3">
+                    <User className="text-primary h-7 w-7" />
+                  </div>
+                  <div>
+                    <h1 className="text-foreground mb-1 text-2xl font-bold tracking-tight">
+                      Create New User
+                    </h1>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      Add a new user to your system with project and role
+                      assignments
+                    </p>
+                  </div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
                 <div className="space-y-4">
+                  <h3 className="text-foreground text-lg font-semibold">
+                    Basic Information
+                  </h3>
                   <FormField
                     control={form.control}
                     name="name"
@@ -203,147 +205,146 @@ export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
                     )}
                   />
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
-              <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
-                  <Shield className="text-primary h-5 w-5" />
-                  Project & Permissions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="project_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-semibold">
-                          Default Project
-                        </FormLabel>
-                        <XCombobox
-                          data={(availableProjects?.projects ?? []).map(
-                            (p) => ({
-                              label: p.project_name,
-                              value: p.project_id,
-                            }),
-                          )}
-                          type="project"
-                          value={field.value}
-                          onChange={(v: string | undefined) =>
-                            field.onChange(v ?? undefined)
-                          }
-                          placeholder="Select default project"
-                          searchPlaceholder="Search projects..."
-                          disabled={
-                            isProjectsLoading ||
-                            (availableProjects?.projects?.length ?? 0) === 0
-                          }
-                          className="!h-10 flex-1 cursor-pointer rounded-full"
-                        />
-                        <FormDescription>
-                          The primary project this user will have access to
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="border-t pt-6">
+                  <div className="space-y-4">
+                    <h3 className="text-foreground flex items-center gap-2 text-lg font-semibold">
+                      <Shield className="text-primary h-5 w-5" />
+                      Project & Permissions
+                    </h3>
 
-                  <FormField
-                    control={form.control}
-                    name="roles"
-                    render={({ field }) => {
-                      const current = field.value ?? [];
-                      const toggle = (roleName: string) => {
-                        const next = current.includes(roleName)
-                          ? current.filter((r: string) => r !== roleName)
-                          : [...current, roleName];
-                        field.onChange(next);
-                      };
-
-                      return (
+                    <FormField
+                      control={form.control}
+                      name="project_id"
+                      render={({ field }) => (
                         <FormItem>
                           <FormLabel className="font-semibold">
-                            User Roles
+                            Default Project
                           </FormLabel>
-                          <div className="space-y-3">
-                            <div className="flex flex-wrap gap-2">
-                              {(roles ?? []).length > 0 ? (
-                                (roles ?? []).map((r) => {
-                                  const selected = current.includes(r.name);
-                                  return (
-                                    <Badge
-                                      key={r.id ?? r.name}
-                                      variant={selected ? "default" : "outline"}
-                                      onClick={() => toggle(r.name)}
-                                      className={
-                                        "cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-opacity select-none hover:opacity-80" +
-                                        (selected
-                                          ? " bg-primary text-primary-foreground"
-                                          : "")
-                                      }
-                                    >
-                                      {r.name}
-                                    </Badge>
-                                  );
-                                })
-                              ) : (
-                                <Badge
-                                  variant="outline"
-                                  className="rounded-full opacity-50"
-                                >
-                                  No roles available
-                                </Badge>
-                              )}
-                            </div>
-                            {current.length > 0 && (
-                              <div className="text-muted-foreground text-sm">
-                                Selected: {current.join(", ")}
-                              </div>
+                          <XCombobox
+                            data={(availableProjects?.projects ?? []).map(
+                              (p) => ({
+                                label: p.project_name,
+                                value: p.project_id,
+                              }),
                             )}
-                          </div>
+                            type="project"
+                            value={field.value}
+                            onChange={(v: string | undefined) =>
+                              field.onChange(v ?? undefined)
+                            }
+                            placeholder="Select default project"
+                            searchPlaceholder="Search projects..."
+                            disabled={
+                              isProjectsLoading ||
+                              (availableProjects?.projects?.length ?? 0) === 0
+                            }
+                            className="!h-10 flex-1 cursor-pointer rounded-full"
+                          />
                           <FormDescription>
-                            Click on role badges to toggle user permissions
+                            The primary project this user will have access to
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
-                      );
-                    }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                      )}
+                    />
 
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onBack}
-              className="bg-muted text-foreground border-border/50 cursor-pointer rounded-full border px-6 py-2 transition-all duration-200"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="bg-primary text-primary-foreground min-w-[120px] cursor-pointer rounded-full transition-all duration-200"
-            >
-              {createMutation.isPending ? (
-                <>
-                  <Plus className="h-4 w-4 animate-pulse" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  Create User
-                </>
-              )}
-            </Button>
-          </div>
+                    <FormField
+                      control={form.control}
+                      name="roles"
+                      render={({ field }) => {
+                        const current = field.value ?? [];
+                        const toggle = (roleName: string) => {
+                          const next = current.includes(roleName)
+                            ? current.filter((r: string) => r !== roleName)
+                            : [...current, roleName];
+                          field.onChange(next);
+                        };
+
+                        return (
+                          <FormItem>
+                            <FormLabel className="font-semibold">
+                              User Roles
+                            </FormLabel>
+                            <div className="space-y-3">
+                              <div className="flex flex-wrap gap-2">
+                                {(roles ?? []).length > 0 ? (
+                                  (roles ?? []).map((r) => {
+                                    const selected = current.includes(r.name);
+                                    return (
+                                      <Badge
+                                        key={r.id ?? r.name}
+                                        variant={
+                                          selected ? "default" : "outline"
+                                        }
+                                        onClick={() => toggle(r.name)}
+                                        className={
+                                          "cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-opacity select-none hover:opacity-80" +
+                                          (selected
+                                            ? " bg-primary text-primary-foreground"
+                                            : "")
+                                        }
+                                      >
+                                        {r.name}
+                                      </Badge>
+                                    );
+                                  })
+                                ) : (
+                                  <Badge
+                                    variant="outline"
+                                    className="rounded-full opacity-50"
+                                  >
+                                    No roles available
+                                  </Badge>
+                                )}
+                              </div>
+                              {current.length > 0 && (
+                                <div className="text-muted-foreground text-sm">
+                                  Selected: {current.join(", ")}
+                                </div>
+                              )}
+                            </div>
+                            <FormDescription>
+                              Click on role badges to toggle user permissions
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 border-t pt-6">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onBack}
+                    className="bg-muted text-foreground border-border/50 cursor-pointer rounded-full border px-6 py-2 transition-all duration-200"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={createMutation.isPending}
+                    className="bg-primary text-primary-foreground min-w-[120px] cursor-pointer rounded-full transition-all duration-200"
+                  >
+                    {createMutation.isPending ? (
+                      <>
+                        <Plus className="h-4 w-4 animate-pulse" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4" />
+                        Create User
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </form>
       </Form>
     </div>

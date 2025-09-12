@@ -84,7 +84,7 @@ type InfoItem = {
 };
 
 type InstanceCardProps = {
-  title: string;
+  title: string | ReactNode;
   description?: string;
   onClick?: MouseEventHandler<HTMLDivElement>;
   badges?: ReactNode;
@@ -92,6 +92,7 @@ type InstanceCardProps = {
   actionButtons?: ReactNode;
   isLoading?: boolean;
   className?: string;
+  centerTitle?: boolean;
 };
 
 export function InfoCard({
@@ -103,6 +104,7 @@ export function InfoCard({
   actionButtons,
   isLoading = false,
   className,
+  centerTitle = false,
 }: InstanceCardProps) {
   return (
     <Card
@@ -116,31 +118,56 @@ export function InfoCard({
     >
       <CardHeader
         className={cn(
-          "flex flex-row items-start justify-between space-y-0",
+          centerTitle
+            ? "flex flex-col items-center space-y-0"
+            : "flex flex-row items-start justify-between space-y-0",
           infoItems && infoItems.length > 0 ? "px-6 pb-2" : "px-4 pb-0",
         )}
       >
-        <div
-          className={cn(
-            infoItems && infoItems.length > 0 ? "space-y-1" : "space-y-0.5",
-          )}
-        >
-          <CardTitle className="text-base font-medium">
-            {isLoading ? <Skeleton className="h-5 w-32" /> : title}
-          </CardTitle>
-          {isLoading ? (
-            <Skeleton className="h-4 w-24" />
-          ) : description ? (
-            <p className="text-muted-foreground line-clamp-1 text-sm">
-              {description}
-            </p>
-          ) : undefined}
-        </div>
-        {isLoading ? (
-          <Skeleton className="h-5 w-16" />
-        ) : badges ? (
-          <div className="flex gap-2">{badges}</div>
-        ) : undefined}
+        {centerTitle ? (
+          // Centered layout
+          <div className="w-full text-center">
+            <CardTitle className="text-base font-medium">
+              {isLoading ? <Skeleton className="mx-auto h-5 w-32" /> : title}
+            </CardTitle>
+            {isLoading ? (
+              <Skeleton className="mx-auto mt-1 h-4 w-24" />
+            ) : description ? (
+              <p className="text-muted-foreground mt-1 line-clamp-1 text-sm">
+                {description}
+              </p>
+            ) : undefined}
+            {isLoading ? (
+              <Skeleton className="mx-auto mt-2 h-5 w-16" />
+            ) : badges ? (
+              <div className="mt-2 flex justify-center gap-2">{badges}</div>
+            ) : undefined}
+          </div>
+        ) : (
+          <>
+            <div
+              className={cn(
+                infoItems && infoItems.length > 0 ? "space-y-1" : "space-y-0.5",
+              )}
+            >
+              <CardTitle className="text-base font-medium">
+                {isLoading ? <Skeleton className="h-5 w-32" /> : title}
+              </CardTitle>
+              {isLoading ? (
+                <Skeleton className="h-4 w-24" />
+              ) : description ? (
+                <p className="text-muted-foreground line-clamp-1 text-sm">
+                  {description}
+                </p>
+              ) : undefined}
+            </div>
+            {isLoading ? (
+              <Skeleton className="h-5 w-16" />
+            ) : badges ? (
+              <div className="flex gap-2">{badges}</div>
+            ) : undefined}
+          </>
+        )}
       </CardHeader>
 
       <CardContent
