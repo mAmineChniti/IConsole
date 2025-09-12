@@ -1,5 +1,6 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,13 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { ScaleService } from "@/lib/requests";
 import type { ScaleNodeRequest } from "@/types/RequestInterfaces";
@@ -76,7 +70,7 @@ export function Scaling() {
   });
 
   return (
-    <Card className="bg-card text-card-foreground border-border/50 rounded-xl border shadow-lg">
+    <Card className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <div className="bg-muted rounded-full p-2">
@@ -156,18 +150,20 @@ export function Scaling() {
                       </span>
                       Node Type
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full cursor-pointer rounded-full">
-                          <SelectValue placeholder="Select node type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="control">Control</SelectItem>
-                        <SelectItem value="compute">Compute</SelectItem>
-                        <SelectItem value="storage">Storage</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <XCombobox
+                        data={[
+                          { label: "Control", value: "control" },
+                          { label: "Compute", value: "compute" },
+                          { label: "Storage", value: "storage" },
+                        ]}
+                        value={field.value}
+                        onChange={field.onChange}
+                        type="node type"
+                        placeholder="Select node type"
+                        className="w-full"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

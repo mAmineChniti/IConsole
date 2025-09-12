@@ -1,16 +1,8 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
 import {
   Sidebar as ShadcnSidebar,
   SidebarContent,
@@ -194,7 +186,7 @@ export function Sidebar() {
     if (savedProject) setSelectedProject(savedProject);
   }, []);
 
-  const { data: projects, isLoading: projectsLoading } = useQuery({
+  const { data: projects } = useQuery({
     queryKey: ["auth", "projects"],
     queryFn: () => AuthService.getProjects(),
   });
@@ -277,8 +269,12 @@ export function Sidebar() {
     },
   });
 
-  const handleProjectChange = (projectId: string) => {
-    if (switchProjectMutation.isPending || projectId === selectedProject)
+  const handleProjectChange = (projectId: string | undefined) => {
+    if (
+      switchProjectMutation.isPending ||
+      !projectId ||
+      projectId === selectedProject
+    )
       return;
     switchProjectMutation.mutate({ project_id: projectId });
   };
@@ -354,7 +350,7 @@ export function Sidebar() {
         <SidebarGroup>
           <SidebarMenu className="space-y-2">
             <SidebarMenuItem>
-              <Combobox
+              <XCombobox
                 data={
                   projects?.projects?.map((project) => ({
                     label: project.project_name,
@@ -363,58 +359,18 @@ export function Sidebar() {
                 }
                 type="project"
                 value={selectedProject}
-                onValueChange={handleProjectChange}
-              >
-                <SidebarMenuButton
-                  asChild
-                  className={cn(
-                    "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                    selectedProject && "rounded-full",
-                  )}
-                >
-                  <ComboboxTrigger
-                    className={cn(
-                      "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-full border-0 bg-transparent text-sm font-medium shadow-none transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                      switchProjectMutation.isPending &&
-                        "cursor-not-allowed opacity-50",
-                      selectedProject && "rounded-full",
-                    )}
-                  />
-                </SidebarMenuButton>
-                <ComboboxContent
-                  popoverOptions={{
-                    className:
-                      "w-[--radix-popover-trigger-width] p-0 border-sidebar-border shadow-lg max-h-[300px] bg-card text-card-foreground rounded-md",
-                  }}
-                >
-                  <ComboboxInput
-                    placeholder="Search projects..."
-                    className="rounded-none border-0 px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
-                  />
-                  <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
-                    {projectsLoading ? (
-                      <div className="text-muted-foreground px-3 py-2 text-sm">
-                        Loading projects...
-                      </div>
-                    ) : projects?.projects && projects.projects.length > 0 ? (
-                      projects.projects.map((project) => (
-                        <ComboboxItem
-                          key={project.project_id}
-                          value={project.project_id}
-                          keywords={[project.project_name]}
-                          className="text-card-foreground hover:bg-accent hover:text-accent-foreground mx-1 cursor-pointer truncate rounded-md px-3 py-2 text-sm transition-colors"
-                        >
-                          <span className="truncate">
-                            {project.project_name}
-                          </span>
-                        </ComboboxItem>
-                      ))
-                    ) : (
-                      <ComboboxEmpty />
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
+                onChange={handleProjectChange}
+                placeholder="Select project"
+                searchPlaceholder="Search projects..."
+                clearable={false}
+                disabled={switchProjectMutation.isPending}
+                className={cn(
+                  "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-full border-0 bg-transparent text-sm font-medium shadow-none transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                  switchProjectMutation.isPending &&
+                    "cursor-not-allowed opacity-50",
+                  selectedProject && "rounded-full",
+                )}
+              />
             </SidebarMenuItem>
 
             <SidebarMenuItem>

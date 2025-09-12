@@ -1,5 +1,6 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,13 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { KeyPairService } from "@/lib/requests";
 import type { KeyPairCreateRequest } from "@/types/RequestInterfaces";
 import { KeyPairCreateRequestSchema } from "@/types/RequestSchemas";
@@ -106,26 +100,24 @@ export function KeyPairCreateDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Key type (optional)</FormLabel>
-                  <Select
-                    value={field.value ?? ""}
-                    onValueChange={(value) => {
-                      field.onChange(
-                        value === ""
-                          ? undefined
-                          : (value as KeyPairCreateRequest["key_type"]),
-                      );
-                    }}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
-                        <SelectValue placeholder="Default (provider)" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="ssh">ssh</SelectItem>
-                      <SelectItem value="x509">x509</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <XCombobox
+                      data={[
+                        { label: "ssh", value: "ssh" },
+                        { label: "x509", value: "x509" },
+                      ]}
+                      value={field.value ?? undefined}
+                      onChange={(value) =>
+                        field.onChange(
+                          value as KeyPairCreateRequest["key_type"],
+                        )
+                      }
+                      type="key type"
+                      placeholder="Default (provider)"
+                      className="h-10 w-full"
+                      clearable={true}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

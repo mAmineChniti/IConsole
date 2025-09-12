@@ -30,7 +30,7 @@ export function FlavorStep({
             {Array.from({ length: 6 }).map((_, i) => (
               <Card
                 key={i}
-                className="bg-card text-card-foreground border-border/50 border shadow-lg"
+                className="text-card-foreground border-border/50 border bg-neutral-50 shadow-lg dark:bg-neutral-900"
               >
                 <CardContent className="p-4">
                   <div className="mb-3 flex items-center justify-between">
@@ -103,7 +103,7 @@ export function FlavorStep({
                       <Card
                         key={flavor.id}
                         className={cn(
-                          "bg-card text-card-foreground cursor-pointer rounded-md border-2 transition-all hover:shadow-md",
+                          "text-card-foreground cursor-pointer rounded-md border-2 bg-neutral-50 transition-all hover:shadow-md dark:bg-neutral-900",
                           field.value === flavor.id
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-border/80",

@@ -284,7 +284,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
           aria-labelledby="create-tab"
           tabIndex={0}
         >
-          <Card className="bg-card text-card-foreground border-border/50 overflow-hidden rounded-xl border shadow-lg">
+          <Card className="text-card-foreground border-border/50 overflow-hidden rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
             <CardContent className="p-3 sm:p-6">
               <div className="flex w-full items-center overflow-x-auto">
                 {steps.map((step, index) => {
@@ -348,7 +348,7 @@ export function VM({ onBack }: { onBack?: () => void }) {
             </CardContent>
           </Card>
 
-          <Card className="bg-card text-card-foreground border-border/50 overflow-hidden rounded-xl border shadow-lg">
+          <Card className="text-card-foreground border-border/50 overflow-hidden rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
             <CardHeader className="space-y-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 {(() => {

@@ -4,6 +4,7 @@ import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { XSearch } from "@/components/reusable/XSearch";
 import { SecurityGroupCreateDialog } from "@/components/SecurityGroups/SecurityGroupCreateDialog";
 import { Badge } from "@/components/ui/badge";
@@ -24,13 +25,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -636,18 +630,17 @@ export function SecurityGroups() {
                       <FormItem>
                         <FormLabel>Direction</FormLabel>
                         <FormControl>
-                          <Select
+                          <XCombobox
+                            type="direction"
+                            data={[
+                              { label: "Ingress", value: "ingress" },
+                              { label: "Egress", value: "egress" },
+                            ]}
                             value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
-                              <SelectValue placeholder="Direction" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="ingress">Ingress</SelectItem>
-                              <SelectItem value="egress">Egress</SelectItem>
-                            </SelectContent>
-                          </Select>
+                            onChange={field.onChange}
+                            placeholder="Direction"
+                            className="w-full"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -660,18 +653,17 @@ export function SecurityGroups() {
                       <FormItem>
                         <FormLabel>Ethertype</FormLabel>
                         <FormControl>
-                          <Select
+                          <XCombobox
+                            type="ethertype"
+                            data={[
+                              { label: "IPv4", value: "IPv4" },
+                              { label: "IPv6", value: "IPv6" },
+                            ]}
                             value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
-                              <SelectValue placeholder="IP Version" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="IPv4">IPv4</SelectItem>
-                              <SelectItem value="IPv6">IPv6</SelectItem>
-                            </SelectContent>
-                          </Select>
+                            onChange={field.onChange}
+                            placeholder="IP Version"
+                            className="w-full"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -684,46 +676,95 @@ export function SecurityGroups() {
                       <FormItem>
                         <FormLabel>Protocol</FormLabel>
                         <FormControl>
-                          <Select
+                          <XCombobox
+                            type="protocol"
+                            data={[
+                              {
+                                label: "TCP personnalisé",
+                                value: "TCP personnalisé",
+                              },
+                              {
+                                label: "UDP personnalisé",
+                                value: "UDP personnalisé",
+                              },
+                              {
+                                label: "ICMP personnalisé",
+                                value: "ICMP personnalisé",
+                              },
+                              {
+                                label: "Autre protocole",
+                                value: "Autre protocole",
+                              },
+                              {
+                                label: "Tout ICMP",
+                                value: "Tout ICMP",
+                              },
+                              {
+                                label: "Tout TCP",
+                                value: "Tout TCP",
+                              },
+                              {
+                                label: "Tout UDP",
+                                value: "Tout UDP",
+                              },
+                              {
+                                label: "DNS",
+                                value: "DNS",
+                              },
+                              {
+                                label: "HTTPS",
+                                value: "HTTPS",
+                              },
+                              {
+                                label: "IMAP",
+                                value: "IMAP",
+                              },
+                              {
+                                label: "IMAPS",
+                                value: "IMAPS",
+                              },
+                              {
+                                label: "LDAP",
+                                value: "LDAP",
+                              },
+                              {
+                                label: "MS SQL",
+                                value: "MS SQL",
+                              },
+                              {
+                                label: "MySQL",
+                                value: "MySQL",
+                              },
+                              {
+                                label: "POP3",
+                                value: "POP3",
+                              },
+                              {
+                                label: "POP3S",
+                                value: "POP3S",
+                              },
+                              {
+                                label: "RDP",
+                                value: "RDP",
+                              },
+                              {
+                                label: "SMTP",
+                                value: "SMTP",
+                              },
+                              {
+                                label: "SMTPS",
+                                value: "SMTPS",
+                              },
+                              {
+                                label: "SSH",
+                                value: "SSH",
+                              },
+                            ]}
                             value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="h-10 w-full cursor-pointer rounded-full">
-                              <SelectValue placeholder="Select protocol" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="TCP personnalisé">
-                                TCP personnalisé
-                              </SelectItem>
-                              <SelectItem value="UDP personnalisé">
-                                UDP personnalisé
-                              </SelectItem>
-                              <SelectItem value="ICMP personnalisé">
-                                ICMP personnalisé
-                              </SelectItem>
-                              <SelectItem value="Autre protocole">
-                                Autre protocole
-                              </SelectItem>
-                              <SelectItem value="Tout ICMP">
-                                Tout ICMP
-                              </SelectItem>
-                              <SelectItem value="Tout TCP">Tout TCP</SelectItem>
-                              <SelectItem value="Tout UDP">Tout UDP</SelectItem>
-                              <SelectItem value="DNS">DNS</SelectItem>
-                              <SelectItem value="HTTPS">HTTPS</SelectItem>
-                              <SelectItem value="IMAP">IMAP</SelectItem>
-                              <SelectItem value="IMAPS">IMAPS</SelectItem>
-                              <SelectItem value="LDAP">LDAP</SelectItem>
-                              <SelectItem value="MS SQL">MS SQL</SelectItem>
-                              <SelectItem value="MySQL">MySQL</SelectItem>
-                              <SelectItem value="POP3">POP3</SelectItem>
-                              <SelectItem value="POP3S">POP3S</SelectItem>
-                              <SelectItem value="RDP">RDP</SelectItem>
-                              <SelectItem value="SMTP">SMTP</SelectItem>
-                              <SelectItem value="SMTPS">SMTPS</SelectItem>
-                              <SelectItem value="SSH">SSH</SelectItem>
-                            </SelectContent>
-                          </Select>
+                            onChange={field.onChange}
+                            placeholder="Select protocol"
+                            className="w-full"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -365,8 +365,8 @@ export function Snapshots() {
                         <div className="min-w-0">
                           <Button
                             type="button"
-                            variant="outline"
-                            className="decoration-muted-foreground/50 inline-flex max-w-full cursor-pointer items-center truncate text-left font-medium underline underline-offset-2 hover:decoration-current"
+                            variant="ghost"
+                            className="decoration-muted-foreground/50 inline-flex h-auto max-w-full cursor-pointer items-center truncate border-none p-0 text-left font-medium underline underline-offset-2 hover:bg-transparent hover:decoration-current"
                             onClick={() => handleViewDetails(s.ID)}
                             title={s.Name || s.ID}
                           >
@@ -490,7 +490,9 @@ export function Snapshots() {
         isLoading={snapshotDetailsLoading || snapshotDetailsFetching}
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
-        title={snapshotDetails?.Name ?? "Snapshot Details"}
+        title={
+          snapshotDetails?.Name ?? snapshotDetails?.ID ?? "Snapshot Details"
+        }
         badges={
           <Badge variant="secondary" className="px-2 py-0 text-xs">
             {snapshotDetails?.Status ?? "unknown"}
@@ -499,23 +501,19 @@ export function Snapshots() {
         infoItems={[
           [
             {
-              label: "ID",
-              value: snapshotDetails?.ID ?? "N/A",
-              icon: FileText,
-              variant: "gray",
-            },
-            {
               label: "Description",
-              value: snapshotDetails?.Description ?? "No description",
+              value: (snapshotDetails?.Description?.trim() ?? "") || "N/A",
               icon: FileText,
               variant: "blue",
             },
             {
               label: "Status",
-              value: snapshotDetails?.Status ?? "N/A",
+              value: (snapshotDetails?.Status?.trim() ?? "") || "N/A",
               icon: Server,
               variant:
-                snapshotDetails?.Status === "available" ? "green" : "gray",
+                snapshotDetails?.Status?.trim().toLowerCase() === "available"
+                  ? "green"
+                  : "orange",
             },
             {
               label: "Size",
@@ -523,19 +521,19 @@ export function Snapshots() {
                 ? `${snapshotDetails.Size} GB`
                 : "N/A",
               icon: HardDrive,
-              variant: "teal",
+              variant: "emerald",
             },
             {
               label: "Volume Name",
-              value: snapshotDetails?.["Volume Name"] ?? "N/A",
+              value: (snapshotDetails?.["Volume Name"]?.trim() ?? "") || "N/A",
               icon: HardDrive,
-              variant: "indigo",
+              variant: "violet",
             },
             {
               label: "Created",
-              value: snapshotDetails?.Created ?? "N/A",
+              value: (snapshotDetails?.Created?.trim() ?? "") || "N/A",
               icon: Calendar,
-              variant: "purple",
+              variant: "cyan",
             },
           ],
         ]}

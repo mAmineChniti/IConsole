@@ -1,17 +1,8 @@
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -64,6 +55,20 @@ export function UserManagementDialog({
     | undefined
   >(undefined);
   const [pendingRoleIds, setPendingRoleIds] = useState<string[]>([]);
+
+  const toggleSelectedRole = (roleName: string) => {
+    const next = selectedRoles.includes(roleName)
+      ? selectedRoles.filter((r: string) => r !== roleName)
+      : [...selectedRoles, roleName];
+    setSelectedRoles(next);
+  };
+
+  const togglePendingRole = (roleId: string) => {
+    const next = pendingRoleIds.includes(roleId)
+      ? pendingRoleIds.filter((id: string) => id !== roleId)
+      : [...pendingRoleIds, roleId];
+    setPendingRoleIds(next);
+  };
 
   const { data: unassignedUsers, isLoading: loadingUnassigned } = useQuery({
     queryKey: ["unassigned-users", project.id],
@@ -222,7 +227,7 @@ export function UserManagementDialog({
                   <User className="h-4 w-4 flex-shrink-0" />
                   Select User
                 </Label>
-                <Combobox
+                <XCombobox
                   data={
                     unassignedUsers?.map((user) => ({
                       label: user.user_name,
@@ -231,77 +236,58 @@ export function UserManagementDialog({
                   }
                   type="user"
                   value={selectedUser}
-                  onValueChange={setSelectedUser}
-                >
-                  <ComboboxTrigger
-                    aria-labelledby="select-user-label"
-                    className="border-border bg-input text-foreground focus:border-primary focus:ring-primary/20 h-11 w-full cursor-pointer rounded-full border transition-all duration-200 focus:ring-2"
-                  />
-                  <ComboboxContent
-                    popoverOptions={{
-                      className:
-                        "w-[--radix-popover-trigger-width] p-0 shadow-lg",
-                    }}
-                  >
-                    <ComboboxInput
-                      placeholder="Search users..."
-                      className="text-foreground rounded-none border-0 px-3 py-2 text-sm focus:ring-0 focus:ring-offset-0 focus:outline-none"
-                    />
-                    <ComboboxList className="max-h-[200px] overflow-y-auto p-1">
-                      {loadingUnassigned ? (
-                        <div className="px-3 py-2 text-sm">
-                          Loading users...
-                        </div>
-                      ) : unassignedUsers && unassignedUsers.length > 0 ? (
-                        unassignedUsers.map((user) => (
-                          <ComboboxItem
-                            key={user.user_id}
-                            value={user.user_id}
-                            keywords={[user.user_name]}
-                            className="text-foreground mx-1 cursor-pointer rounded-full px-3 py-2 text-sm"
-                          >
-                            {user.user_name}
-                          </ComboboxItem>
-                        ))
-                      ) : (
-                        <ComboboxEmpty />
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
+                  onChange={(value) => setSelectedUser(value ?? "")}
+                  placeholder="Select user"
+                  searchPlaceholder="Search users..."
+                  disabled={loadingUnassigned}
+                  className="border-border bg-input text-foreground focus:border-primary focus:ring-primary/20 h-11 w-full cursor-pointer rounded-full border transition-all duration-200 focus:ring-2"
+                />
               </div>
               <div className="space-y-2">
                 <Label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                   <Users className="h-4 w-4" />
                   Select Roles
                 </Label>
-                <div className="border-border text-foreground grid max-h-32 grid-cols-2 gap-2 overflow-y-auto rounded-md border p-3 transition-all duration-200">
+                <div className="space-y-3">
                   {loadingRoles ? (
-                    <div className="text-muted-foreground col-span-2 text-center text-sm">
+                    <div className="text-muted-foreground text-center text-sm">
                       Loading roles...
                     </div>
                   ) : (
-                    roles?.map((role) => (
-                      <label
-                        key={role.id}
-                        className="flex cursor-pointer items-center space-x-2"
-                      >
-                        <Checkbox
-                          className="bg-input text-foreground border-border cursor-pointer"
-                          checked={selectedRoles.includes(role.name)}
-                          onCheckedChange={(checked) => {
-                            if (checked === true) {
-                              setSelectedRoles([...selectedRoles, role.name]);
-                            } else {
-                              setSelectedRoles(
-                                selectedRoles.filter((r) => r !== role.name),
-                              );
-                            }
-                          }}
-                        />
-                        <span className="text-sm">{role.name}</span>
-                      </label>
-                    ))
+                    <div className="flex flex-wrap gap-2">
+                      {(roles ?? []).length > 0 ? (
+                        (roles ?? []).map((role) => {
+                          const selected = selectedRoles.includes(role.name);
+                          return (
+                            <Badge
+                              key={role.id ?? role.name}
+                              variant={selected ? "default" : "outline"}
+                              onClick={() => toggleSelectedRole(role.name)}
+                              className={
+                                "cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-opacity select-none hover:opacity-80" +
+                                (selected
+                                  ? " bg-primary text-primary-foreground"
+                                  : "")
+                              }
+                            >
+                              {role.name}
+                            </Badge>
+                          );
+                        })
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="rounded-full opacity-50"
+                        >
+                          No roles available
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                  {selectedRoles.length > 0 && (
+                    <div className="text-muted-foreground text-sm">
+                      Selected: {selectedRoles.join(", ")}
+                    </div>
                   )}
                 </div>
               </div>
@@ -418,31 +404,45 @@ export function UserManagementDialog({
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="text-foreground grid max-h-48 grid-cols-1 gap-2 overflow-y-auto rounded-md border p-3 transition-all duration-200 sm:grid-cols-2">
-                  {roles?.map((role) => {
-                    const isChecked = pendingRoleIds.includes(role.id);
-                    return (
-                      <label
-                        key={role.id}
-                        className="flex cursor-pointer items-center space-x-2"
-                      >
-                        <Checkbox
-                          className="text-foreground border-border cursor-pointer"
-                          checked={isChecked}
-                          onCheckedChange={(checked) => {
-                            if (checked === true) {
-                              setPendingRoleIds([...pendingRoleIds, role.id]);
-                            } else {
-                              setPendingRoleIds(
-                                pendingRoleIds.filter((id) => id !== role.id),
-                              );
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {(roles ?? []).length > 0 ? (
+                      (roles ?? []).map((role) => {
+                        const selected = pendingRoleIds.includes(role.id);
+                        return (
+                          <Badge
+                            key={role.id ?? role.name}
+                            variant={selected ? "default" : "outline"}
+                            onClick={() => togglePendingRole(role.id)}
+                            className={
+                              "cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-opacity select-none hover:opacity-80" +
+                              (selected
+                                ? " bg-primary text-primary-foreground"
+                                : "")
                             }
-                          }}
-                        />
-                        <span className="text-sm">{role.name}</span>
-                      </label>
-                    );
-                  })}
+                          >
+                            {role.name}
+                          </Badge>
+                        );
+                      })
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="rounded-full opacity-50"
+                      >
+                        No roles available
+                      </Badge>
+                    )}
+                  </div>
+                  {pendingRoleIds.length > 0 && (
+                    <div className="text-muted-foreground text-sm">
+                      Selected:{" "}
+                      {(roles ?? [])
+                        .filter((r) => pendingRoleIds.includes(r.id))
+                        .map((r) => r.name)
+                        .join(", ")}
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col justify-end gap-3 pt-4 sm:flex-row">
                   <Button

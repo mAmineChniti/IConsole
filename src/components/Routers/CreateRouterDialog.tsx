@@ -1,16 +1,7 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxGroup,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -123,35 +114,17 @@ export function CreateRouterDialog({
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>External Network</FormLabel>
-                  <Combobox
-                    data={comboboxData}
-                    type="network"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <ComboboxTrigger
-                        className="w-full cursor-pointer rounded-full"
-                        disabled={isLoadingNetworks}
-                      />
-                    </FormControl>
-                    <ComboboxContent>
-                      <ComboboxInput />
-                      <ComboboxList>
-                        <ComboboxEmpty />
-                        <ComboboxGroup>
-                          {comboboxData.map((network) => (
-                            <ComboboxItem
-                              key={network.value}
-                              value={network.value}
-                            >
-                              {network.label}
-                            </ComboboxItem>
-                          ))}
-                        </ComboboxGroup>
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
+                  <FormControl>
+                    <XCombobox
+                      data={comboboxData}
+                      type="network"
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={isLoadingNetworks}
+                      className="w-full"
+                      placeholder="Select external network..."
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

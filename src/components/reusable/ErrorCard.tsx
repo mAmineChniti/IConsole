@@ -22,7 +22,7 @@ export function ErrorCard({
   const messageId = useId();
   return (
     <div className="max-w-none space-y-6 px-2 sm:px-4 lg:px-6">
-      <Card className="bg-card text-card-foreground border-border/50 w-full overflow-hidden rounded-xl border shadow-lg">
+      <Card className="text-card-foreground border-border/50 w-full overflow-hidden rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900">
         <CardContent className="p-4 text-center sm:p-6 lg:p-8">
           <div className="flex flex-col items-center space-y-4">
             <div className="bg-destructive/10 flex-shrink-0 rounded-full p-2 sm:p-3">

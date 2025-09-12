@@ -15,67 +15,67 @@ import type { ReactNode } from "react";
 
 const iconVariants = {
   gray: {
-    bg: "bg-gray-100 dark:bg-gray-800",
-    text: "text-gray-600 dark:text-gray-300",
+    bg: "bg-slate-100 dark:bg-slate-800/50",
+    text: "text-slate-600 dark:text-slate-400",
   },
   blue: {
-    bg: "bg-blue-100 dark:bg-blue-900/30",
+    bg: "bg-blue-50 dark:bg-blue-900/20",
     text: "text-blue-600 dark:text-blue-400",
   },
   sky: {
-    bg: "bg-sky-100 dark:bg-sky-900/30",
+    bg: "bg-sky-50 dark:bg-sky-900/20",
     text: "text-sky-600 dark:text-sky-400",
   },
   indigo: {
-    bg: "bg-indigo-100 dark:bg-indigo-900/30",
+    bg: "bg-indigo-50 dark:bg-indigo-900/20",
     text: "text-indigo-600 dark:text-indigo-400",
   },
   green: {
-    bg: "bg-green-100 dark:bg-green-900/30",
-    text: "text-green-600 dark:text-green-400",
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
+    text: "text-emerald-600 dark:text-emerald-400",
   },
   emerald: {
-    bg: "bg-emerald-100 dark:bg-emerald-900/30",
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
     text: "text-emerald-600 dark:text-emerald-400",
   },
   teal: {
-    bg: "bg-teal-100 dark:bg-teal-900/30",
+    bg: "bg-teal-50 dark:bg-teal-900/20",
     text: "text-teal-600 dark:text-teal-400",
   },
   amber: {
-    bg: "bg-amber-100 dark:bg-amber-900/30",
-    text: "text-amber-600 dark:text-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-900/20",
+    text: "text-amber-600 dark:text-amber-500",
   },
   orange: {
-    bg: "bg-orange-100 dark:bg-orange-900/30",
+    bg: "bg-orange-50 dark:bg-orange-900/20",
     text: "text-orange-600 dark:text-orange-400",
   },
   red: {
-    bg: "bg-red-100 dark:bg-red-900/30",
+    bg: "bg-red-50 dark:bg-red-900/20",
     text: "text-red-600 dark:text-red-400",
   },
   rose: {
-    bg: "bg-rose-100 dark:bg-rose-900/30",
+    bg: "bg-rose-50 dark:bg-rose-900/20",
     text: "text-rose-600 dark:text-rose-400",
   },
   purple: {
-    bg: "bg-purple-100 dark:bg-purple-900/30",
+    bg: "bg-purple-50 dark:bg-purple-900/20",
     text: "text-purple-600 dark:text-purple-400",
   },
   violet: {
-    bg: "bg-violet-100 dark:bg-violet-900/30",
+    bg: "bg-violet-50 dark:bg-violet-900/20",
     text: "text-violet-600 dark:text-violet-400",
   },
   cyan: {
-    bg: "bg-cyan-100 dark:bg-cyan-900/30",
+    bg: "bg-cyan-50 dark:bg-cyan-900/20",
     text: "text-cyan-600 dark:text-cyan-400",
   },
   pink: {
-    bg: "bg-pink-100 dark:bg-pink-900/30",
+    bg: "bg-pink-50 dark:bg-pink-900/20",
     text: "text-pink-600 dark:text-pink-400",
   },
   fuchsia: {
-    bg: "bg-fuchsia-100 dark:bg-fuchsia-900/30",
+    bg: "bg-fuchsia-50 dark:bg-fuchsia-900/20",
     text: "text-fuchsia-600 dark:text-fuchsia-400",
   },
 } as const;

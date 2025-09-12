@@ -185,7 +185,7 @@ export function Flavors() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Card
               key={i}
-              className="bg-card text-card-foreground border-border/50 border shadow-lg"
+              className="text-card-foreground border-border/50 border bg-neutral-50 shadow-lg dark:bg-neutral-900"
             >
               <CardContent className="p-3">
                 <div className="mb-2 flex items-center">

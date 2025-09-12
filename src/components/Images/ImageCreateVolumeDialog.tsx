@@ -1,3 +1,4 @@
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,13 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { ImageService } from "@/lib/requests";
 import type { ImageCreateVolumeRequest } from "@/types/RequestInterfaces";
@@ -91,7 +85,7 @@ export function ImageCreateVolumeDialog({
       form.reset({
         name: `${image.name}-volume`,
         size: 1,
-        visibility: image.visibility,
+        visibility: image.visibility === "public" ? "public" : "private",
         protected: image.protected,
       });
     }
@@ -150,21 +144,19 @@ export function ImageCreateVolumeDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Visibility</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue="private"
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select visibility" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="private">Private</SelectItem>
-                      <SelectItem value="public">Public</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <XCombobox
+                      type="visibility"
+                      data={[
+                        { label: "Private", value: "private" },
+                        { label: "Public", value: "public" },
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select visibility"
+                      className="w-full"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

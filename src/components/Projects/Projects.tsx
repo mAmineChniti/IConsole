@@ -1,6 +1,6 @@
 "use client";
 
-import { ProjectFormDialog } from "@/components/Projects/ProjectFormDialog";
+import { ProjectForm } from "@/components/Projects/ProjectForm";
 import { UserManagementDialog } from "@/components/Projects/UserManagementDialog";
 import { ConfirmDeleteDialog } from "@/components/reusable/ConfirmDeleteDialog";
 import { EmptyState } from "@/components/reusable/EmptyState";
@@ -94,10 +94,10 @@ export function Projects() {
   const [visibleCount, setVisibleCount] = useState(6);
   const [search, setSearch] = useState("");
   useEffect(() => setVisibleCount(6), [search]);
-  const [dialogProject, setDialogProject] = useState<
+  const [viewMode, setViewMode] = useState<"list" | "create" | "edit">("list");
+  const [editingProject, setEditingProject] = useState<
     ProjectDetailsResponse | undefined
   >(undefined);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<
@@ -108,6 +108,7 @@ export function Projects() {
   );
 
   const queryClient = useQueryClient();
+
   const {
     data: projectList,
     isLoading: isListLoading,
@@ -175,8 +176,8 @@ export function Projects() {
   });
 
   const handleEdit = (project: ProjectDetailsResponse) => {
-    setDialogProject(project);
-    setDialogOpen(true);
+    setEditingProject(project);
+    setViewMode("edit");
   };
 
   const handleDelete = (projectId: string) => {
@@ -240,7 +241,7 @@ export function Projects() {
             <Card
               key={i}
               className={cn(
-                "bg-card text-card-foreground border-border/50 flex flex-col overflow-hidden rounded-xl border shadow-lg",
+                "text-card-foreground border-border/50 flex flex-col overflow-hidden rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900",
               )}
             >
               <CardHeader className="pb-3">
@@ -328,21 +329,39 @@ export function Projects() {
           primaryLabel="Create Project"
           primaryDisabled={isRefetching}
           onPrimary={() => {
-            setDialogProject(undefined);
-            setDialogOpen(true);
+            setEditingProject(undefined);
+            setViewMode("create");
           }}
           variant="dashed"
           compact={false}
         />
-        <ProjectFormDialog
-          project={dialogProject}
-          open={dialogOpen}
-          onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) setDialogProject(undefined);
-          }}
-        />
       </div>
+    );
+  }
+
+  const handleBackToList = () => {
+    setViewMode("list");
+    setEditingProject(undefined);
+  };
+
+  const handleSuccessAction = () => {
+    setViewMode("list");
+    setEditingProject(undefined);
+  };
+
+  if (viewMode === "create") {
+    return (
+      <ProjectForm onBack={handleBackToList} onSuccess={handleSuccessAction} />
+    );
+  }
+
+  if (viewMode === "edit" && editingProject) {
+    return (
+      <ProjectForm
+        project={editingProject}
+        onBack={handleBackToList}
+        onSuccess={handleSuccessAction}
+      />
     );
   }
 
@@ -367,8 +386,8 @@ export function Projects() {
           refreshAriaLabel="Refresh projects"
           mainButton={{
             onClick: () => {
-              setDialogProject(undefined);
-              setDialogOpen(true);
+              setEditingProject(undefined);
+              setViewMode("create");
             },
             label: "Create Project",
             shortLabel: "Create",
@@ -395,7 +414,7 @@ export function Projects() {
             <Card
               key={project.id}
               className={cn(
-                "bg-card text-card-foreground border-border/50 flex flex-col overflow-hidden rounded-xl border shadow-lg",
+                "text-card-foreground border-border/50 flex flex-col overflow-hidden rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900",
               )}
             >
               <CardHeader className="pb-3">
@@ -550,17 +569,6 @@ export function Projects() {
           </span>
         </Button>
       </div>
-
-      {dialogOpen && (
-        <ProjectFormDialog
-          project={dialogProject}
-          open={dialogOpen}
-          onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) setDialogProject(undefined);
-          }}
-        />
-      )}
 
       {selectedProject && (
         <UserManagementDialog

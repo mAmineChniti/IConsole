@@ -1,3 +1,4 @@
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,13 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { VolumeService } from "@/lib/requests";
 import type { VolumeUploadToImageRequest } from "@/types/RequestInterfaces";
 import { VolumeUploadToImageRequestSchema } from "@/types/RequestSchemas";
@@ -118,17 +112,19 @@ export function VolumeUploadToImageDialog({
                 <FormItem>
                   <FormLabel>Disk Format (Optional)</FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="rounded-full">
-                        <SelectValue placeholder="Select disk format (default: qcow2)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="raw">RAW</SelectItem>
-                        <SelectItem value="qcow2">QCOW2 (default)</SelectItem>
-                        <SelectItem value="vmdk">VMDK</SelectItem>
-                        <SelectItem value="vdi">VDI</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <XCombobox
+                      type="disk format"
+                      data={[
+                        { label: "RAW", value: "raw" },
+                        { label: "QCOW2 (default)", value: "qcow2" },
+                        { label: "VMDK", value: "vmdk" },
+                        { label: "VDI", value: "vdi" },
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select disk format (default: qcow2)"
+                      className="w-full"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,16 +138,18 @@ export function VolumeUploadToImageDialog({
                 <FormItem>
                   <FormLabel>Container Format (Optional)</FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="rounded-full">
-                        <SelectValue placeholder="Select container format (default: bare)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="bare">Bare (default)</SelectItem>
-                        <SelectItem value="ovf">OVF</SelectItem>
-                        <SelectItem value="ova">OVA</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <XCombobox
+                      type="container format"
+                      data={[
+                        { label: "Bare (default)", value: "bare" },
+                        { label: "OVF", value: "ovf" },
+                        { label: "OVA", value: "ova" },
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select container format (default: bare)"
+                      className="w-full"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

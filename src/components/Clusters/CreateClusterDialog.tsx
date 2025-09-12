@@ -1,3 +1,4 @@
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,15 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ClusterService, InfraService } from "@/lib/requests";
-import { cn, formatWithDuplicateCount, makeDupSafeSelect } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { ClusterCreateRequest } from "@/types/RequestInterfaces";
 import { ClusterCreateRequestSchema } from "@/types/RequestSchemas";
 import type { ResourcesResponse } from "@/types/ResponseInterfaces";
@@ -236,62 +230,17 @@ export function CreateClusterDialog({
                 <FormItem>
                   <FormLabel>Image</FormLabel>
                   <FormControl>
-                    {(() => {
-                      const { options, toForm, fromForm } = makeDupSafeSelect(
-                        safeResources.images,
-                        (img) => img.id,
-                        (img) => img.name ?? `Image (${img.id})`,
-                      );
-
-                      const selectedItem = safeResources.images.find(
-                        (img) => img.id === field.value,
-                      );
-
-                      return (
-                        <Select
-                          onValueChange={(val) => field.onChange(toForm(val))}
-                          value={fromForm(field.value)}
-                        >
-                          <FormControl>
-                            <SelectTrigger
-                              className={cn(
-                                "w-full cursor-pointer",
-                                "rounded-full",
-                              )}
-                            >
-                              <SelectValue>
-                                {field.value && selectedItem
-                                  ? formatWithDuplicateCount(
-                                      selectedItem.name ??
-                                        `Image (${selectedItem.id})`,
-                                      safeResources.images,
-                                      selectedItem,
-                                      (img) => img.name ?? img.id,
-                                    )
-                                  : "Select an image"}
-                              </SelectValue>
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {options.map((option) => {
-                              return (
-                                <SelectItem
-                                  key={option.key}
-                                  value={option.value}
-                                >
-                                  {formatWithDuplicateCount(
-                                    option.label,
-                                    safeResources.images,
-                                    option.original,
-                                    (img) => img?.name ?? img?.id ?? "",
-                                  )}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      );
-                    })()}
+                    <XCombobox
+                      type="image"
+                      data={safeResources.images.map((img) => ({
+                        label: img.name ?? `Image (${img.id})`,
+                        value: img.id,
+                      }))}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select an image"
+                      className="w-full"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -304,61 +253,17 @@ export function CreateClusterDialog({
                 <FormItem>
                   <FormLabel>Instance Type</FormLabel>
                   <FormControl>
-                    {(() => {
-                      const { options, toForm, fromForm } = makeDupSafeSelect(
-                        safeResources.flavors,
-                        (f) => f.id,
-                        (f) => f.name,
-                      );
-
-                      const selectedItem = safeResources.flavors.find(
-                        (f) => f.id === field.value,
-                      );
-
-                      return (
-                        <Select
-                          onValueChange={(val) => field.onChange(toForm(val))}
-                          value={fromForm(field.value)}
-                        >
-                          <FormControl>
-                            <SelectTrigger
-                              className={cn(
-                                "w-full cursor-pointer",
-                                "rounded-full",
-                              )}
-                            >
-                              <SelectValue>
-                                {field.value && selectedItem
-                                  ? `${formatWithDuplicateCount(
-                                      selectedItem.name,
-                                      safeResources.flavors,
-                                      selectedItem,
-                                      (f) => f.name,
-                                    )} (${selectedItem.vcpus} vCPU, ${selectedItem.ram}MB RAM, ${selectedItem.disk}GB Disk)`
-                                  : "Select a flavor"}
-                              </SelectValue>
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {options.map((option) => {
-                              return (
-                                <SelectItem
-                                  key={option.key}
-                                  value={option.value}
-                                >
-                                  {`${formatWithDuplicateCount(
-                                    option.label,
-                                    safeResources.flavors,
-                                    option.original,
-                                    (f) => f?.name ?? "",
-                                  )} (${option.original?.vcpus ?? "N/A"} vCPU, ${option.original?.ram ?? "N/A"}MB RAM, ${option.original?.disk ?? "N/A"}GB Disk)`}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      );
-                    })()}
+                    <XCombobox
+                      type="flavor"
+                      data={safeResources.flavors.map((f) => ({
+                        label: `${f.name} (${f.vcpus} vCPU, ${f.ram}MB RAM, ${f.disk}GB Disk)`,
+                        value: f.id,
+                      }))}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select a flavor"
+                      className="w-full"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -371,62 +276,17 @@ export function CreateClusterDialog({
                 <FormItem>
                   <FormLabel>Network</FormLabel>
                   <FormControl>
-                    {(() => {
-                      const { options, toForm, fromForm } = makeDupSafeSelect(
-                        safeResources.networks,
-                        (n) => n.id,
-                        (n) => n.name ?? `Network (${n.id})`,
-                      );
-
-                      const selectedItem = safeResources.networks.find(
-                        (n) => n.id === field.value,
-                      );
-
-                      return (
-                        <Select
-                          onValueChange={(val) => field.onChange(toForm(val))}
-                          value={fromForm(field.value)}
-                        >
-                          <FormControl>
-                            <SelectTrigger
-                              className={cn(
-                                "w-full cursor-pointer",
-                                "rounded-full",
-                              )}
-                            >
-                              <SelectValue>
-                                {field.value && selectedItem
-                                  ? formatWithDuplicateCount(
-                                      selectedItem.name ??
-                                        `Network (${selectedItem.id})`,
-                                      safeResources.networks,
-                                      selectedItem,
-                                      (n) => n.name ?? n.id,
-                                    )
-                                  : "Select a network"}
-                              </SelectValue>
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {options.map((option) => {
-                              return (
-                                <SelectItem
-                                  key={option.key}
-                                  value={option.value}
-                                >
-                                  {formatWithDuplicateCount(
-                                    option.label,
-                                    safeResources.networks,
-                                    option.original,
-                                    (n) => n?.name ?? n?.id ?? "",
-                                  )}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      );
-                    })()}
+                    <XCombobox
+                      type="network"
+                      data={safeResources.networks.map((n) => ({
+                        label: n.name ?? `Network (${n.id})`,
+                        value: n.id,
+                      }))}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select a network"
+                      className="w-full"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -440,61 +300,17 @@ export function CreateClusterDialog({
                   <FormItem>
                     <FormLabel>SSH Key Pair</FormLabel>
                     <FormControl>
-                      {(() => {
-                        const { options, toForm, fromForm } = makeDupSafeSelect(
-                          safeResources.keypairs,
-                          (kp) => kp.name,
-                          (kp) => kp.name,
-                        );
-
-                        const selectedItem = safeResources.keypairs.find(
-                          (kp) => kp.name === field.value,
-                        );
-
-                        return (
-                          <Select
-                            onValueChange={(val) => field.onChange(toForm(val))}
-                            value={fromForm(field.value)}
-                          >
-                            <FormControl>
-                              <SelectTrigger
-                                className={cn(
-                                  "w-full cursor-pointer",
-                                  "rounded-full",
-                                )}
-                              >
-                                <SelectValue>
-                                  {field.value && selectedItem
-                                    ? formatWithDuplicateCount(
-                                        selectedItem.name,
-                                        safeResources.keypairs,
-                                        selectedItem,
-                                        (kp) => kp.name,
-                                      )
-                                    : "Select a key pair"}
-                                </SelectValue>
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {options.map((option) => {
-                                return (
-                                  <SelectItem
-                                    key={option.key}
-                                    value={option.value}
-                                  >
-                                    {formatWithDuplicateCount(
-                                      option.label,
-                                      safeResources.keypairs,
-                                      option.original,
-                                      (kp) => kp?.name ?? "",
-                                    )}
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
-                        );
-                      })()}
+                      <XCombobox
+                        type="key pair"
+                        data={safeResources.keypairs.map((kp) => ({
+                          label: kp.name,
+                          value: kp.name,
+                        }))}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select a key pair"
+                        className="w-full"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -507,61 +323,17 @@ export function CreateClusterDialog({
                   <FormItem>
                     <FormLabel>Security Group</FormLabel>
                     <FormControl>
-                      {(() => {
-                        const { options, toForm, fromForm } = makeDupSafeSelect(
-                          safeResources.security_groups,
-                          (sg) => sg.name,
-                          (sg) => sg.name,
-                        );
-
-                        const selectedItem = safeResources.security_groups.find(
-                          (sg) => sg.name === field.value,
-                        );
-
-                        return (
-                          <Select
-                            onValueChange={(val) => field.onChange(toForm(val))}
-                            value={fromForm(field.value)}
-                          >
-                            <FormControl>
-                              <SelectTrigger
-                                className={cn(
-                                  "w-full cursor-pointer",
-                                  "rounded-full",
-                                )}
-                              >
-                                <SelectValue>
-                                  {field.value && selectedItem
-                                    ? formatWithDuplicateCount(
-                                        selectedItem.name,
-                                        safeResources.security_groups,
-                                        selectedItem,
-                                        (sg) => sg.name,
-                                      )
-                                    : "Select a security group"}
-                                </SelectValue>
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {options.map((option) => {
-                                return (
-                                  <SelectItem
-                                    key={option.key}
-                                    value={option.value}
-                                  >
-                                    {formatWithDuplicateCount(
-                                      option.label,
-                                      safeResources.security_groups,
-                                      option.original,
-                                      (sg) => sg?.name ?? "",
-                                    )}
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
-                        );
-                      })()}
+                      <XCombobox
+                        type="security group"
+                        data={safeResources.security_groups.map((sg) => ({
+                          label: sg.name,
+                          value: sg.name,
+                        }))}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select a security group"
+                        className="w-full"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

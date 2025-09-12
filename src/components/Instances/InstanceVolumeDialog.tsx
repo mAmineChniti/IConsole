@@ -1,3 +1,4 @@
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -6,13 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { InfraService } from "@/lib/requests";
 import {
   type AttachedVolumesResponse,
@@ -183,21 +177,17 @@ export function InstanceVolumeDialog({
                 </div>
               ) : availableVolumes.length > 0 ? (
                 <div className="space-y-2">
-                  <Select
+                  <XCombobox
+                    type="volume"
+                    data={availableVolumes.map((volume) => ({
+                      label: `${volume.name || "Unnamed Volume"} (ID: ${volume.id})`,
+                      value: volume.id,
+                    }))}
                     value={selectedVolume}
-                    onValueChange={setSelectedVolume}
-                  >
-                    <SelectTrigger className="w-full cursor-pointer rounded-full">
-                      <SelectValue placeholder="Select a volume to attach" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableVolumes.map((volume) => (
-                        <SelectItem key={volume.id} value={volume.id}>
-                          {volume.name || "Unnamed Volume"} (ID: {volume.id})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={(value) => setSelectedVolume(value ?? "")}
+                    placeholder="Select a volume to attach"
+                    className="w-full"
+                  />
                   <Button
                     onClick={handleAttach}
                     className="w-full cursor-pointer rounded-full"

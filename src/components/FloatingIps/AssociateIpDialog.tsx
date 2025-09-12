@@ -1,16 +1,7 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxGroup,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -110,32 +101,17 @@ export function AssociateIpDialog({
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Virtual Machine</FormLabel>
-                  <Combobox
-                    data={comboboxData}
-                    type="VM"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <ComboboxTrigger
-                        className="w-full cursor-pointer rounded-full"
-                        disabled={isLoadingVms}
-                      />
-                    </FormControl>
-                    <ComboboxContent>
-                      <ComboboxInput />
-                      <ComboboxList>
-                        <ComboboxEmpty />
-                        <ComboboxGroup>
-                          {comboboxData.map((vm) => (
-                            <ComboboxItem key={vm.value} value={vm.value}>
-                              {vm.label}
-                            </ComboboxItem>
-                          ))}
-                        </ComboboxGroup>
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
+                  <FormControl>
+                    <XCombobox
+                      data={comboboxData}
+                      type="VM"
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select virtual machine"
+                      disabled={isLoadingVms}
+                      className="w-full cursor-pointer rounded-full"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

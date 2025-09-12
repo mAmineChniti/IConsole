@@ -1,5 +1,6 @@
 "use client";
 
+import { XCombobox } from "@/components/reusable/XCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,12 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 import { VolumeService } from "@/lib/requests";
 import type { VolumeAttachmentsDetailsResponse } from "@/types/ResponseInterfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -107,38 +102,25 @@ export function VolumeAttachmentsDialog({
                   </div>
                 ) : (
                   <>
-                    <Select
+                    <XCombobox
+                      type="instance"
+                      data={
+                        instances?.available_instances?.map((inst) => ({
+                          label: inst.name,
+                          value: inst.id,
+                        })) ?? []
+                      }
                       value={selectedInstance}
-                      onValueChange={setSelectedInstance}
-                    >
-                      <SelectTrigger
-                        className="w-full cursor-pointer rounded-full"
-                        aria-label="Select instance"
-                      >
-                        {selectedInstance
-                          ? (instances?.available_instances?.find(
-                              (inst) => inst.id === selectedInstance,
-                            )?.name ?? "Select instance")
-                          : "Select instance"}
-                      </SelectTrigger>
-                      <SelectContent>
-                        {instances?.available_instances?.length ? (
-                          instances.available_instances.map((inst) => (
-                            <SelectItem key={inst.id} value={inst.id}>
-                              {inst.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem
-                            value="no-instances"
-                            disabled
-                            className="text-muted-foreground"
-                          >
-                            No instances found
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
+                      onChange={setSelectedInstance}
+                      placeholder={
+                        !instances?.available_instances?.length
+                          ? "No instances found"
+                          : "Select instance"
+                      }
+                      disabled={!instances?.available_instances?.length}
+                      className="w-full"
+                      clearable
+                    />
                     <Button
                       variant="default"
                       onClick={async () => {
