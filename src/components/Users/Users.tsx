@@ -7,6 +7,7 @@ import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
 import { InfoDialog } from "@/components/reusable/InfoDialog";
 import { XSearch } from "@/components/reusable/XSearch";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -32,7 +33,6 @@ import {
   Mail,
   Trash2,
   User,
-  UserCheck,
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -151,20 +151,13 @@ export function UsersManager() {
               key={i}
               className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 p-6 shadow-lg dark:bg-neutral-900"
             >
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-6 w-32" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-                <div className="flex gap-2">
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                </div>
+              <div className="flex flex-col items-center gap-2">
+                <Skeleton className="h-16 w-16 rounded-full" />
+                <Skeleton className="h-6 w-32" />
               </div>
-              <div className="mt-4 space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
+              <div className="mt-4 flex items-center justify-center gap-2">
+                <Skeleton className="h-9 w-24 rounded-full" />
+                <Skeleton className="h-9 w-32 rounded-full" />
               </div>
             </div>
           ))}
@@ -265,16 +258,19 @@ export function UsersManager() {
           {visibleData.map((user) => (
             <InfoCard
               key={user.id}
-              title={user.name}
-              onClick={() => handleCardClick(user.id)}
-              className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
-              badges={
-                <div className="flex items-center gap-2">
-                  <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
-                    <UserCheck className="text-muted-foreground h-4 w-4" />
-                  </div>
+              title={
+                <div className="flex flex-col items-center gap-2">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback className="bg-gradient-to-r from-blue-600 to-blue-400 text-2xl font-bold text-white dark:from-blue-600 dark:to-blue-400">
+                      {user.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-xl font-semibold">{user.name}</span>
                 </div>
               }
+              centerTitle={true}
+              onClick={() => handleCardClick(user.id)}
+              className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 shadow-lg dark:bg-neutral-900"
               actionButtons={
                 <>
                   <Tooltip>

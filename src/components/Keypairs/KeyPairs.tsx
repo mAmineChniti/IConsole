@@ -8,7 +8,7 @@ import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { InfoCard } from "@/components/reusable/InfoCard";
 import { XSearch } from "@/components/reusable/XSearch";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -141,21 +141,18 @@ export function KeyPairs() {
         </div>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {Array.from({ length: 12 }).map((_, i) => (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="flex flex-col gap-2 rounded-md border p-2 text-center text-sm"
+                className="text-card-foreground border-border/50 rounded-xl border bg-neutral-50 p-6 shadow-lg dark:bg-neutral-900"
               >
-                <div className="min-w-0">
-                  <Skeleton className="mx-auto h-4 w-24 rounded-full" />
+                <div className="flex flex-col items-center gap-2">
+                  <Skeleton className="h-20 w-20 rounded-full" />
+                  <Skeleton className="h-6 w-32" />
                 </div>
-                <div>
-                  <Skeleton className="mx-auto h-5 w-20 rounded-full" />
-                </div>
-                <div className="mt-auto flex items-center justify-center gap-2">
-                  <Skeleton className="h-8 w-20 rounded-full" />
-                  <Skeleton className="h-8 w-8 rounded-full" />
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  <Skeleton className="h-9 w-32 rounded-full" />
                 </div>
               </div>
             ))}
@@ -273,27 +270,43 @@ export function KeyPairs() {
               No key pairs match your search.
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {visible.map((k) => (
                 <InfoCard
                   key={k.name}
-                  title={k.name}
-                  onClick={() => openDetails(k.name)}
-                  badges={
-                    <Badge
-                      variant="secondary"
-                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs"
-                    >
-                      {k.type === "ssh" ? (
-                        <KeyIcon className="h-3.5 w-3.5" />
-                      ) : k.type === "x509" ? (
-                        <ShieldCheck className="h-3.5 w-3.5" />
-                      ) : (
-                        <KeyRound className="h-3.5 w-3.5" />
-                      )}
-                      <span className="capitalize">{k.type}</span>
-                    </Badge>
+                  title={
+                    <div className="flex flex-col items-center gap-2">
+                      <Avatar className="h-20 w-20">
+                        <AvatarFallback className="flex flex-col items-center justify-center">
+                          {k.type === "ssh" ? (
+                            <>
+                              <KeyIcon className="text-muted-foreground h-6 w-6" />
+                              <span className="text-muted-foreground text-xs font-medium uppercase">
+                                {k.type}
+                              </span>
+                            </>
+                          ) : k.type === "x509" ? (
+                            <>
+                              <ShieldCheck className="text-muted-foreground h-6 w-6" />
+                              <span className="text-muted-foreground text-xs font-medium uppercase">
+                                {k.type}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <KeyRound className="text-muted-foreground h-6 w-6" />
+                              <span className="text-muted-foreground text-xs font-medium uppercase">
+                                {k.type}
+                              </span>
+                            </>
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-xl font-semibold">{k.name}</span>
+                    </div>
                   }
+                  centerTitle={true}
+                  onClick={() => openDetails(k.name)}
                   actionButtons={
                     <Tooltip>
                       <TooltipTrigger asChild>
