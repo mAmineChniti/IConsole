@@ -8,15 +8,7 @@ export const metadata: Metadata = {
 
 export default function ScalingPage() {
   return (
-    <div className="w-full space-y-6 p-4 sm:p-6">
-      <div className="space-y-1">
-        <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent select-none dark:from-blue-400 dark:to-indigo-400">
-          Scaling & Operations
-        </h1>
-        <p className="text-muted-foreground">
-          Add compute/control/storage nodes
-        </p>
-      </div>
+    <div className="w-full p-4 sm:p-6">
       <Scaling />
     </div>
   );

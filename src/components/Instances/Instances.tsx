@@ -1,6 +1,7 @@
 "use client";
 
 import { InstanceActions } from "@/components/Instances/InstanceActions";
+import { InstanceActionsDropdown } from "@/components/Instances/InstanceActionsDropdown";
 import InstanceLogs from "@/components/Instances/InstanceLogs";
 import { VM } from "@/components/Instances/VM";
 import { EmptyState } from "@/components/reusable/EmptyState";
@@ -25,6 +26,7 @@ import {
   Bolt,
   ClipboardList,
   Cpu,
+  Disc3,
   HardDrive,
   MapPin,
   MemoryStick,
@@ -273,6 +275,12 @@ export function Instances() {
                       Locked
                     </Badge>
                   )}
+                  <InstanceActionsDropdown
+                    instance={instance}
+                    status={instance.status}
+                    disabled={instance.status === "BUILD"}
+                    onViewLogs={handleViewLogs}
+                  />
                 </>
               }
               infoItems={[
@@ -280,28 +288,28 @@ export function Instances() {
                   {
                     label: "Image",
                     value: instance.image_name || "Unknown image",
-                    icon: Server,
+                    icon: Disc3,
                     variant: "blue",
                   },
                   {
                     label: "IP Address",
                     value: instance.ip_address || "No IP",
-                    icon: Cpu,
-                    variant: "purple",
+                    icon: Network,
+                    variant: "teal",
                   },
                 ],
                 [
                   {
                     label: "Age",
                     value: instance.age || "Unknown",
-                    icon: HardDrive,
-                    variant: "amber",
+                    icon: Timer,
+                    variant: "orange",
                   },
                   {
                     label: "Flavor",
                     value: instance.flavor || "No Flavor",
-                    icon: Network,
-                    variant: "green",
+                    icon: MemoryStick,
+                    variant: "pink",
                   },
                 ],
               ]}
@@ -311,7 +319,6 @@ export function Instances() {
                     instance={instance}
                     status={instance.status}
                     disabled={instance.status === "BUILD"}
-                    onViewLogs={handleViewLogs}
                   />
                 </>
               }
@@ -353,7 +360,7 @@ export function Instances() {
             {
               label: "Image",
               value: dialogInstance?.image_name ?? "Unknown",
-              icon: HardDrive,
+              icon: Disc3,
               variant: "blue",
             },
             {
@@ -372,14 +379,14 @@ export function Instances() {
               label: "Availability Zone",
               value: dialogInstance?.availability_zone ?? "N/A",
               icon: MapPin,
-              variant: "sky",
+              variant: "cyan",
             },
 
             {
               label: "Key Pair",
               value: dialogInstance?.key_pair ?? "N/A",
               icon: Cpu,
-              variant: "indigo",
+              variant: "amber",
             },
             {
               label: "Age",
@@ -398,7 +405,7 @@ export function Instances() {
               label: "Task",
               value: dialogInstance?.task ?? "N/A",
               icon: ClipboardList,
-              variant: "purple",
+              variant: "indigo",
             },
             {
               label: "Has Volume",
@@ -414,7 +421,6 @@ export function Instances() {
               instance={dialogInstance}
               status={dialogInstance?.status}
               disabled={dialogInstance?.status === "BUILD"}
-              onViewLogs={() => setViewingLogsFor(dialogInstance)}
             />
           )
         }

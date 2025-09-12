@@ -179,7 +179,9 @@ export function Images() {
                     <Skeleton className="h-4 w-10" />
                   </TableCell>
                   <TableCell className="w-1/5 py-3">
-                    <Skeleton className="h-8 w-24" />
+                    <div className="flex justify-end">
+                      <Skeleton className="h-8 w-24" />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -320,7 +322,9 @@ export function Images() {
                   <TableHead className="w-1/5 py-3">Status</TableHead>
                   <TableHead className="w-1/5 py-3">Visibility</TableHead>
                   <TableHead className="w-1/5 py-3">Protected</TableHead>
-                  <TableHead className="w-1/5 py-3">Actions</TableHead>
+                  <TableHead className="w-1/5 py-3 text-right">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -372,59 +376,61 @@ export function Images() {
                         </Tooltip>
                       )}
                     </TableCell>
-                    <TableCell className="w-1/5 space-x-2 py-3">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="cursor-pointer rounded-full"
-                            onClick={() => {
-                              setCreateVolumeForImage(image);
-                              setIsCreateVolumeOpen(true);
-                            }}
-                          >
-                            <HardDrive className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Create Volume</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="cursor-pointer rounded-full"
-                            onClick={() => handleEditImage(image)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Edit</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className="cursor-pointer rounded-full text-white"
-                            onClick={() => {
-                              setImageToDelete(image);
-                              setDeleteDialogOpen(true);
-                            }}
-                            disabled={
-                              deleteMutation.isPending || !!image.protected
-                            }
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {image.protected
-                            ? "Cannot delete protected image"
-                            : "Delete"}
-                        </TooltipContent>
-                      </Tooltip>
+                    <TableCell className="w-1/5 py-3">
+                      <div className="flex justify-end gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="cursor-pointer rounded-full"
+                              onClick={() => {
+                                setCreateVolumeForImage(image);
+                                setIsCreateVolumeOpen(true);
+                              }}
+                            >
+                              <HardDrive className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Create Volume</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="cursor-pointer rounded-full"
+                              onClick={() => handleEditImage(image)}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="cursor-pointer rounded-full text-white"
+                              onClick={() => {
+                                setImageToDelete(image);
+                                setDeleteDialogOpen(true);
+                              }}
+                              disabled={
+                                deleteMutation.isPending || !!image.protected
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {image.protected
+                              ? "Cannot delete protected image"
+                              : "Delete"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

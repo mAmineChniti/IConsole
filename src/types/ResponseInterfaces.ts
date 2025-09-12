@@ -5,6 +5,17 @@
 type ServiceStatus = "enabled" | "disabled";
 type ServiceState = "up" | "down";
 
+export type InstanceStatus =
+  | "ACTIVE"
+  | "SHUTOFF"
+  | "BUILD"
+  | "ERROR"
+  | "SUSPENDED"
+  | "PAUSED"
+  | "SHELVED"
+  | "RESCUE"
+  | "DELETED";
+
 interface ProjectInfo {
   project_id: string;
   project_name: string;
@@ -330,7 +341,7 @@ export interface InstanceListItem {
   ip_address: string;
   flavor: string;
   key_pair: string;
-  status: string;
+  status: InstanceStatus;
   availability_zone: string;
   task: string;
   power_state: string;

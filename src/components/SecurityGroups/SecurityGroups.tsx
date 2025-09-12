@@ -305,7 +305,7 @@ export function SecurityGroups() {
                 <TableHead className="py-3">Name</TableHead>
                 <TableHead className="py-3">Description</TableHead>
                 <TableHead className="w-32 py-3">Rules</TableHead>
-                <TableHead className="w-40 py-3">Actions</TableHead>
+                <TableHead className="w-40 py-3 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -321,7 +321,9 @@ export function SecurityGroups() {
                     <Skeleton className="h-4 w-10" />
                   </TableCell>
                   <TableCell className="py-3">
-                    <Skeleton className="h-8 w-24" />
+                    <div className="flex justify-end">
+                      <Skeleton className="h-8 w-24" />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -423,7 +425,9 @@ export function SecurityGroups() {
                 <TableHead className="w-1/5 py-3">Name</TableHead>
                 <TableHead className="py-3">Description</TableHead>
                 <TableHead className="w-24 py-3">Rules</TableHead>
-                <TableHead className="w-1/4 py-3">Actions</TableHead>
+                <TableHead className="w-1/4 py-3 text-center">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -437,7 +441,7 @@ export function SecurityGroups() {
                     <RuleCountBadge groupId={g["Security Group ID"]} />
                   </TableCell>
                   <TableCell className="py-3">
-                    <div className="flex gap-2">
+                    <div className="flex justify-end gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -881,7 +885,9 @@ export function SecurityGroups() {
                   <TableHead className="py-3">Protocol</TableHead>
                   <TableHead className="py-3">Port Range</TableHead>
                   <TableHead className="py-3">CIDR</TableHead>
-                  <TableHead className="w-24 py-3">Actions</TableHead>
+                  <TableHead className="w-24 py-3 text-center">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -895,18 +901,20 @@ export function SecurityGroups() {
                       {r["Remote IP Prefix"]}
                     </TableCell>
                     <TableCell className="py-3">
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="cursor-pointer rounded-full text-white"
-                        onClick={() => {
-                          setRuleToDelete(r.ID);
-                          setRuleDeleteOpen(true);
-                        }}
-                        disabled={deleteRuleMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex justify-end">
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="cursor-pointer rounded-full text-white"
+                          onClick={() => {
+                            setRuleToDelete(r.ID);
+                            setRuleDeleteOpen(true);
+                          }}
+                          disabled={deleteRuleMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

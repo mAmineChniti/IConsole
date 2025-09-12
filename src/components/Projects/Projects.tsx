@@ -445,8 +445,8 @@ export function Projects() {
                 <div className="flex-grow space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow-sm dark:bg-black dark:text-white">
-                        <Users className="text-card-foreground h-4 w-4" />
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-sm">
+                        <Users className="h-4 w-4 text-white" />
                       </span>
                       <span className="text-sm font-medium">
                         {project.assignments?.length ?? 0} user
@@ -481,7 +481,7 @@ export function Projects() {
                               >
                                 <div className="flex min-w-0 flex-1 items-center gap-2">
                                   <Avatar className="h-6 w-6 flex-shrink-0">
-                                    <AvatarFallback className="bg-white text-xs font-medium text-black dark:bg-black dark:text-white">
+                                    <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-xs font-medium text-white">
                                       {(
                                         assignment.user_name?.charAt(0) ?? "?"
                                       ).toUpperCase()}
