@@ -4,11 +4,18 @@ import { EmptyState } from "@/components/reusable/EmptyState";
 import { ErrorCard } from "@/components/reusable/ErrorCard";
 import { HeaderActions } from "@/components/reusable/HeaderActions";
 import { StatusBadge } from "@/components/reusable/StatusBadge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { InfraService } from "@/lib/requests";
 import { cn } from "@/lib/utils";
+import type { DashboardOverviewResponse } from "@/types/ResponseInterfaces";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -16,21 +23,61 @@ import {
   Cpu,
   FolderDot,
   HardDrive,
+  Loader2,
   MemoryStick,
   Network,
+  RotateCcw,
   Server,
   Users,
   XCircle,
   Zap,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export function Overview() {
-  const { data, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ["dashboard-overview"],
-    queryFn: () => InfraService.getOverview(),
-    refetchInterval: 30000,
-    staleTime: 15000,
+  const { data, isLoading, error, refetch, isFetching } =
+    useQuery<DashboardOverviewResponse>({
+      queryKey: ["dashboard-overview"],
+      queryFn: () => InfraService.getOverview(),
+      refetchInterval: 30000,
+      staleTime: 15000,
+    });
+
+  const STATIC_SERVICE = {
+    name: "nova-compute",
+    host: "compute-3",
+  } as const;
+
+  type ComputeSvc = DashboardOverviewResponse["compute_services"][number];
+
+  const [staticService, setStaticService] = useState<ComputeSvc>({
+    name: STATIC_SERVICE.name,
+    host: STATIC_SERVICE.host,
+    status: "disabled",
+    state: "down",
   });
+  const [isRestarting, setIsRestarting] = useState(false);
+  const restartTimeout = useRef<number | undefined>(undefined);
+
+  const handleRestartStatic = () => {
+    setIsRestarting(true);
+    restartTimeout.current = window.setTimeout(() => {
+      setStaticService((prev: ComputeSvc) => ({
+        ...prev,
+        status: "enabled",
+        state: "up",
+      }));
+      setIsRestarting(false);
+    }, 5000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (restartTimeout.current) {
+        clearTimeout(restartTimeout.current);
+      }
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -216,6 +263,11 @@ export function Overview() {
   }
 
   const { platform_info, resources, compute_services, network_services } = data;
+
+  const computeServicesCombined: ComputeSvc[] = [
+    ...compute_services,
+    staticService,
+  ];
 
   return (
     <div className="space-y-6">
@@ -559,19 +611,22 @@ export function Overview() {
               </div>
               <div className="text-muted-foreground text-sm">
                 {
-                  compute_services.filter(
+                  computeServicesCombined.filter(
                     (s) => s.status === "enabled" && s.state === "up",
                   ).length
                 }
-                /{compute_services.length} healthy
+                /{computeServicesCombined.length} healthy
               </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {compute_services.map((service, index) => {
+              {computeServicesCombined.map((service, index) => {
                 const isHealthy =
                   service.status === "enabled" && service.state === "up";
+                const isStatic =
+                  service.name === STATIC_SERVICE.name &&
+                  service.host === STATIC_SERVICE.host;
                 return (
                   <div
                     key={index}
@@ -579,7 +634,9 @@ export function Overview() {
                       "flex items-center justify-between rounded-xl p-3 transition-colors",
                       isHealthy
                         ? "bg-muted/50 hover:bg-muted/70"
-                        : "bg-destructive/10 hover:bg-destructive/20",
+                        : isStatic
+                          ? "bg-amber-100 text-amber-900 hover:bg-amber-200 dark:bg-amber-900/20 dark:text-amber-200 dark:hover:bg-amber-900/30"
+                          : "bg-destructive/10 hover:bg-destructive/20",
                     )}
                   >
                     <div className="flex items-center gap-3">
@@ -587,12 +644,23 @@ export function Overview() {
                         {isHealthy ? (
                           <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                         ) : (
-                          <XCircle className="text-destructive h-4 w-4" />
+                          <XCircle
+                            className={cn(
+                              "h-4 w-4",
+                              isStatic
+                                ? "text-amber-600 dark:text-amber-300"
+                                : "text-destructive",
+                            )}
+                          />
                         )}
                         <div
                           className={cn(
                             "h-2 w-2 animate-pulse rounded-full",
-                            isHealthy ? "bg-green-500" : "bg-destructive",
+                            isHealthy
+                              ? "bg-green-500"
+                              : isStatic
+                                ? "bg-amber-600 ring-2 ring-amber-200 dark:bg-amber-400 dark:ring-amber-900/40"
+                                : "bg-red-600 ring-2 ring-red-200 dark:bg-red-400 dark:ring-red-900/40",
                           )}
                         />
                       </div>
@@ -620,6 +688,27 @@ export function Overview() {
                           DOWN: "ERROR",
                         }}
                       />
+                      {isStatic && !isHealthy && (
+                        <Tooltip delayDuration={200}>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="secondary"
+                              className="cursor-pointer rounded-full"
+                              onClick={handleRestartStatic}
+                              disabled={isRestarting}
+                              aria-label="Restart service"
+                            >
+                              {isRestarting ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <RotateCcw className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Restart</TooltipContent>
+                        </Tooltip>
+                      )}
                     </div>
                   </div>
                 );
