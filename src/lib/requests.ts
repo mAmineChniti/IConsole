@@ -90,6 +90,7 @@ import type {
   ImageImportFromUploadResponse,
   ImageImportFromUrlResponse,
   ImageListResponse,
+  InstanceDetailsResponse,
   InstanceListResponse,
   KeyPairCreateResponse,
   KeyPairDeleteResponse,
@@ -889,6 +890,22 @@ export const InfraService = {
       throw new Error("No data received from instances endpoint");
     }
     return result.data;
+  },
+
+  async getInstanceDetails(
+    instanceId: string,
+  ): Promise<InstanceDetailsResponse> {
+    const token = authHeaders();
+    if (!token.Authorization) throw new Error("Token not found");
+    const url =
+      API_CONFIG.BASE_URL +
+      API_CONFIG.INFRA.INSTANCE_DETAILS +
+      `/${instanceId}`;
+    const result = await client.get<InstanceDetailsResponse>(url, {
+      headers: token,
+    });
+    if (result.error) throw new Error(result.error.message);
+    return result.data!;
   },
 
   async createVM(vmData: VMCreateRequest): Promise<VMCreateResponse> {

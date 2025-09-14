@@ -353,6 +353,39 @@ export type InstanceListResponse = InstanceListItem[];
 
 /**
  * @service InfraService
+ * @endpoint GET /nova/servers/{instanceId}
+ * @function getInstanceDetails
+ */
+export interface InstanceDetailsResponse {
+  id: string;
+  name: string;
+  status: string;
+  locked: boolean;
+  project_id: string;
+  created_at: string;
+  host: string;
+  flavor: {
+    name: string;
+    ram: string;
+    vcpus: number;
+    disk: string;
+  };
+  image: {
+    name: string;
+    id: string;
+  };
+  networks: Array<{
+    network: string;
+    ip: string;
+    type: string;
+  }>;
+  security_groups: string[];
+  volumes: unknown[];
+  floating_ips: unknown[];
+}
+
+/**
+ * @service InfraService
  * @endpoint POST /nova/create-vm
  * @function createVM
  */
