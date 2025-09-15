@@ -58,7 +58,7 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@tanstack/eslint-plugin-query": "^5.83.1",
     "@types/eslint-plugin-jsx-a11y": "^6.10.0",
-    "@types/node": "^24.3.2",
+    "@types/node": "^24.5.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.7",
     "@types/react-speech-recognition": "^3.9.6",
