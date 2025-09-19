@@ -33,8 +33,6 @@ export default defineConfig(
       "jsx-a11y": jsxA11yPlugin,
       unicorn: unicornPlugin,
       prettier: prettierPlugin,
-      // @ts-expect-error - TanStack Query plugin has type compatibility issues with new ESLint types
-      "@tanstack/query": pluginQuery,
     },
     rules: {
       "@typescript-eslint/array-type": "off",
