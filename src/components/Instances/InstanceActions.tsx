@@ -252,7 +252,7 @@ export function InstanceActions({
     },
   });
 
-  const canStart = status === "SHUTOFF" && !isDisabled;
+  const canStart = ["SHUTOFF", "PAUSED"].includes(status) && !isDisabled;
   const canStop = status === "ACTIVE" && !isDisabled;
   const canReboot = status === "ACTIVE" && !isDisabled;
 

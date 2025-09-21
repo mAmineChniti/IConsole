@@ -132,12 +132,6 @@ export function Images() {
     setIsEditDialogOpen(true);
   };
 
-  // Commented out unused function
-  // const handleDeleteImage = (image: Image) => {
-  //   setImageToDelete(image);
-  //   setDeleteDialogOpen(true);
-  // };
-
   if (loading) {
     return (
       <div className="space-y-6 px-2 sm:px-0">

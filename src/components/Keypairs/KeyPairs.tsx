@@ -277,25 +277,25 @@ export function KeyPairs() {
                   title={
                     <div className="flex flex-col items-center gap-2">
                       <Avatar className="h-20 w-20">
-                        <AvatarFallback className="flex flex-col items-center justify-center">
+                        <AvatarFallback className="bg-gradient-to-r from-blue-600 to-blue-400 text-white dark:from-blue-600 dark:to-blue-400 flex flex-col items-center justify-center">
                           {k.type === "ssh" ? (
                             <>
-                              <KeyIcon className="text-muted-foreground h-6 w-6" />
-                              <span className="text-muted-foreground text-xs font-medium uppercase">
+                              <KeyIcon className="h-6 w-6 text-white" />
+                              <span className="text-xs font-medium uppercase text-white/90">
                                 {k.type}
                               </span>
                             </>
                           ) : k.type === "x509" ? (
                             <>
-                              <ShieldCheck className="text-muted-foreground h-6 w-6" />
-                              <span className="text-muted-foreground text-xs font-medium uppercase">
+                              <ShieldCheck className="h-6 w-6 text-white" />
+                              <span className="text-xs font-medium uppercase text-white/90">
                                 {k.type}
                               </span>
                             </>
                           ) : (
                             <>
-                              <KeyRound className="text-muted-foreground h-6 w-6" />
-                              <span className="text-muted-foreground text-xs font-medium uppercase">
+                              <KeyRound className="h-6 w-6 text-white" />
+                              <span className="text-xs font-medium uppercase text-white/90">
                                 {k.type}
                               </span>
                             </>
