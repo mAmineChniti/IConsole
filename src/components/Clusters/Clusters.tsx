@@ -49,7 +49,9 @@ const clusterStatusMap = {
 } as const;
 
 const canStart = (status: string) => {
-  return ["stopped", "failed", "error", "partial"].includes(status?.toLowerCase());
+  return ["stopped", "failed", "error", "partial"].includes(
+    status?.toLowerCase(),
+  );
 };
 
 const canStop = (status: string) => {

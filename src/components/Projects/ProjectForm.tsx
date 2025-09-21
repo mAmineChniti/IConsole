@@ -186,7 +186,9 @@ export function ProjectForm({
     }
 
     const createPayload: ProjectCreateRequest = {
-      ...data,
+      name: data.name,
+      description: data.description,
+      enabled: data.enabled,
       assignments: assignments.map((a) => ({
         user_id: a.user_id,
         roles: a.roles ?? [],
@@ -305,7 +307,8 @@ export function ProjectForm({
                 />
               </div>
 
-              {!isEditing && (
+              {/* Show user assignments section only when editing */}
+              {isEditing && (
                 <>
                   <Separator />
                   <div className="space-y-4">

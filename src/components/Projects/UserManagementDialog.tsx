@@ -408,12 +408,12 @@ export function UserManagementDialog({
                   <div className="flex flex-wrap gap-2">
                     {(roles ?? []).length > 0 ? (
                       (roles ?? []).map((role) => {
-                        const selected = pendingRoleIds.includes(role.id);
+                        const selected = pendingRoleIds.includes(role.name);
                         return (
                           <Badge
                             key={role.id ?? role.name}
                             variant={selected ? "default" : "outline"}
-                            onClick={() => togglePendingRole(role.id)}
+                            onClick={() => togglePendingRole(role.name)}
                             className={
                               "cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-opacity select-none hover:opacity-80" +
                               (selected
@@ -438,7 +438,7 @@ export function UserManagementDialog({
                     <div className="text-muted-foreground text-sm">
                       Selected:{" "}
                       {(roles ?? [])
-                        .filter((r) => pendingRoleIds.includes(r.id))
+                        .filter((r) => pendingRoleIds.includes(r.name))
                         .map((r) => r.name)
                         .join(", ")}
                     </div>

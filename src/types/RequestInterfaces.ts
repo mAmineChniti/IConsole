@@ -595,7 +595,7 @@ interface UserProjectAssignment {
  */
 export interface NetworkCreateRequest {
   name: string;
-  description: string;
+  description?: string;
   mtu: number;
   shared: boolean;
   port_security_enabled: boolean;
