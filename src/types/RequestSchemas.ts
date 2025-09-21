@@ -37,17 +37,16 @@ export const VolumeCreateRequestSchema = z.object({
 
 export const VolumeSnapshotCreateRequestSchema = z.object({
   volume_id: z.uuid("Invalid volume ID format"),
-  name: z.string().min(1, "Name is required").max(64, "Name too long").trim(),
-  description: z.string().max(255, "Description too long").trim().optional(),
+  name: z.string().min(1, "Name is required").max(64, "Name too long"),
+  description: z.string().max(255, "Description too long").optional(),
 });
 
 export const SecurityGroupCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Security group name is required")
-    .max(64, "Security group name too long")
-    .trim(),
-  description: z.string().max(255, "Description too long").trim().optional(),
+    .max(64, "Security group name too long"),
+  description: z.string().max(255, "Description too long").optional(),
   project_id: z.uuid("Invalid project ID format").optional(),
 });
 
@@ -114,21 +113,17 @@ export const SecurityGroupRuleCreateRequestSchema = z
   );
 
 export const LoginRequestSchema = z.object({
-  username: z.string().min(1, "Username is required").trim(),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
 });
 
 export const CreateFromDescriptionRequestSchema = z.object({
-  description: z.string().min(1, "Description is required").trim(),
+  description: z.string().min(1, "Description is required"),
   vm_name: z
     .string()
     .min(1, "VM name is required")
     .max(63, "VM name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
-      "VM name must start and end with alphanumeric characters",
-    )
-    .trim(),
+,
   timeout: z.number().int().min(1).default(300),
 });
 
@@ -149,12 +144,8 @@ export const ProjectCreateRequestSchema = z.object({
     .string()
     .min(1, "Project name is required")
     .max(64, "Project name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/,
-      "Project name must start and end with alphanumeric characters",
-    )
-    .trim(),
-  description: z.string().max(500, "Description too long").trim().optional(),
+,
+  description: z.string().max(500, "Description too long").optional(),
   domain_id: z.uuid("Invalid domain ID format").optional(),
   enabled: z.boolean(),
   assignments: z.array(ProjectAssignmentSchema).default([]),
@@ -165,7 +156,7 @@ export const UserCreateRequestSchema = z.object({
     .string()
     .min(3, "Username must be at least 3 characters")
     .max(64, "Username too long")
-    .trim(),
+,
   email: z
     .email("Invalid email format")
     .max(254, "Email too long")
@@ -196,11 +187,6 @@ export const UserUpdateRequestSchema = z.object({
     .string()
     .min(1, "Username is required")
     .max(64, "Username too long")
-    .regex(
-      /^[a-zA-Z][a-zA-Z0-9._-]*$/,
-      "Username must start with a letter and contain only letters, numbers, dots, underscores, or hyphens",
-    )
-    .trim()
     .optional(),
   email: z
     .email("Invalid email format")
@@ -229,20 +215,15 @@ export const ImageImportFromUrlRequestSchema = z.object({
     .string()
     .min(1, "Image name is required")
     .max(64, "Image name too long")
-    .regex(
-      /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
-      "Image name must start with alphanumeric character",
-    )
-    .trim(),
+,
   visibility: z.enum(["private", "public"]).default("private"),
 });
 
 export const ImageImportFromNameRequestSchema = z.object({
   description: z
     .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(500, "Description too long")
-    .trim(),
+    .min(4, "Description must be at least 4 characters")
+    .max(500, "Description too long"),
   visibility: z.enum(["private", "public"]).optional(),
   protected: z.boolean(),
 });
@@ -299,11 +280,7 @@ const SubnetCreateRequestSchema = z.object({
     .string()
     .min(1, "Subnet name is required")
     .max(128, "Subnet name too long")
-    .regex(
-      /^[\w\-\.\(\)\[\]\:\^']+$/,
-      "Subnet name contains invalid characters",
-    )
-    .trim(),
+,
   ip_version: z.union([z.literal(4), z.literal(6)]),
   cidr: z
     .string()
@@ -355,11 +332,7 @@ export const RouterCreateRequestSchema = z.object({
     .string()
     .min(1, "Router name is required")
     .max(63, "Router name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
-      "Router name must start and end with alphanumeric characters",
-    )
-    .trim(),
+,
   external_network_id: z.uuid("Invalid external network ID format"),
 });
 
@@ -391,22 +364,14 @@ export const networkSchema = z.object({
 export const vmDetailsSchema = z.object({
   name: z
     .string()
-    .min(1, "VM name is required")
-    .max(63, "VM name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
-      "VM name must start and end with alphanumeric characters",
-    )
-    .trim(),
+    .min(1, "Name is required")
+    .max(64, "Name too long")
+,
   admin_username: z
     .string()
     .min(1, "Admin username is required")
     .max(32, "Username too long")
-    .regex(
-      /^[a-zA-Z][a-zA-Z0-9_-]*$/,
-      "Username must start with a letter and contain only alphanumeric, underscore, or hyphen",
-    )
-    .trim(),
+,
   admin_password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -418,12 +383,8 @@ export const ImportVMwareRequestSchema = z.object({
     .string()
     .min(1, "VM name is required")
     .max(63, "VM name too long")
-    .regex(
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
-      "VM name must start and end with alphanumeric characters",
-    )
-    .trim(),
-  description: z.string().trim().optional(),
+,
+  description: z.string().optional(),
   min_disk: z.number().int("Minimum disk size must be an integer").optional(),
   min_ram: z.number().int("Minimum RAM must be an integer").optional(),
   is_public: z.boolean().optional(),
@@ -504,12 +465,8 @@ export const NetworkCreateRequestSchema = z.object({
     .string()
     .min(1, "Network name is required")
     .max(128, "Network name too long")
-    .regex(
-      /^[\w\-\.\(\)\[\]\:\^']+$/,
-      "Network name contains invalid characters",
-    )
-    .trim(),
-  description: z.string().max(500, "Description too long").trim(),
+,
+  description: z.string().max(500, "Description too long").optional(),
   mtu: z
     .number()
     .int("MTU must be an integer")
@@ -517,7 +474,7 @@ export const NetworkCreateRequestSchema = z.object({
     .max(9000, "MTU too large"),
   shared: z.boolean(),
   port_security_enabled: z.boolean(),
-  availability_zone_hints: z.array(z.string().min(1).trim()),
+  availability_zone_hints: z.array(z.string().min(1).optional()),
   subnet: SubnetCreateRequestSchema,
   is_external: z.boolean(),
 });
@@ -527,11 +484,7 @@ export const KeyPairCreateRequestSchema = z.object({
     .string()
     .min(1, "Key pair name is required")
     .max(64, "Key pair name too long")
-    .regex(
-      /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
-      "Key pair name must start with alphanumeric character",
-    )
-    .trim(),
+,
   key_type: z.enum(["ssh", "x509"]).optional(),
 });
 
@@ -540,11 +493,7 @@ export const KeyPairImportFromFileRequestSchema = z.object({
     .string()
     .min(1, "Key pair name is required")
     .max(64, "Key pair name too long")
-    .regex(
-      /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
-      "Key pair name must start with alphanumeric character",
-    )
-    .trim(),
+,
   public_key: z.instanceof(File, { message: "Public key file is required" }),
 });
 
@@ -552,9 +501,8 @@ export const VolumeCreateFromSnapshotRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Volume name is required")
-    .max(64, "Volume name too long")
-    .trim(),
-  description: z.string().max(255, "Description too long").trim().optional(),
+    .max(64, "Volume name too long"),
+  description: z.string().max(255, "Description too long").optional(),
   snapshot_id: z.uuid("Invalid snapshot ID format"),
   volume_type: z.string().max(64).optional(),
   availability_zone: z.string().max(64).optional(),
@@ -565,9 +513,8 @@ export const VolumeSnapshotUpdateRequestSchema = z.object({
     .string()
     .min(1, "Snapshot name is required")
     .max(64, "Snapshot name too long")
-    .trim()
     .optional(),
-  description: z.string().max(255, "Description too long").trim().optional(),
+  description: z.string().max(255, "Description too long").optional(),
 });
 
 export const VolumeUploadToImageRequestSchema = z.object({
@@ -575,8 +522,7 @@ export const VolumeUploadToImageRequestSchema = z.object({
   image_name: z
     .string()
     .min(1, "Image name is required")
-    .max(64, "Image name too long")
-    .trim(),
+    .max(64, "Image name too long"),
   disk_format: z.enum(["raw", "qcow2", "vmdk", "vdi"]).default("qcow2"),
   container_format: z.enum(["bare", "ovf", "ova"]).default("bare"),
 });
@@ -585,9 +531,8 @@ export const VolumeTypeCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Volume type name is required")
-    .max(64, "Volume type name too long")
-    .trim(),
-  description: z.string().max(255, "Description too long").trim().optional(),
+    .max(64, "Volume type name too long"),
+  description: z.string().max(255, "Description too long").optional(),
   is_public: z.boolean().optional(),
 });
 
@@ -597,9 +542,8 @@ export const VolumeTypeUpdateRequestSchema = z.object({
     .string()
     .min(1, "Volume type name is required")
     .max(64, "Volume type name too long")
-    .trim()
     .optional(),
-  description: z.string().max(255, "Description too long").trim().optional(),
+  description: z.string().max(255, "Description too long").optional(),
 });
 
 export const SecurityGroupUpdateRequestSchema = z.object({
@@ -607,9 +551,8 @@ export const SecurityGroupUpdateRequestSchema = z.object({
     .string()
     .min(1, "Security group name is required")
     .max(64, "Security group name too long")
-    .trim()
     .optional(),
-  description: z.string().max(255, "Description too long").trim().optional(),
+  description: z.string().max(255, "Description too long").optional(),
 });
 
 export const VolumeExtendRequestSchema = z.object({
@@ -620,7 +563,7 @@ export const VolumeExtendRequestSchema = z.object({
 });
 
 export const CreateSnapshotRequestSchema = z.object({
-  snapshot_name: z.string().trim().min(1, "Snapshot name is required"),
+  snapshot_name: z.string().min(1, "Snapshot name is required"),
 });
 
 export const ImageUpdateRequestSchema = z.object({
@@ -628,11 +571,6 @@ export const ImageUpdateRequestSchema = z.object({
     .string()
     .min(1, "Image name is required")
     .max(64, "Image name too long")
-    .regex(
-      /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
-      "Image name must start with alphanumeric character",
-    )
-    .trim()
     .optional(),
   visibility: z.enum(["public", "private", "shared", "community"]).optional(),
   protected: z.boolean().optional(),
@@ -643,8 +581,7 @@ export const ImageImportFromUploadRequestSchema = z.object({
   image_name: z
     .string()
     .min(1, "Image name is required")
-    .max(64, "Image name too long")
-    .trim(),
+    .max(64, "Image name too long"),
   visibility: z.enum(["private", "public"]).default("private"),
   protected: z.boolean().optional(),
 });
@@ -653,8 +590,7 @@ export const ImageCreateVolumeRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Volume name is required")
-    .max(64, "Volume name too long")
-    .trim(),
+    .max(64, "Volume name too long"),
   size: z
     .number()
     .int("Size must be an integer")
