@@ -1322,9 +1322,11 @@ export const FlavorService = {
   async create(data: FlavorCreateRequest): Promise<FlavorDetails> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
+
+    const params = createSearchParams(data);
     const result = await client.post<FlavorDetails>(
-      API_CONFIG.BASE_URL + API_CONFIG.FLAVOR.BASE,
-      { type: "json", data },
+      `${API_CONFIG.BASE_URL}${API_CONFIG.FLAVOR.BASE}?${params.toString()}`,
+      { type: "json", data: {} },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
