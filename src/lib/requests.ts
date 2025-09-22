@@ -1494,10 +1494,13 @@ export const VolumeService = {
   ): Promise<VolumeActionResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
+    const { volume_id, ...queryData } = data;
+    const params = createSearchParams(queryData);
+
     const result = await client.post<VolumeActionResponse>(
       API_CONFIG.BASE_URL +
-        `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/upload-to-image`,
-      { type: "json", data },
+        `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/upload-to-image?${params.toString()}`,
+      { type: "json", data: {} },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
@@ -1645,9 +1648,13 @@ export const VolumeService = {
   async createVolumeType(data: VolumeTypeCreateRequest): Promise<VolumeType> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
+
+    const params = createSearchParams(data);
     const result = await client.post<VolumeType>(
-      API_CONFIG.BASE_URL + API_CONFIG.VOLUME.TYPES_CREATE,
-      { type: "json", data },
+      API_CONFIG.BASE_URL +
+        API_CONFIG.VOLUME.TYPES_CREATE +
+        `?${params.toString()}`,
+      { type: "json", data: {} },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
