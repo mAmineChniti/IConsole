@@ -119,11 +119,7 @@ export const LoginRequestSchema = z.object({
 
 export const CreateFromDescriptionRequestSchema = z.object({
   description: z.string().min(1, "Description is required"),
-  vm_name: z
-    .string()
-    .min(1, "VM name is required")
-    .max(63, "VM name too long")
-,
+  vm_name: z.string().min(1, "VM name is required").max(63, "VM name too long"),
   timeout: z.number().int().min(1).default(300),
 });
 
@@ -143,8 +139,7 @@ export const ProjectCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Project name is required")
-    .max(64, "Project name too long")
-,
+    .max(64, "Project name too long"),
   description: z.string().max(500, "Description too long").optional(),
   domain_id: z.uuid("Invalid domain ID format").optional(),
   enabled: z.boolean(),
@@ -155,8 +150,7 @@ export const UserCreateRequestSchema = z.object({
   name: z
     .string()
     .min(3, "Username must be at least 3 characters")
-    .max(64, "Username too long")
-,
+    .max(64, "Username too long"),
   email: z
     .email("Invalid email format")
     .max(254, "Email too long")
@@ -214,8 +208,7 @@ export const ImageImportFromUrlRequestSchema = z.object({
   image_name: z
     .string()
     .min(1, "Image name is required")
-    .max(64, "Image name too long")
-,
+    .max(64, "Image name too long"),
   visibility: z.enum(["private", "public"]).default("private"),
 });
 
@@ -279,8 +272,7 @@ const SubnetCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Subnet name is required")
-    .max(128, "Subnet name too long")
-,
+    .max(128, "Subnet name too long"),
   ip_version: z.union([z.literal(4), z.literal(6)]),
   cidr: z
     .string()
@@ -331,8 +323,7 @@ export const RouterCreateRequestSchema = z.object({
   router_name: z
     .string()
     .min(1, "Router name is required")
-    .max(63, "Router name too long")
-,
+    .max(63, "Router name too long"),
   external_network_id: z.uuid("Invalid external network ID format"),
 });
 
@@ -362,16 +353,11 @@ export const networkSchema = z.object({
 });
 
 export const vmDetailsSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(64, "Name too long")
-,
+  name: z.string().min(1, "Name is required").max(64, "Name too long"),
   admin_username: z
     .string()
     .min(1, "Admin username is required")
-    .max(32, "Username too long")
-,
+    .max(32, "Username too long"),
   admin_password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -379,11 +365,7 @@ export const vmDetailsSchema = z.object({
 });
 
 export const ImportVMwareRequestSchema = z.object({
-  vm_name: z
-    .string()
-    .min(1, "VM name is required")
-    .max(63, "VM name too long")
-,
+  vm_name: z.string().min(1, "VM name is required").max(63, "VM name too long"),
   description: z.string().optional(),
   min_disk: z.number().int("Minimum disk size must be an integer").optional(),
   min_ram: z.number().int("Minimum RAM must be an integer").optional(),
@@ -464,8 +446,7 @@ export const NetworkCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Network name is required")
-    .max(128, "Network name too long")
-,
+    .max(128, "Network name too long"),
   description: z.string().max(500, "Description too long").optional(),
   mtu: z
     .number()
@@ -474,7 +455,7 @@ export const NetworkCreateRequestSchema = z.object({
     .max(9000, "MTU too large"),
   shared: z.boolean(),
   port_security_enabled: z.boolean(),
-  availability_zone_hints: z.array(z.string().min(1).optional()),
+  availability_zone_hints: z.array(z.string()),
   subnet: SubnetCreateRequestSchema,
   is_external: z.boolean(),
 });
@@ -483,8 +464,7 @@ export const KeyPairCreateRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Key pair name is required")
-    .max(64, "Key pair name too long")
-,
+    .max(64, "Key pair name too long"),
   key_type: z.enum(["ssh", "x509"]).optional(),
 });
 
@@ -492,8 +472,7 @@ export const KeyPairImportFromFileRequestSchema = z.object({
   name: z
     .string()
     .min(1, "Key pair name is required")
-    .max(64, "Key pair name too long")
-,
+    .max(64, "Key pair name too long"),
   public_key: z.instanceof(File, { message: "Public key file is required" }),
 });
 

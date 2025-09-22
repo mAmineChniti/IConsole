@@ -31,7 +31,7 @@ import type {
 } from "@/types/ResponseInterfaces";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Save, Shield, User, X } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, Save, Shield, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -45,7 +45,6 @@ interface UserEditFormProps {
 export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
   const queryClient = useQueryClient();
   const [projectsModified, setProjectsModified] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<UserUpdateRequest>({
     resolver: zodResolver(UserUpdateRequestSchema),
@@ -80,37 +79,39 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
       staleTime: 5 * 60 * 1000,
     });
 
-  const [userDetails, setUserDetails] = useState<
-    UserDetailsResponse | undefined
-  >(undefined);
+  const {
+    data: userDetails,
+    isLoading: isUserLoading,
+    error: userError,
+  } = useQuery<UserDetailsResponse, Error>({
+    queryKey: ["users", userId],
+    queryFn: () => UserService.get(userId),
+    enabled: !!userId,
+  });
 
   useEffect(() => {
-    const loadUserDetails = async () => {
-      try {
-        setIsLoading(true);
-        const details = await UserService.get(userId);
-        setUserDetails(details);
-        form.reset({
-          name: details.name,
-          email: details.email ?? undefined,
-          password: undefined,
-          projects: details.projects.map((p) => ({
-            project_id: p.project_id,
-            roles: p.roles ?? [],
-          })),
-        });
-      } catch {
-        toast.error("Failed to load user details");
-        onBack();
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (userId) {
-      void loadUserDetails();
+    if (userDetails) {
+      form.reset({
+        name: userDetails.name,
+        email: userDetails.email ?? undefined,
+        password: undefined,
+        projects: userDetails.projects.map((p) => ({
+          project_id: p.project_id,
+          roles: p.roles ?? [],
+        })),
+      });
     }
-  }, [userId, form, onBack]);
+  }, [userDetails, form]);
+
+  useEffect(() => {
+    if (userError) {
+      console.error("Failed to load user details:", userError);
+      toast.error("Failed to load user details");
+      onBack();
+    }
+  }, [userError, onBack]);
+
+  const isLoading = isUserLoading || isProjectsLoading;
 
   const updateMutation = useMutation({
     mutationFn: async (values: UserUpdateRequest) => {
@@ -558,11 +559,11 @@ export function UserEditForm({ userId, onBack, onSuccess }: UserEditFormProps) {
                 <Button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="bg-primary text-primary-foreground min-w-[120px] cursor-pointer rounded-full transition-all duration-200"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[120px] rounded-full transition-all duration-200"
                 >
                   {updateMutation.isPending ? (
                     <>
-                      <Save className="mr-2 h-4 w-4 animate-pulse" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Saving...
                     </>
                   ) : (

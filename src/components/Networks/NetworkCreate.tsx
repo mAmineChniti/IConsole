@@ -54,7 +54,7 @@ export function NetworkCreate({
     resolver: zodResolver(NetworkCreateRequestSchema),
     defaultValues: {
       name: "",
-      description: "",
+      description: undefined,
       mtu: 1500,
       shared: false,
       port_security_enabled: true,
@@ -96,7 +96,7 @@ export function NetworkCreate({
     mutationFn: async (formData: NetworkCreateRequest) => {
       const payload: NetworkCreateRequest = {
         name: formData.name.trim(),
-        description: formData.description.trim(),
+        description: formData.description?.trim(),
         mtu: formData.mtu,
         shared: formData.shared,
         port_security_enabled: formData.port_security_enabled,

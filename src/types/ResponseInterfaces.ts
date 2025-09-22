@@ -380,7 +380,11 @@ export interface InstanceDetailsResponse {
     type: string;
   }>;
   security_groups: string[];
-  volumes: unknown[];
+  volumes: Array<{
+    id: string;
+    name: string;
+    size: string;
+  }>;
   floating_ips: unknown[];
 }
 
