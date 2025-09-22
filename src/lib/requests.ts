@@ -1442,8 +1442,8 @@ export const VolumeService = {
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.put<VolumeActionResponse>(
       API_CONFIG.BASE_URL +
-        `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/extend`,
-      { type: "json", data },
+        `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/extend?new_size=${data.new_size}`,
+      { type: "json", data: {} },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
