@@ -163,7 +163,6 @@ export function ProjectForm({
       roles: selectedRoles,
     };
 
-    console.log("Adding user assignment:", newAssignment);
     setAssignments([...assignments, newAssignment]);
     setSelectedUser("");
     setSelectedRoles([]);
@@ -171,7 +170,6 @@ export function ProjectForm({
   };
 
   const handleRemoveUserAssignment = (userId: string) => {
-    console.log("Removing user assignment for user:", userId);
     setAssignments(assignments.filter((a) => a.user_id !== userId));
     toast.success("User assignment removed");
   };
@@ -183,10 +181,6 @@ export function ProjectForm({
         description: data.description,
         enabled: data.enabled,
       };
-      console.log(
-        "Project UPDATE payload:",
-        JSON.stringify(updatePayload, null, 2),
-      );
       updateMutation.mutate({ ...updatePayload, id: project.id });
       return;
     }
@@ -200,11 +194,6 @@ export function ProjectForm({
         roles: a.roles ?? [],
       })),
     };
-    console.log(
-      "Project CREATE payload:",
-      JSON.stringify(createPayload, null, 2),
-    );
-    console.log("Current assignments state:", assignments);
     createMutation.mutate(createPayload);
   };
 
