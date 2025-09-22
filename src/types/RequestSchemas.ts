@@ -160,12 +160,12 @@ export const UserCreateRequestSchema = z.object({
     .string()
     .min(6, "Password must be at least 6 characters")
     .max(128, "Password too long"),
-  project_id: z.uuid("Invalid project ID format").optional(),
+  project_id: z.string().optional(),
   roles: z.array(z.string().min(1, "Role name cannot be empty")).optional(),
 });
 
 const UserProjectAssignmentSchema = z.object({
-  project_id: z.uuid("Invalid project ID format"),
+  project_id: z.string(),
   roles: z
     .array(
       z
