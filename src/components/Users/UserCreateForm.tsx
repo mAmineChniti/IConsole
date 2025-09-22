@@ -27,12 +27,13 @@ import { ArrowLeft, Plus, Shield, User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-interface UserCreateFormProps {
+export function UserCreateForm({
+  onBack,
+  onSuccess,
+}: {
   onBack: () => void;
   onSuccess: () => void;
-}
-
-export function UserCreateForm({ onBack, onSuccess }: UserCreateFormProps) {
+}) {
   const queryClient = useQueryClient();
 
   const form = useForm<UserCreateRequest>({

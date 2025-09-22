@@ -308,7 +308,7 @@ export function ProjectForm({
               </div>
 
               {/* Show user assignments section only when editing */}
-              {isEditing && (
+              {!isEditing && (
                 <>
                   <Separator />
                   <div className="space-y-4">
