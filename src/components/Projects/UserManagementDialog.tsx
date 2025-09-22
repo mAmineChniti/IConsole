@@ -364,7 +364,7 @@ export function UserManagementDialog({
                           });
                           setPendingRoleIds(
                             (assignment.roles ?? []).map(
-                              (role) => role.role_id,
+                              (role) => role.role_name,
                             ),
                           );
                         }}
