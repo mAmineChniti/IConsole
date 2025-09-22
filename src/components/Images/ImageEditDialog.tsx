@@ -73,38 +73,32 @@ export function ImageEditDialog({
   const onSubmit = form.handleSubmit((values) => {
     if (!imageId) return;
 
-    const dirtyFields = form.formState.dirtyFields;
     const updateData: Partial<ImageUpdateRequest> = {};
 
-    if (dirtyFields.new_name && values.new_name?.trim()) {
-      updateData.new_name = values.new_name.trim();
+    if (values.new_name !== undefined) {
+      updateData.new_name = values.new_name;
     }
 
-    if (dirtyFields.visibility && values.visibility) {
+    if (values.visibility !== undefined) {
       updateData.visibility = values.visibility;
     }
 
-    if (dirtyFields.protected !== undefined) {
+    if (values.protected !== undefined) {
       updateData.protected = values.protected;
-    }
-
-    if (Object.keys(updateData).length === 0) {
-      onOpenChange(false);
-      return;
     }
 
     mutation.mutate(updateData as ImageUpdateRequest);
   });
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData && imageId) {
       form.reset({
         new_name: initialData.name,
         visibility: initialData.visibility,
         protected: initialData.protected,
       });
     }
-  }, [initialData, form]);
+  }, [initialData, imageId, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -203,9 +197,7 @@ export function ImageEditDialog({
               <Button
                 type="submit"
                 variant="default"
-                disabled={
-                  mutation.isPending || !imageId || !form.formState.isDirty
-                }
+                disabled={mutation.isPending || !imageId}
                 className="order-1 w-full min-w-[140px] cursor-pointer gap-2 rounded-full sm:order-2 sm:w-auto"
               >
                 {mutation.isPending ? (
