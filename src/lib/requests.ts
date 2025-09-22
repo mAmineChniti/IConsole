@@ -1440,7 +1440,7 @@ export const VolumeService = {
   async extend(data: VolumeExtendRequest): Promise<VolumeActionResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.put<VolumeActionResponse>(
+    const result = await client.post<VolumeActionResponse>(
       API_CONFIG.BASE_URL +
         `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/extend?new_size=${data.new_size}`,
       { type: "json", data: {} },
