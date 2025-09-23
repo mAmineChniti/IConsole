@@ -1729,9 +1729,11 @@ export const SecurityGroupService = {
   ): Promise<SecurityGroupCreateResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
+
+    const params = createSearchParams(data);
     const result = await client.post<SecurityGroupCreateResponse>(
-      API_CONFIG.BASE_URL + API_CONFIG.SECURITY_GROUP.BASE,
-      { type: "json", data },
+      `${API_CONFIG.BASE_URL}${API_CONFIG.SECURITY_GROUP.BASE}?${params.toString()}`,
+      { type: "json", data: {} },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
@@ -1771,10 +1773,11 @@ export const SecurityGroupService = {
   ): Promise<SecurityGroupRuleCreateResponse> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
+
+    const params = createSearchParams(data);
     const result = await client.post<SecurityGroupRuleCreateResponse>(
-      API_CONFIG.BASE_URL +
-        `${API_CONFIG.SECURITY_GROUP.RULES}${securityGroupId}/rules`,
-      { type: "json", data },
+      `${API_CONFIG.BASE_URL}${API_CONFIG.SECURITY_GROUP.RULES}${securityGroupId}/rules?${params.toString()}`,
+      { type: "json", data: {} },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
