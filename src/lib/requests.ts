@@ -834,13 +834,14 @@ export const NetworkService = {
     if (!token.Authorization) throw new Error("Token not found");
 
     const response = await fetch(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.NETWORK.FLOATING_IPS}/delete/${data.floating_ip_id}`,
+      `${API_CONFIG.BASE_URL}${API_CONFIG.NETWORK.FLOATING_IPS}/delete/`,
       {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           ...token,
         },
+        body: JSON.stringify(data),
       },
     );
 
@@ -871,7 +872,7 @@ export const NetworkService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<unknown>(
-      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/diassociate",
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/disassociate",
       { type: "json", data },
       { headers: token },
     );
