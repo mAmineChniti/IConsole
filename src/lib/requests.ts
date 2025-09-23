@@ -832,13 +832,30 @@ export const NetworkService = {
   async deleteFloatingIP(data: FloatingIPIdRequest): Promise<unknown> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.post<unknown>(
-      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/delete",
-      { type: "json", data },
-      { headers: token },
+
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.NETWORK.FLOATING_IPS}/delete/${data.floating_ip_id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...token,
+        },
+      },
     );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
+
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = (await response.json()) as { message?: string };
+        errorMessage = errorData.message ?? errorMessage;
+      } catch {
+        // Ignore JSON parsing errors
+      }
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
   },
   async listVMS(): Promise<VMListResponse> {
     const token = authHeaders();
@@ -854,7 +871,7 @@ export const NetworkService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<unknown>(
-      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/dissociate",
+      API_CONFIG.BASE_URL + API_CONFIG.NETWORK.FLOATING_IPS + "/diassociate",
       { type: "json", data },
       { headers: token },
     );
@@ -1499,7 +1516,7 @@ export const VolumeService = {
 
     const result = await client.post<VolumeActionResponse>(
       API_CONFIG.BASE_URL +
-        `${API_CONFIG.VOLUME.BASE}/${data.volume_id}/upload-to-image?${params.toString()}`,
+        `${API_CONFIG.VOLUME.BASE}/${volume_id}/upload-to-image?${params.toString()}`,
       { type: "json", data: {} },
       { headers: token },
     );
