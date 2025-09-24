@@ -32,6 +32,7 @@ import {
   Database,
   Disc3,
   Folder,
+  GitBranch,
   Globe,
   HardDrive,
   Home,
@@ -92,6 +93,19 @@ const computeSubItems = [
     title: "Migrate VM",
     icon: MoveRight,
     href: "/dashboard/migrate-vm",
+  },
+] as const;
+
+const clustersSubItems = [
+  {
+    title: "Clusters",
+    icon: Server,
+    href: "/dashboard/clusters",
+  },
+  {
+    title: "CI/CD Deployment",
+    icon: GitBranch,
+    href: "/dashboard/cicd-deployment",
   },
 ] as const;
 
@@ -159,9 +173,15 @@ export function Sidebar() {
   );
   const [networksOpen, setNetworksOpen] = useState(initialNetworksOpen);
 
+  const initialClustersOpen = clustersSubItems.some(
+    (item) => pathname === item.href,
+  );
+  const [clustersOpen, setClustersOpen] = useState(initialClustersOpen);
+
   const [computeTooltipOpen, setComputeTooltipOpen] = useState(false);
   const [storageTooltipOpen, setStorageTooltipOpen] = useState(false);
   const [networksTooltipOpen, setNetworksTooltipOpen] = useState(false);
+  const [clustersTooltipOpen, setClustersTooltipOpen] = useState(false);
 
   const [selectedProject, setSelectedProject] = useState<string>("");
 
@@ -664,26 +684,82 @@ export function Sidebar() {
             </SidebarMenuItem>
 
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                className={cn(
-                  "hover:bg-accent hover:text-accent-foreground h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                  pathname === "/dashboard/clusters" && "rounded-full",
-                )}
+              <Tooltip
+                open={clustersTooltipOpen && !clustersOpen}
+                onOpenChange={setClustersTooltipOpen}
               >
-                <Link
-                  href="/dashboard/clusters"
-                  className={cn(
-                    "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
-                    pathname === "/dashboard/clusters"
-                      ? "bg-accent text-accent-foreground rounded-full font-bold"
-                      : "text-sidebar-foreground",
-                  )}
+                <TooltipTrigger asChild>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                      clustersOpen && "rounded-full",
+                    )}
+                  >
+                    <Button
+                      variant="ghost"
+                      onClick={() => setClustersOpen(!clustersOpen)}
+                      className={cn(
+                        "text-sidebar-foreground flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                        clustersOpen && "rounded-full",
+                      )}
+                    >
+                      <Server className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="flex-1 truncate text-left text-sm font-medium">
+                        Clusters
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 flex-shrink-0 transition-transform",
+                          clustersOpen && "rotate-180",
+                        )}
+                      />
+                    </Button>
+                  </SidebarMenuButton>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  className="text-xs"
+                  avoidCollisions={true}
+                  onMouseEnter={() => setClustersTooltipOpen(false)}
                 >
-                  <Server className="mr-3 h-4 w-4 flex-shrink-0" />
-                  <span className="truncate text-sm font-medium">Clusters</span>
-                </Link>
-              </SidebarMenuButton>
+                  <p>Clusters, CI/CD Deployment</p>
+                </TooltipContent>
+              </Tooltip>
+
+              {clustersOpen && (
+                <SidebarMenuSub className="mt-1 ml-4 space-y-1 border-l-0 pl-0">
+                  {clustersSubItems.map((subItem) => {
+                    const isSubActive = pathname === subItem.href;
+                    return (
+                      <SidebarMenuItem key={subItem.href}>
+                        <SidebarMenuButton
+                          asChild
+                          className={cn(
+                            "hover:bg-accent hover:text-accent-foreground group h-10 w-full rounded-md px-3 transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                            isSubActive && "rounded-full",
+                          )}
+                        >
+                          <Link
+                            href={subItem.href}
+                            className={cn(
+                              "flex w-full min-w-0 cursor-pointer items-center justify-start rounded-md transition-all hover:rounded-full focus:rounded-full active:rounded-full",
+                              isSubActive
+                                ? "bg-accent text-accent-foreground rounded-full font-bold"
+                                : "text-sidebar-foreground",
+                            )}
+                          >
+                            <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate text-sm font-medium">
+                              {subItem.title}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenuSub>
+              )}
             </SidebarMenuItem>
 
             <SidebarMenuItem>
