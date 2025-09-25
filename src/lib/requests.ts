@@ -1937,8 +1937,8 @@ export const ClusterService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<ClusterActionResponse>(
-      API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.START}/${data.cluster_id}`,
-      { type: "json", data: {} },
+      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.START,
+      { type: "json", data },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
@@ -1949,8 +1949,8 @@ export const ClusterService = {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
     const result = await client.post<ClusterActionResponse>(
-      API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.STOP}/${data.cluster_id}`,
-      { type: "json", data: {} },
+      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.STOP,
+      { type: "json", data },
       { headers: token },
     );
     if (result.error) throw new Error(result.error.message);
