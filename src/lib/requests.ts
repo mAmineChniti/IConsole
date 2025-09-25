@@ -1957,14 +1957,30 @@ export const ClusterService = {
     return result.data!;
   },
 
-  async delete(data: ClusterActionRequest): Promise<ClusterActionResponse> {
+  async delete(data: ClusterActionRequest): Promise<unknown> {
     const token = authHeaders();
     if (!token.Authorization) throw new Error("Token not found");
-    const result = await client.delete<ClusterActionResponse>(
-      API_CONFIG.BASE_URL + `${API_CONFIG.CLUSTER.DELETE}/${data.cluster_id}`,
-      { headers: token },
+    const response = await fetch(
+      API_CONFIG.BASE_URL + API_CONFIG.CLUSTER.DELETE,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...token,
+        },
+        body: JSON.stringify(data),
+      },
     );
-    if (result.error) throw new Error(result.error.message);
-    return result.data!;
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = (await response.json()) as { message?: string };
+        errorMessage = errorData.message ?? errorMessage;
+      } catch {
+        // Ignore JSON parsing errors
+      }
+      throw new Error(errorMessage);
+    }
+    return response.json();
   },
 };
