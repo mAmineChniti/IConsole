@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ScaleService } from "@/lib/requests";
 import type { ScaleNodeRequest } from "@/types/RequestInterfaces";
 import { ScaleNodeRequestSchema } from "@/types/RequestSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,9 +48,13 @@ export function Scaling() {
   });
 
   const addNodeMutation = useMutation({
-    mutationFn: (data: ScaleNodeRequest) => ScaleService.addNode(data),
+    mutationFn: async (_data: ScaleNodeRequest) => {
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return { message: "Node scaling initiated successfully" };
+    },
     onSuccess: (res) => {
-      toast.success(res.message || "Node scaling initiated");
+      toast.success(res.message ?? "Node scaling initiated");
       nodeForm.reset();
     },
     onError: (err: unknown) => {
