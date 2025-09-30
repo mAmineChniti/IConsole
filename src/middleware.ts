@@ -7,8 +7,10 @@ export function middleware(request: NextRequest) {
   const isLoggedIn = !!(user && token);
 
   const protectedRoutes = [
+    "/dashboard/cicd-deployment",
     "/dashboard/clusters",
     "/dashboard/flavors",
+    "/dashboard/floating-ips",
     "/dashboard/images",
     "/dashboard/instances",
     "/dashboard/keypairs",
@@ -16,6 +18,7 @@ export function middleware(request: NextRequest) {
     "/dashboard/networks",
     "/dashboard/overview",
     "/dashboard/projects",
+    "/dashboard/routers",
     "/dashboard/scale",
     "/dashboard/security-groups",
     "/dashboard/snapshots",
