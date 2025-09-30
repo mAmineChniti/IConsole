@@ -2,9 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  //const user = request.cookies.get("user");
-  //const token = request.cookies.get("token");
-  const isLoggedIn = true; //!!(user && token);
+  const user = request.cookies.get("user");
+  const token = request.cookies.get("token");
+  const isLoggedIn = !!(user && token);
 
   const protectedRoutes = [
     "/dashboard/clusters",
